@@ -1,0 +1,23 @@
+{% extends "beers/base.html" %}
+
+{% block title %}
+	One Hundred Beers - Homepage
+{% endblock %}
+
+{% block content %}
+	<div>
+		{% if contests %}
+			<ul>
+			{% for c in contests %}
+				<li>
+					<a href="{% url 'contest' c.id %}">
+						{{ c.name }} ({{c.beer_count}} beers)
+					</a>
+				</li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			No contests found
+		{% endif %}
+	</div>
+{% endblock %}

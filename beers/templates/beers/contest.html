@@ -1,0 +1,72 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="{% static "css/beers.css" %}"/>
+		<title>{{ contest.name }}</title>
+	</head>
+	<body>
+		<div class="top">
+			<div class="header-title-box">One Hundred Beers</div>
+			<div class="header-login-box">Login</div>
+		</div>
+		<div class="top-image">
+			<img src="{% static "images/snow-restaurant-mountains-sky-short.png" %}" alt="Beers in a Row" id="topimage"/>
+		</div>
+
+
+		<div class="content">
+
+			<h1>{{ contest.name }}</h1>
+
+			<div class="contest-leaderboard">
+				<table>
+					<tr>
+						<th>
+							#
+						</th>
+						<th>
+							Player
+						</th>
+						<th>
+							Total Beers
+						</th>
+						<th>
+							Last Beer Drank
+						</th>
+					</tr>
+					{% for p in players %}
+					<tr>
+						<td>
+							{{ forloop.counter }}
+						</td>
+						<td>
+							<a href="{% url 'player-detail' contest_id=contest.id username=p.user_name %}">{{ p.user_name }}</a>
+						</td>
+						<td>
+							{{ p.beer_count }}
+						</td>
+						<td>
+							{{ p.last_checkin_beer }}
+						</td>
+					</tr>
+					{% empty %}
+						<td>
+							-
+						</td>
+						<td>
+							-
+						</td>
+						<td>
+							-
+						</td>
+						<td>
+							-
+						</td>
+					{% endfor %}
+				</table>
+			</div>
+
+		</div>
+	</body>
+</html>
