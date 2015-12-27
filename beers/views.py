@@ -1,5 +1,8 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
+from django.contrib.auth import authenticate
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import AuthenticationForm
 from .models import Contest
 from .models import Beer
 from .models import Player

@@ -141,3 +141,60 @@ img.column-icon {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* line 194, ../../../styles/sass/beers.scss */
+.login-box {
+  width: 34.125em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* line 203, ../../../styles/sass/beers.scss */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 30em;
+  background-color: lightgrey;
+  border: 1px solid;
+  border-color: darkgrey;
+  margin: 1em;
+  padding: 1em;
+}
+
+/* line 215, ../../../styles/sass/beers.scss */
+.login-field {
+  width: 30em;
+  float: left;
+  padding-bottom: 0.75em;
+}
+/* line 219, ../../../styles/sass/beers.scss */
+.login-field input {
+  font-size: 1.25em;
+  width: 23.8em;
+  border: 0.05em;
+  padding: 0.05em;
+  height: 1.5em;
+}
+
+/* line 228, ../../../styles/sass/beers.scss */
+.login-button-row {
+  width: 100%;
+  padding-bottom: 0.75em;
+}
+/* line 232, ../../../styles/sass/beers.scss */
+.login-button-row input[type=submit] {
+  font-size: 1.25em;
+  float: right;
+}
+
+/* line 238, ../../../styles/sass/beers.scss */
+.login-label {
+  font-size: 1em;
+  height: 1em;
+  width: 80%;
+  text-align: left;
+  float: left;
+  padding-bottom: 0.25em;
+}

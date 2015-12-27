@@ -190,3 +190,56 @@ img.column-icon {
   margin-left: auto;
   margin-right: auto;
 }
+
+.login-box {
+  width: 34em + 2px / $default-font-size * 1em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+$login-field-width: 30em;
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: $login-field-width;
+  background-color: lightgrey;
+  border: 1px solid;
+  border-color: darkgrey;
+  margin: 1em;
+  padding: 1em;
+}
+
+.login-field {
+  width: $login-field-width;
+  float: left;
+  padding-bottom: 0.75em;
+  input {
+    font-size: 1.25em;
+    width: $login-field-width / 1.25 - (4px / ($default-font-size * 1.25) * 1em);
+    border: 1px / ($default-font-size * 1.25) * 1em;
+    padding: 1px / ($default-font-size * 1.25) * 1em;
+    height: 1.5em;
+  }
+}
+
+.login-button-row {
+  width: 100%;
+  padding-bottom: 0.75em;
+
+  input[type=submit] {
+    font-size: 1.25em;
+    float: right;
+  }
+}
+
+.login-label {
+  font-size: 1em;
+  height: 1em;
+  width: 80%;
+  text-align: left;
+  float: left;
+  padding-bottom: 0.25em;
+}
