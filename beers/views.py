@@ -16,7 +16,7 @@ class HttpNotImplementedResponse(HttpResponse):
 # Create your views here.
 def index(request):
 	contests = Contest.objects.order_by('created_on')[:5]
-	context = { 'contests': contest }
+	context = { 'contests': contests }
 	return render(request, 'beers/index.html', context)
 
 def contests(request):

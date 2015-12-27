@@ -1,21 +1,22 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="/static/css/beers.css"/> 
-		<title>{% block title %}Title{% endblock %}</title>
+		<link rel="stylesheet" href="{% static "css/beers.css" %}"/>
+    <title>{% block title %}One Hundred Beers - Login{% endblock %}</title>
 	</head>
-	
 	<body>
-		<header>
-			<div>
-				One Hundred Beers
-			</div>
-			<div>
-				Login
-			</div>
-		</header>
-		{% block content %}
-			Content
-		{% endblock %}
+		<div class="top">
+			<div class="header-title-box">One Hundred Beers</div>
+			<div class="header-login-box">Login</div>
+		</div>
+		<div class="top-image">
+			<img src="{% static "images/snow-restaurant-mountains-sky-short.png" %}" alt="Beers in a Row" id="topimage"/>
+		</div>
+		<div class="content">
+			{% block content %}
+				Content
+			{% endblock %}
+		</div>
 	</body>
 </html>
