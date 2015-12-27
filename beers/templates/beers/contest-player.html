@@ -1,0 +1,69 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="{% static "css/beers.css" %}"/>
+		<title>{{ contest.name }}</title>
+	</head>
+	<body>
+		<div class="top">
+			<div class="header-title-box">One Hundred Beers</div>
+			<div class="header-login-box">Login</div>
+		</div>
+		<div class="top-image">
+			<img src="{% static "images/snow-restaurant-mountains-sky-short.png" %}" alt="Beers in a Row" id="topimage"/>
+		</div>
+
+
+		<div class="content">
+
+			<h1>{{ player.contest.name }} - {{ player.player.user.username }}</h1>
+
+			{% if player.personal_statement %}
+			<p id="pstmt">
+				"{{ player.personal_statement }}"
+			</p>
+			{% endif %}
+
+			<div class="player-beers">
+				<table>
+					<tr>
+						<th>
+							Date
+						</th>
+						<th>
+							Beer
+						</th>
+						<th>
+							Rating
+						</th>
+					</tr>
+					{% for c in checkins %}
+					<tr>
+						<td>
+							{{ c.checkin_time|date:'SHORT_DATE_FORMAT' }}
+						</td>
+						<td>
+							{{ c.beer.name }}
+						</td>
+						<td>
+							{{ c.rating }}
+						</td>
+					</tr>
+					{% empty %}
+						<td>
+							-
+						</td>
+						<td>
+							-
+						</td>
+						<td>
+							-
+						</td>
+					{% endfor %}
+				</table>
+			</div>
+
+		</div>
+	</body>
+</html>
