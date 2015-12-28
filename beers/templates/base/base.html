@@ -7,11 +7,13 @@
 	</head>
 	<body>
 		<div class="top">
-			<div class="header-title-box">One Hundred Beers</div>
-			<div class="header-login-box">Login</div>
+			<div class="header-title-box"><a href="{% url 'index' %}">One Hundred Beers</a></div>
+			<div class="header-login-box"><a href="{% url 'login' %}">Login</a></div>
 		</div>
 		<div class="top-image">
-			<img src="{% static "images/snow-restaurant-mountains-sky-short.png" %}" alt="Beers in a Row" id="topimage"/>
+			{% block banner_image %}
+			<img src="{% static "images/snow-restaurant-mountains-sky-blurred-short.png" %}" alt="Beers in a Row" id="topimage"/>
+			{% endblock %}
 		</div>
 		<div class="content">
 			{% block content %}

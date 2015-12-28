@@ -1,22 +1,6 @@
+{% extends "base/base.html" %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
-	<head>
-		<link rel="stylesheet" href="{% static "css/beers.css" %}"/>
-    <title>One Hundred Beers - Login</title>
-	</head>
-	<body>
-		<div class="top">
-			<div class="header-title-box">One Hundred Beers</div>
-			<div class="header-login-box">Login</div>
-		</div>
-		<div class="top-image">
-			<img src="{% static "images/snow-restaurant-mountains-sky-titled.png" %}" alt="Beers in a Row" id="topimage"/>
-		</div>
-		<div class="content">
-			{% block content %}
-				Content
-			{% endblock %}
-		</div>
-	</body>
-</html>
+
+{% block banner_image %}
+	<img src="{% static "images/snow-restaurant-mountains-sky-titled.png" %}" alt="Beers in a Row" id="topimage"/>
+{% endblock %}
