@@ -53,10 +53,11 @@ $rgba-secondary-2-4: rgba(255,174,122,1);
 $font-list: Helvetica, sans-serif;
 $header-height: 24px;
 $default-font-size: 16px;
+$default-font-color: dimgray;
 
 body {
   background-color: ghostwhite;
-  color: dimgray;
+  color: $default-font-color;
   margin: 0px;
 }
 
@@ -67,8 +68,7 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
   height: $header-height;
   vertical-align: text-top;
   padding-top: 10px / $default-font-size * 1em;
-  padding-left: $top-padding-horizontal;
-  margin-right: $top-padding-horizontal;
+  padding-bottom: 5px / $default-font-size * 1em;
   width: 100%;
   margin: 0em;
   display: flex;
@@ -83,6 +83,11 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
   float: left;
   margin-left: 4px / $default-font-size * 1em;
   margin-bottom: 10px / $default-font-size * 1em;
+  a:link, a:visited, a:active, a:hover {
+    font-weight: bold;
+    text-decoration: none;
+    text-decoration-color: $default-font-color;
+  }
 }
 
 .header-login-box {
@@ -94,6 +99,10 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
   border-left-width: 1px;
   border-left-color: $color-secondary-1-0;
   padding-right: 2 * $top-padding-horizontal;
+  a:link, a:visited, a:active, a:hover {
+    text-decoration: none;
+    text-decoration-color: $default-font-color;
+  }
 }
 
 #topimage {
