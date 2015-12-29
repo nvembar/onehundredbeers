@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
+from django.db import transaction
 from django.contrib.auth import authenticate
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Contest
 from .models import Beer
@@ -9,6 +11,7 @@ from .models import Player
 from .models import Checkin
 from .models import Contest_Beer
 from .models import Contest_Player
+from .forms.registration import RegistrationForm
 
 class HttpNotImplementedResponse(HttpResponse):
 	status_code = 501
@@ -43,3 +46,26 @@ def contest_beers(request, contest_id):
 
 def contest_beer(request, contest_id, beer_id):
 	return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+
+@transaction.atomic
+def signup(request):
+	f = None
+	if request.method == 'POST':
+		f = RegistrationForm(request.POST)
+		if f.is_valid():
+			# Create a new User and Player object
+			data = f.clean()
+			user = User.objects.create_user(data.get('username'),
+					email=data.get('email'),
+					first_name=data.get('first_name'),
+					last_name=data.get('last_name'),
+					password=data.get('password'))
+			user.save()
+			player = Player.create(user,
+				personal_statement=data.get('personal_statement'),
+				untappd_rss=data.get('untappd_rss'))
+			player.save()
+			return render(request, 'registration/signup_success.html')
+	else:
+		f = RegistrationForm
+	return render(request, 'registration/signup.html', { 'form': f })

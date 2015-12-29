@@ -1,0 +1,28 @@
+{% extends "base/base.html" %}
+
+{% block titie %}
+  One Hundred Beers - Signup
+{% endblock %}
+
+{% block content %}
+
+  {% if form.non_field_errors %}
+    <ul>
+      {% for k, v in form.errors.items %}
+        {% for e in v %}
+          <li>{{ k }}: {{ e }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form action="{% url 'signup' %}" method="post">
+    {% csrf_token %}
+
+    <table>
+      {{ form.as_table }}
+    </table>
+
+    <input type="submit" value="Save"/>
+  </form>
+{% endblock %}
