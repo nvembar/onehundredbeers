@@ -7,6 +7,11 @@ class Player(models.Model):
 	personal_statement = models.CharField(max_length=150, blank=True, default='')
 	untappd_rss = models.URLField(max_length=512, null=True, blank=True)
 
+	@classmethod
+	def create(cls, user, personal_statement=None, untappd_rss=None):
+		player = cls(user=user, personal_statement=personal_statement, untappd_rss=untappd_rss)
+		return player
+
 	def __str__(self):
 		return self.user.username
 
