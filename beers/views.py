@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import PermissionDenied
 from .models import Contest
 from .models import Beer
 from .models import Player
@@ -12,11 +13,17 @@ from .models import Checkin
 from .models import Contest_Beer
 from .models import Contest_Player
 from .forms.registration import RegistrationForm
+from .forms.contests import ContestForm
 
 class HttpNotImplementedResponse(HttpResponse):
 	status_code = 501
 
-# Create your views here.
+def is_authenticated_user_contest_runner(request):
+	"""Convenience method to check if the authenticated user is allowed to
+	create contests"""
+	return (request.user.is_authenticated()
+		and len([g for g in request.user.groups.all() if g.name == 'G_ContestRunner']) > 0)
+
 def index(request):
 	contests = Contest.objects.order_by('created_on')[:5]
 	context = { 'contests': contests }
@@ -24,7 +31,8 @@ def index(request):
 
 def contests(request):
 	contests = Contest.objects.order_by('created_on')
-	context = { 'contests': contests }
+	context = { 'contests': contests,
+	 			'allow_add': is_authenticated_user_contest_runner(request) }
 	return render(request, 'beers/contests.html', context)
 
 def contest(request, contest_id):
@@ -33,6 +41,25 @@ def contest(request, contest_id):
 	contest_beers = Contest_Beer.objects.filter(contest_id =contest_id).order_by('beer_name')
 	context = { 'contest': contest, 'players': contest_players, 'beers': contest_beers }
 	return render(request, 'beers/contest.html', context)
+
+def contest_add(request):
+	f = None
+	if request.method == 'POST':
+		if not authenticated_user_is_contest_runner(request):
+			raise PermissionDenied("User is not allowed to create new contests")
+		f = ContestForm(request.POST)
+		if f.is_valid():
+			data = f.clean()
+			contest = Contest.objects.create_contest(data['name'],
+						creator=request.user,
+						start_date=data['start_date'],
+						end_date=data['end_date'])
+			contest.save()
+			context = { 'contest': contest }
+			return render(request, 'beers/contest-add-success.html', context)
+	else:
+		f = ContestForm()
+	return render(request, 'beers/contest-add.html', { 'form': f })
 
 def contest_player(request, contest_id, username):
 	contest_player = get_object_or_404(Contest_Player.objects.select_related(),
@@ -67,5 +94,5 @@ def signup(request):
 			player.save()
 			return render(request, 'registration/signup_success.html')
 	else:
-		f = RegistrationForm
+		f = RegistrationForm()
 	return render(request, 'registration/signup.html', { 'form': f })

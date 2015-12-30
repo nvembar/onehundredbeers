@@ -1,0 +1,14 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+  Add Contest - One Hundred Beers
+{% endblock %}
+
+{% block content %}
+  <form action="{% url 'contest-add' %}" method="post">
+    <table>
+      {{ form.as_table }}
+    </table>
+    <input type="submit" value="Add Contest"/>
+  </form>
+{% endblock %}
