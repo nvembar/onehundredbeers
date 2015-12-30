@@ -6,6 +6,7 @@
 
 {% block content %}
   <form action="{% url 'contest-add' %}" method="post">
+    {% csrf_token %}
     <table>
       {{ form.as_table }}
     </table>
