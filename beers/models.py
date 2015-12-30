@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 import datetime
 
 # The user profile.
@@ -37,10 +38,12 @@ class ContestManager(models.Manager):
 	"Manager for contests"
 
 	def create_contest(self, name, creator, start_date, end_date):
+		"""Creates a contest with defaults on active status, creation date,
+		update date, beer count, and user count"""
 		contest = self.create(name=name, creator=creator,
 				start_date=start_date, end_date=end_date,
-				active=True, created_on=datetime.datetime.now(),
-				last_updated=datetime.datetime.now(),
+				active=True, created_on=timezone.now(),
+				last_updated=timezone.now(),
 				user_count=0, beer_count=0)
 		return contest
 
