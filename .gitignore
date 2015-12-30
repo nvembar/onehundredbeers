@@ -5,5 +5,4 @@ pip-selfcheck.json
 **/__pycache__
 **/.sass-cache
 .Python
-manage.py
 dev-data
