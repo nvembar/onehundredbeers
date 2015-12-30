@@ -1,0 +1,30 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+  One Hundred Beers - Contests
+{% endblock %}
+
+{% block content %}
+  <h1>All contests</h1>
+
+  <div class="contests">
+    <table>
+      <tr>
+        <th>Contest</th>
+        <th>Creator</th>
+        <th>Ending On</th>
+        <th>Beer #</th>
+        <th>Player #</th>
+      </tr>
+      {% for c in contests %}
+        <tr>
+          <td><a href="{% url 'contest' c.id %}">{{ c.name }}</a></td>
+          <td>{{ c.creator.username }}</td>
+          <td>{{ c.end_date|date:"SHORT_DATE_FORMAT" }}</td>
+          <td>{{ c.beer_count }}</td>
+          <td>{{ c.user_count }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
