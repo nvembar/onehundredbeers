@@ -43,6 +43,7 @@ def contest(request, contest_id):
 	return render(request, 'beers/contest.html', context)
 
 def contest_add(request):
+	"""Add a contest with a unique name to the list"""
 	f = None
 	if request.method == 'POST':
 		if not is_authenticated_user_contest_runner(request):
