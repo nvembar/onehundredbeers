@@ -26,5 +26,8 @@
         </tr>
       {% endfor %}
     </table>
+    {% if allow_add %}
+      <a href="{% url 'contest-add' %}">Add New Contest</a>
+    {% endif %}
   </div>
 {% endblock %}

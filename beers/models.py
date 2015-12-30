@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 # The user profile.
 class Player(models.Model):
+	"Represents a player profile"
+
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	personal_statement = models.CharField(max_length=150, blank=True, default='')
 	untappd_rss = models.URLField(max_length=512, null=True, blank=True)
@@ -17,6 +20,8 @@ class Player(models.Model):
 
 # Create your models here.
 class Beer(models.Model):
+	"Represents a common beer - can be shared across contests"
+
 	name = models.CharField(max_length=250)
 	brewery = models.CharField(max_length=250)
 	style = models.CharField(max_length=250, null=True, blank=True, default='')
@@ -28,8 +33,20 @@ class Beer(models.Model):
 	def __str__(self):
 		return self.name
 
+class ContestManager(models.Manager):
+	"Manager for contests"
+
+	def create_contest(self, name, creator, start_date, end_date):
+		contest = self.create(name=name, creator=creator,
+				start_date=start_date, end_date=end_date,
+				active=True, created_on=datetime.now(),
+				last_updated=datetime.now(),
+				user_count=0, beer_count=0)
+		return contest
 
 class Contest(models.Model):
+	"Represents a contest"
+
 	name = models.CharField(max_length=250)
 	creator = models.ForeignKey(Player, default=1)
 	active = models.BooleanField(default=False)
@@ -40,10 +57,15 @@ class Contest(models.Model):
 	user_count = models.IntegerField(default=0)
 	beer_count = models.IntegerField(default=0)
 
+	objects = ContestManager()
+
 	def __str__(self):
 		return self.name
 
+
 class Contest_Beer(models.Model):
+	"Represents a many-to-many connection between a beer and a contest"
+
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 	beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
 	beer_name = models.CharField(max_length=250)
