@@ -45,13 +45,14 @@ def contest(request, contest_id):
 def contest_add(request):
 	f = None
 	if request.method == 'POST':
-		if not authenticated_user_is_contest_runner(request):
+		if not is_authenticated_user_contest_runner(request):
 			raise PermissionDenied("User is not allowed to create new contests")
 		f = ContestForm(request.POST)
 		if f.is_valid():
 			data = f.clean()
+			creator = Player.objects.get(user_id=request.user.id)
 			contest = Contest.objects.create_contest(data['name'],
-						creator=request.user,
+						creator=creator,
 						start_date=data['start_date'],
 						end_date=data['end_date'])
 			contest.save()

@@ -39,8 +39,8 @@ class ContestManager(models.Manager):
 	def create_contest(self, name, creator, start_date, end_date):
 		contest = self.create(name=name, creator=creator,
 				start_date=start_date, end_date=end_date,
-				active=True, created_on=datetime.now(),
-				last_updated=datetime.now(),
+				active=True, created_on=datetime.datetime.now(),
+				last_updated=datetime.datetime.now(),
 				user_count=0, beer_count=0)
 		return contest
 

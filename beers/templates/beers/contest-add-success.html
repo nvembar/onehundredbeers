@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+  Contest Added!
+{% endblock %}
+
+{% block content %}
+  <p>
+    Contest <a href="{% url 'contest' contest.id %}">{{ contest.name }}</a> added!
+{% endblock %}
