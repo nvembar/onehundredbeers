@@ -1,1 +1,1 @@
-web: gunicorn onehundredbeers.wsgi --log-file -
+web: gunicorn hundred_beers.wsgi --log-file -
