@@ -26,6 +26,9 @@ class Beer(models.Model):
 	name = models.CharField(max_length=250)
 	brewery = models.CharField(max_length=250)
 	style = models.CharField(max_length=250, null=True, blank=True, default='')
+	brewery_city = models.CharField(max_length=250, null=True, blank=True, default='')
+	brewery_state = models.CharField(max_length=250, null=True, blank=True, default='')
+	brewery_country = models.CharField(max_length=250, null=True, blank=True, default='')
 	brewery_lat = models.FloatField(null=True, blank=True)
 	brewery_lon = models.FloatField(null=True, blank=True)
 	untappd_id = models.CharField(max_length=25, null=True, blank=True)
@@ -91,6 +94,15 @@ class Contest_Player(models.Model):
 	def __str__(self):
 		return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
+class Unvalidated_Checkin(models.Model):
+	player = models.ForeignKey(Player, on_delete=models.CASCADE)
+	untappd_title = models.CharField(max_length=500, blank=False)
+	untappd_checkin = models.URLField()
+	untappd_checkin_date = models.DateTimeField()
+
+	def __str__(self):
+		return "Unvalidated checkin: {0}".format(self.untappd_title)
+
 class Checkin(models.Model):
 	player = models.ForeignKey(Player, on_delete=models.CASCADE)
 	beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
@@ -98,3 +110,4 @@ class Checkin(models.Model):
 	comment = models.CharField(max_length=250, null=True, blank=True, default='')
 	rating = models.IntegerField(default=-1)
 	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
+	runner_validated = models.BooleanField(default=False)
