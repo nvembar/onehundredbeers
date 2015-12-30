@@ -94,11 +94,26 @@ class Contest_Player(models.Model):
 	def __str__(self):
 		return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
+class Unvalidated_CheckinManager(models.Manager):
+	def create_checkin(self, contest_player, untappd_title, brewery, beer,
+						untappd_checkin, untappd_checkin_date):
+		uv = self.create(contest_player=contest_player,
+						untappd_title=untappd_title,
+						brewery=brewery,
+						beer=beer,
+						untappd_checkin=untappd_checkin,
+						untappd_checkin_date=untappd_checkin_date)
+		return uv
+
 class Unvalidated_Checkin(models.Model):
-	player = models.ForeignKey(Player, on_delete=models.CASCADE)
+	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
 	untappd_title = models.CharField(max_length=500, blank=False)
 	untappd_checkin = models.URLField()
 	untappd_checkin_date = models.DateTimeField()
+	brewery = models.CharField(max_length=250, default='')
+	beer = models.CharField(max_length=250, default='')
+
+	objects = Unvalidated_CheckinManager()
 
 	def __str__(self):
 		return "Unvalidated checkin: {0}".format(self.untappd_title)
