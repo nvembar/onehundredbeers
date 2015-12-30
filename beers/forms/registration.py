@@ -5,6 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 import re
 
 class RegistrationForm(forms.Form):
+    "Form for registering a new user, including profile data"
+
     username = forms.CharField(max_length=30, required=True)
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
