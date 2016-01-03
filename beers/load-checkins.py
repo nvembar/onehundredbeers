@@ -12,7 +12,7 @@ import datetime
 
 players = Player.objects.all()
 re_has_loc = re.compile(r'^(.+) at (.+)$')
-re_title = re.compile(r'^(?P<user>.+) is drinking a(n){0,1} (?P<beer>.+) by (?P<brewery>.+)( at .+){0,1}$')
+re_title = re.compile(r'^(?P<user>.+) is drinking a(n){0,1}\s+(?P<beer>.+)\s+by\s+(?P<brewery>.+)( at .+){0,1}$')
 
 for p in players:
     if p.untappd_rss:
