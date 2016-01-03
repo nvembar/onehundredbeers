@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'djangobower',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -119,13 +120,20 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = 'staticfiles'
 STATIC_URL = '/static/'
 
+STATICFILES_FINDERS = [
+	"django.contrib.staticfiles.finders.FileSystemFinder",
+ 	"django.contrib.staticfiles.finders.AppDirectoriesFinder",
+	"djangobower.finders.BowerFinder"]
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-LOGIN_REDIRECT_URL = '/beers/'
 
-import os
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, '..', 'bower_components')
+BOWER_INSTALLED_APPS = [ 'jquery' ]
+
+LOGIN_REDIRECT_URL = '/beers/'
 
 LOGGING = {
     'version': 1,
