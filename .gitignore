@@ -6,3 +6,5 @@ pip-selfcheck.json
 **/.sass-cache
 .Python
 dev-data
+staticfiles/
+bower_components/
