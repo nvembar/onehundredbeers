@@ -11,8 +11,8 @@ import feedparser
 import datetime
 
 players = Player.objects.all()
-re_has_loc = re.compile(r'^(.+) at (.+)$')
-re_title = re.compile(r'^(?P<user>.+) is drinking a(n){0,1}\s+(?P<beer>.+)\s+by\s+(?P<brewery>.+)( at .+){0,1}$')
+re_has_loc = re.compile(r'^(.+)\s+at\s+(.+)$')
+re_title = re.compile(r'^(?P<user>.+)\s+is\s+drinking\s+a(n){0,1}\s+(?P<beer>.+)\s+by\s+(?P<brewery>.+)(\s+at\s+.+){0,1}$')
 
 for p in players:
     if p.untappd_rss:
@@ -34,6 +34,7 @@ for p in players:
                         print("{0} did not match '{1}'".format(re_title, c.title))
                         continue
                     uv = Unvalidated_Checkin.objects.create_checkin(cp, c.title,
-                            match.group('brewery'), match.group('beer'), c.link, dt)
+                            match.group('brewery').strip(),
+                            match.group('beer').strip(), c.link, dt)
                     print('\tAdding "{0}" to {1} for {2}'.format(uv.untappd_title, p.user.username, cp.contest.id))
                     uv.save()
