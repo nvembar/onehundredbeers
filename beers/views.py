@@ -62,6 +62,12 @@ def contest(request, contest_id):
 	context = { 'contest': contest, 'players': contest_players, 'beers': contest_beers }
 	return render(request, 'beers/contest.html', context)
 
+def contest_leaderboard(request, contest_id):
+	contest = get_object_or_404(Contest, id=contest_id)
+	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
+	context = { 'contest': contest, 'players': contest_players, 'beers': contest_beers }
+	return render(request, 'beers/contest-leaderboard.html', context)
+
 def contest_add(request):
 	"""Add a contest with a unique name to the list"""
 	f = None
@@ -92,7 +98,10 @@ def contest_player(request, contest_id, username):
 	return render(request, 'beers/contest-player.html', context)
 
 def contest_beers(request, contest_id):
-	return HttpNotImplementedResponse('Contest-Beer List not yet implemented')
+	contest = get_object_or_404(Contest, id=contest_id)
+	contest_beers = Contest_Beer.objects.filter(contest_id=contest_id)
+	context = { 'contest': contest, 'contest_beers': contest_beers }
+	return render(request, 'beers/contest-beers.html', context)
 
 def contest_beer(request, contest_id, beer_id):
 	return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')

@@ -80,23 +80,23 @@ body {
 }
 
 /* line 136, ../../../styles/sass/beers.scss */
-.core-table table, .player-beers table, .contest-summary-list table, .contests table, .contest-leaderboard table {
+.core-table table, .player-beers table, .contest-summary-list table, .contests table, .contest-leaderboard table, .contest-beerlist table {
   background-color: white;
   width: 100%;
 }
 /* line 139, ../../../styles/sass/beers.scss */
-.core-table table th, .player-beers table th, .contest-summary-list table th, .contests table th, .contest-leaderboard table th {
+.core-table table th, .player-beers table th, .contest-summary-list table th, .contests table th, .contest-leaderboard table th, .contest-beerlist table th {
   height: 1.5em;
   font-size: 1rem;
   background-color: white;
 }
 /* line 144, ../../../styles/sass/beers.scss */
-.core-table table tr, .player-beers table tr, .contest-summary-list table tr, .contests table tr, .contest-leaderboard table tr {
+.core-table table tr, .player-beers table tr, .contest-summary-list table tr, .contests table tr, .contest-leaderboard table tr, .contest-beerlist table tr {
   height: 1.25em;
   font-size: 0.9rem;
 }
 /* line 148, ../../../styles/sass/beers.scss */
-.core-table table td, .player-beers table td, .contest-summary-list table td, .contests table td, .contest-leaderboard table td {
+.core-table table td, .player-beers table td, .contest-summary-list table td, .contests table td, .contest-leaderboard table td, .contest-beerlist table td {
   background-color: #dfc8b9;
   padding: 0.5em;
   margin: 0.5em;
@@ -133,6 +133,13 @@ body {
 }
 
 /* line 186, ../../../styles/sass/beers.scss */
+.contest-beerlist {
+  width: 80%;
+  margin-left: 3em;
+  margin-top: 0.5em;
+}
+
+/* line 193, ../../../styles/sass/beers.scss */
 .three-column-box {
   display: flex;
   width: 100%;
@@ -142,15 +149,36 @@ body {
   margin-top: 2em;
 }
 
-/* line 195, ../../../styles/sass/beers.scss */
-.column-box {
+/* line 202, ../../../styles/sass/beers.scss */
+.column-box, .outset-column-box {
   width: 25%;
   margin-left: 0.5em;
   margin-right: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
   text-align: center;
+  height: 100%;
+}
+/* line 211, ../../../styles/sass/beers.scss */
+.column-box .column-box-content, .outset-column-box .column-box-content {
+  height: 80%;
+}
+/* line 215, ../../../styles/sass/beers.scss */
+.column-box .column-box-link, .outset-column-box .column-box-link {
+  text-align: right;
+  font-size: 0.8em;
+  width: 100%;
+  vertical-align: text-bottom;
 }
 
-/* line 202, ../../../styles/sass/beers.scss */
+/* line 223, ../../../styles/sass/beers.scss */
+.outset-column-box {
+  background-color: lightgrey;
+  box-shadow: 0.3em 0.3em 0.1em darkgrey;
+  padding-bottom: 1em;
+}
+
+/* line 230, ../../../styles/sass/beers.scss */
 img.column-icon {
   display: block;
   width: 50%;
@@ -159,7 +187,7 @@ img.column-icon {
   margin-right: auto;
 }
 
-/* line 210, ../../../styles/sass/beers.scss */
+/* line 238, ../../../styles/sass/beers.scss */
 .login-box {
   width: 34.125em;
   display: block;
@@ -167,7 +195,7 @@ img.column-icon {
   margin-right: auto;
 }
 
-/* line 219, ../../../styles/sass/beers.scss */
+/* line 247, ../../../styles/sass/beers.scss */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -180,13 +208,13 @@ img.column-icon {
   padding: 1em;
 }
 
-/* line 231, ../../../styles/sass/beers.scss */
+/* line 259, ../../../styles/sass/beers.scss */
 .login-field {
   width: 30em;
   float: left;
   padding-bottom: 0.75em;
 }
-/* line 235, ../../../styles/sass/beers.scss */
+/* line 263, ../../../styles/sass/beers.scss */
 .login-field input {
   font-size: 1.25em;
   width: 23.8em;
@@ -195,18 +223,18 @@ img.column-icon {
   height: 1.5em;
 }
 
-/* line 244, ../../../styles/sass/beers.scss */
+/* line 272, ../../../styles/sass/beers.scss */
 .login-button-row {
   width: 100%;
   padding-bottom: 0.75em;
 }
-/* line 248, ../../../styles/sass/beers.scss */
+/* line 276, ../../../styles/sass/beers.scss */
 .login-button-row input[type=submit] {
   font-size: 1.25em;
   float: right;
 }
 
-/* line 254, ../../../styles/sass/beers.scss */
+/* line 282, ../../../styles/sass/beers.scss */
 .login-label {
   font-size: 1em;
   font-weight: bold;
@@ -217,7 +245,7 @@ img.column-icon {
   margin-bottom: 0.25em;
 }
 
-/* line 264, ../../../styles/sass/beers.scss */
+/* line 292, ../../../styles/sass/beers.scss */
 .field-help {
   font-size: 0.75rem;
   height: 0.8rem;
