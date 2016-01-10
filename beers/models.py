@@ -80,9 +80,21 @@ class Contest_Beer(models.Model):
 	def __str__(self):
 		return "{0}: {1}".format(self.contest, self.beer_name)
 
-# Links a player's activities relative to a contest
-# A reverse sort by contest and beer count gives you a leaderboard
+class Contest_PlayerManager(models.Manager):
+	"""Manager for linking contests to players"""
+
+	def link(self, contest, player):
+		cp = self.create(contest=contest, player=player,
+					user_name=player.user.username,
+					beer_count=0,
+					last_checkin_date=None,
+					last_checkin_beer=None,
+					rank=-1)
+		return cp
+
 class Contest_Player(models.Model):
+	""" Links a player's activities relative to a contest
+		A reverse sort by contest and beer count gives you a leaderboard"""
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 	player = models.ForeignKey(Player, on_delete=models.CASCADE)
 	user_name = models.CharField(max_length=50)
@@ -90,6 +102,8 @@ class Contest_Player(models.Model):
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
 	rank = models.IntegerField(default=0)
+
+	objects = Contest_PlayerManager()
 
 	def __str__(self):
 		return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
