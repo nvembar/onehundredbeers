@@ -13,6 +13,9 @@ class RegistrationForm(forms.Form):
     email = forms.EmailField(required=True)
     personal_statement = forms.CharField(max_length=150, widget=forms.Textarea,
         required=False)
+    untappd_rss = forms.URLField(max_length=512, required=True,
+            label="Untappd RSS Link",
+            help_text="Copy the URL from your Untappd account page")
     password = forms.CharField(widget=forms.PasswordInput, required=True)
     password_repeat = forms.CharField(widget=forms.PasswordInput, required=True)
 
