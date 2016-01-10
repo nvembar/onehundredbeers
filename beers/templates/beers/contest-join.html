@@ -1,0 +1,14 @@
+{% extends 'base/base.html' %}
+{% block title %}Joining {{ context.contest.name }}{% endblock %}
+
+{% block content %}
+  <h1>Go Drinking!</h1>
+
+  <p>
+    You're now playing in {{ context.contest.name }}.
+  </p>
+
+  <p>
+    Go back to the <a href="{% url 'contests' %}">list of contests.</a>
+  </p>
+{% endblock %}

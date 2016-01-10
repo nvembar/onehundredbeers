@@ -15,14 +15,28 @@
         <th>Ending On</th>
         <th>Beer #</th>
         <th>Player #</th>
+        {% if player %}<th>Join</th>{% endif %}
       </tr>
       {% for c in contests %}
         <tr>
           <td><a href="{% url 'contest' c.id %}">{{ c.name }}</a></td>
-          <td>{{ c.creator.username }}</td>
+          <td>{{ c.creator.user.username }}</td>
           <td>{{ c.end_date|date:"SHORT_DATE_FORMAT" }}</td>
           <td>{{ c.beer_count }}</td>
           <td>{{ c.user_count }}</td>
+          {% if player %}
+            <td>
+              {% if c.can_add %}
+                <form action="{% url 'contest-join' c.id %}" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="join"/>
+                  <input type="submit" value="Join"/>
+                </form>
+              {% else %}
+                Playing
+              {% endif %}
+            </td>
+          {% endif %}
         </tr>
       {% endfor %}
     </table>
