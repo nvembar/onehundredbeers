@@ -253,9 +253,18 @@ $login-field-width: 30em;
 
 .login-label {
   font-size: 1em;
+  font-weight: bold;
   height: 1em;
   width: 80%;
   text-align: left;
   float: left;
-  padding-bottom: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.field-help {
+  font-size: 0.75rem;
+  height: 0.8rem;
+  text-align: left;
+  float: left;
+  margin-bottom: 0.25rem;
 }

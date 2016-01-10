@@ -18,11 +18,47 @@
 
   <form action="{% url 'signup' %}" method="post">
     {% csrf_token %}
+    <div class="login-form">
+      <div class="login-label">{{ form.username.label_tag }}</div>
+      <div class="login-field">{{ form.username }}</div>
+      <div class="login-field">
+        {{ form.username.errors }}
+      </div>
+      <div class="login-label">{{ form.first_name.label_tag }}</div>
+      <div class="login-field">{{ form.first_name }}</div>
+      <div class="login-field">
+        {{ form.first_name.errors }}
+      </div>
+      <div class="login-label">{{ form.last_name.label_tag }}</div>
+      <div class="login-field">{{ form.last_name }}</div>
+      <div class="login-field">
+        {{ form.last_name.errors }}
+      </div>
+      <div class="login-label">{{ form.email.label_tag }}</div>
+      <div class="login-field">{{ form.email }}</div>
+      <div class="login-field">
+        {{ form.email.errors }}
+      </div>
+      <div class="login-label">{{ form.untappd_rss.label_tag }}</div>
+      <div class="field-help">{{ form.untappd_rss.help_text }}</div>
+      <div class="login-field">{{ form.untappd_rss }}</div>
+      <div class="login-field">
+        {{ form.untappd_rss.errors }}
+      </div>
+      <div class="login-label">{{ form.password.label_tag }}</div>
+      <div class="login-field">{{ form.password }}</div>
+      <div class="login-field">
+        {{ form.password.errors }}
+      </div>
+      <div class="login-label">{{ form.password_repeat.label_tag }}</div>
+      <div class="login-field">{{ form.password_repeat }}</div>
+      <div class="login-field">
+        {{ form.password_repeat.errors }}
+      </div>
 
-    <table>
-      {{ form.as_table }}
-    </table>
-
-    <input type="submit" value="Save"/>
+      <div class="login-button-row">
+        <input type="submit" value="Signup"/>
+      </div>
+    </div>
   </form>
 {% endblock %}

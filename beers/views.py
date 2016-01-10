@@ -130,7 +130,7 @@ def signup(request):
 					last_name=data.get('last_name'),
 					password=data.get('password'))
 			# Making an assumption that G_Player exists
-			user.groups.add(Groups.objects.get(name='G_Player'))
+			user.groups.add(Group.objects.get(name='G_Player'))
 			user.save()
 			player = Player.create(user,
 				personal_statement=data.get('personal_statement'),

@@ -5,6 +5,6 @@
 {% endblock %}
 
 {% block content %}
-  Success! Now go back and <a href="{% url 'login' %}">Login</a> and sign up
+  Success! Now go back and <a href="{% url 'login' %}?next={% url 'contests' %}">Login</a> and sign up
   for contests!
 {% endblock %}
