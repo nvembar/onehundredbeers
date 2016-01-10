@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ contest.name }} - Beers{% endblock %}
+
+{% block content %}
+<h2>Beer List</h2>
+
+<div class="contest-beerlist">
+  <table>
+    <tr>
+      <th>Beer</th>
+      <th>Brewery</th>
+      <th>Style</th>
+      <th>City</th>
+      <th>State</th>
+    </tr>
+    {% for cb in contest_beers %}
+    <tr>
+      <td>{{ cb.beer.name }}</td>
+      <td>{{ cb.beer.brewery }}</td>
+      <td>{{ cb.beer.style }}</td>
+      <td>{{ cb.beer.brewery_city }}</td>
+      <td>{{ cb.beer.brewery_state }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

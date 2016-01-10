@@ -5,51 +5,22 @@
 {% block content %}
 	<h1>{{ contest.name }}</h1>
 
-	<div class="contest-leaderboard">
-		<table>
-			<tr>
-				<th>
-					#
-				</th>
-				<th>
-					Player
-				</th>
-				<th>
-					Total Beers
-				</th>
-				<th>
-					Last Beer Drank
-				</th>
-			</tr>
-			{% for p in players %}
-			<tr>
-				<td>
-					{{ forloop.counter }}
-				</td>
-				<td>
-					<a href="{% url 'player-detail' contest_id=contest.id username=p.user_name %}">{{ p.user_name }}</a>
-				</td>
-				<td>
-					{{ p.beer_count }}
-				</td>
-				<td>
-					{{ p.last_checkin_beer }}
-				</td>
-			</tr>
-			{% empty %}
-				<td>
-					-
-				</td>
-				<td>
-					-
-				</td>
-				<td>
-					-
-				</td>
-				<td>
-					-
-				</td>
-			{% endfor %}
-		</table>
+	<div class="three-column-box" style="height: 10em;">
+		<div class="outset-column-box">
+			<h3>Leaderboards</h3>
+
+			Coming soon
+		</div>
+		<div class="outset-column-box">
+			<div class="column-box-content">
+				<h3>Beers</h3>
+
+				The whole point of this is to drink some beer - check out which ones!
+			</div>
+			<div class="column-box-link">
+				<a href="{% url 'beer-list' contest.id %}">See the list&gt;</a>
+			</div>
+		</div>
 	</div>
+
 {% endblock %}

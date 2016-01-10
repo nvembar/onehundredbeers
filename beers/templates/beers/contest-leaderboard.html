@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+{% block title %}{{ contest.name }} - Leaderboard{% endblock %}
+
+{% block content %}
+<h2>Leaderboard</h2>
+
+<div class="contest-leaderboard">
+  <table>
+    <tr>
+      <th>
+        #
+      </th>
+      <th>
+        Player
+      </th>
+      <th>
+        Total Beers
+      </th>
+      <th>
+        Last Beer Drank
+      </th>
+    </tr>
+    {% for p in players %}
+    <tr>
+      <td>
+        {{ forloop.counter }}
+      </td>
+      <td>
+        <a href="{% url 'player-detail' contest_id=contest.id username=p.user_name %}">{{ p.user_name }}</a>
+      </td>
+      <td>
+        {{ p.beer_count }}
+      </td>
+      <td>
+        {{ p.last_checkin_beer }}
+      </td>
+    </tr>
+    {% empty %}
+      <td>
+        -
+      </td>
+      <td>
+        -
+      </td>
+      <td>
+        -
+      </td>
+      <td>
+        -
+      </td>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
