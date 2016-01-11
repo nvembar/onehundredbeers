@@ -21,6 +21,19 @@ class Player(models.Model):
 	def __str__(self):
 		return self.user.username
 
+class BeerManager(models.Manager):
+	"""Manages beer data"""
+	def create_beer(self, name, brewery, style='', description='',
+					brewery_city='', brewery_state=''):
+		"""Creates a contest with defaults on active status, creation date,
+		update date, beer count, and user count"""
+		beer = self.create(name=name, brewery=brewery,
+							style=style, description=description,
+							brewery_city=brewery_city,
+							brewery_state=brewery_state,
+							last_updated=timezone.now())
+		return beer
+
 # Create your models here.
 class Beer(models.Model):
 	"Represents a common beer - can be shared across contests"
@@ -37,6 +50,8 @@ class Beer(models.Model):
 	untappd_id = models.CharField(max_length=25, null=True, blank=True)
 	last_updated = models.DateTimeField()
 
+	objects = BeerManager()
+
 	def __str__(self):
 		return self.name
 
@@ -52,6 +67,11 @@ class ContestManager(models.Manager):
 				last_updated=timezone.now(),
 				user_count=0, beer_count=0)
 		return contest
+
+	def add_beer(self, contest, beer):
+		contest_beer = Contest_Beer(contest=contest, beer=beer,
+							beer_name=beer.name, total_drank=0)
+		return contest_beer
 
 class Contest(models.Model):
 	"Represents a contest"
