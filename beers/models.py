@@ -8,7 +8,8 @@ class Player(models.Model):
 	"Represents a player profile"
 
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	personal_statement = models.CharField(max_length=150, blank=True, default='')
+	personal_statement = models.CharField(max_length=150, blank=True,
+					default='', label='Motto')
 	city = models.CharField(max_length=150, blank=True, default='')
 	untappd_rss = models.URLField(max_length=512, null=True, blank=True)
 
