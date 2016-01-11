@@ -105,13 +105,24 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
   }
 }
 
+.footer {
+  height: 2em;
+  color: lightgrey;
+  background-color: darkgrey;
+  padding-top: 10px / $default-font-size * 1em;
+  padding-bottom: 5px / $default-font-size * 1em;
+  margin: 0em;
+  font-size: 0.5em;
+}
+
 #topimage {
   width: 100%;
 }
 
 .content {
   font-family: $font-list;
-  margin-left: 0.5em;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
   width: 100%;
 
   h1 {
