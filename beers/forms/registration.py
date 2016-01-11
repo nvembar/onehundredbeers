@@ -12,7 +12,9 @@ class RegistrationForm(forms.Form):
     last_name = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
     personal_statement = forms.CharField(max_length=150, widget=forms.Textarea,
-        required=False)
+        required=False, label='Motto')
+    untappd_username = forms.CharField(max_length=150, required=True,
+            label="Untappd Username")
     untappd_rss = forms.URLField(max_length=512, required=True,
             label="Untappd RSS Link",
             help_text="Copy the URL from your Untappd account page")

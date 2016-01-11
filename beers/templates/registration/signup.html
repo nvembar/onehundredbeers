@@ -39,6 +39,16 @@
       <div class="login-field">
         {{ form.email.errors }}
       </div>
+      <div class="login-label">{{ form.personal_statement.label_tag }}</div>
+      <div class="login-field">{{ form.personal_statement }}</div>
+      <div class="login-field">
+        {{ form.personal_statement.errors }}
+      </div>
+      <div class="login-label">{{ form.untappd_username.label_tag }}</div>
+      <div class="login-field">{{ form.untappd_username }}</div>
+      <div class="login-field">
+        {{ form.untappd_username.errors }}
+      </div>
       <div class="login-label">{{ form.untappd_rss.label_tag }}</div>
       <div class="field-help">{{ form.untappd_rss.help_text }}</div>
       <div class="login-field">{{ form.untappd_rss }}</div>
