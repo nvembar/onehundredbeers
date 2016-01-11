@@ -5,19 +5,56 @@
 {% endblock %}
 
 {% block content %}
-	<div>
-		{% if contests %}
-			<ul>
-			{% for c in contests %}
-				<li>
-					<a href="{% url 'contest' c.id %}">
-						{{ c.name }} ({{c.beer_count}} beers)
-					</a>
-				</li>
-			{% endfor %}
-			</ul>
-		{% else %}
-			No contests found
+	<h1>Thirsty for life? Thirsty for love? Thirsty for beer?</h1>
+
+	<p style="font-size: 1.25em;">
+		Join the hunt for the best beer and race your fellow beer-lovers to drink
+		these 100 brews. It’s fun, promise.
+	</p>
+
+	<p style="font-size: 1.25em;">
+		1 Year<br/>
+		&nbsp;&nbsp;&nbsp;100 Beers<br/>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8734; Possibilities<br/>
+	</p>
+
+	<div class="three-column-box" style="height: 10em;">
+		{% if not request.user.is_authenticated %}
+		<div class="outset-column-box">
+			<div class="column-box-content">
+				<h3>Signup/Login</h3>
+
+				You'll need to create a profile - and have an
+				<a href="https://untappd.com">Untappd</a> account - to play. So get going!
+				(Note: we have no affiliation with Untappd.)
+			</div>
+			<div class="column-box-link">
+				<a href="{% url 'signup' %}">Signup</a> or <a href="{% url 'login' %}">Login</a>
+			</div>
+		</div>
 		{% endif %}
+		<div class="outset-column-box">
+			<div class="column-box-content">
+				<h3>The Contests</h3>
+
+				See the contests! (Right now, there's only one running, but maybe there
+				will be more later.)
+			</div>
+			<div class="column-box-link">
+				<a href="{% url 'contests' %}">See the lists&gt;</a>
+			</div>
+		</div>
+		<div class="outset-column-box">
+			<div class="column-box-content">
+				<h3>The Pot</h3>
+
+				We are using <a href="https://kiva.org">Kiva</a> for our pot. Everyone
+				should contribute to the pot - we'll drink beer and let our money do some
+				good while we're at it.
+			</div>
+			<div class="column-box-link">
+				<a href="https://kiva.org">Go to Kiva&gt;</a>
+			</div>
+		</div>
 	</div>
 {% endblock %}
