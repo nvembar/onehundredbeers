@@ -3,6 +3,7 @@ dj-static==0.0.6
 Django==1.9
 django-bower==5.0.4
 django-paginator==0.2a3
+django-sslify==0.2.7
 django-toolbelt==0.0.1
 feedparser==5.2.1
 gunicorn==19.4.1
