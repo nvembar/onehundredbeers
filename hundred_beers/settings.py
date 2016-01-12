@@ -26,8 +26,7 @@ SECRET_KEY = 'xt^8&=li&8s!n84gggs$@x90oep(guy#7yc_%vw@24jloieeur'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', default='0') is '1'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [os.getenv('ALLLOWED_HOSTS', default='*')]
 
 # Application definition
 
