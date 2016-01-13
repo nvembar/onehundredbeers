@@ -281,6 +281,12 @@ $login-field-width: 30em;
   }
 }
 
+.error-info {
+  float: left;
+  font-weight: bold;
+  color: darken(red, 0.25);
+}
+
 .login-button-row {
   width: 100%;
   padding-bottom: 0.75em;
