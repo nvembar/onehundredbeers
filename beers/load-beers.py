@@ -2,6 +2,7 @@
 
 import django
 import csv
+import sys
 import argparse
 
 django.setup()
@@ -11,7 +12,8 @@ from beers.models import Beer, Contest, Contest_Beer
 parser = argparse.ArgumentParser(description='Load beers into database')
 parser.add_argument('--contest-id', '-c', type=int, action='append',
             help='Contest ID to add beers to', dest='contest_ids')
-parser.add_argument('filename', help='CSV file to be consumed')
+parser.add_argument('filename', nargs='?', default='<>',
+                    help='CSV file to be consumed (no file will read from stdin)')
 
 args = parser.parse_args()
 
@@ -22,7 +24,7 @@ except Contest.DoesNotExist as e:
     print('Could not find contest {0}'.format(e))
     exit(1)
 
-with open(args.filename) as csvfile:
+with open(args.filename) if args.filename != '<>' else sys.stdin as csvfile:
     reader = csv.reader(csvfile)
     is_first = True
     for row in reader:
