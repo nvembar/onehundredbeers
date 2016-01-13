@@ -78,7 +78,7 @@ def contest_add(request):
 		if f.is_valid():
 			data = f.clean()
 			creator = Player.objects.get(user_id=request.user.id)
-			contest = Contest.objects.create_contest(data['name'],
+			contest = Contest.objects.create_contest(name=data['name'],
 						creator=creator,
 						start_date=data['start_date'],
 						end_date=data['end_date'])

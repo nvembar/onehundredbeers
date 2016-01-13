@@ -10,13 +10,16 @@ class ContestForm(forms.Form):
     name = forms.CharField(max_length=250)
     start_date = forms.DateField()
     end_date = forms.DateField()
-    re_name = re.compile('^[A-Za-z][A-Za-z0-9_\- ]{0,249}$')
+    re_name = re.compile('^[A-Za-z][A-Za-z0-9_\-\'"\.\! ]{0,249}$')
 
     def clean_name(self):
         """Ensure that the name is rational and unique"""
         name = self.cleaned_data['name']
         if not re.match(ContestForm.re_name, name):
-            raise forms.ValidationError('Contest name must start with an alphabetic character and can only contain letters, numbers, spaces and underscores', code='contest_name_valid')
+            raise forms.ValidationError(
+                'Contest name must start with an alphabetic character ' +
+                'and can only contain letters, numbers, spaces, periods, quotes ' +
+                'and underscores', code='contest_name_valid')
         if Contest.objects.filter(name=name).count() > 0:
             raise forms.ValidationError('Contest name "{0}" already taken'.format(name))
         return name
@@ -28,3 +31,10 @@ class ContestForm(forms.Form):
     def clean_start_date(self):
         """Makes the start date a time starting at midnight"""
         return datetime.datetime.combine(self.cleaned_data['start_date'], datetime.time())
+
+    def clean(self):
+        super(ContestForm, self).clean()
+        if self.cleaned_data['start_date'] >= self.cleaned_data['end_date']:
+            self.add_error('start_date', forms.ValidationError('Start date ' +
+                    'must be before end date', code='date_compare'))
+        return self.cleaned_data
