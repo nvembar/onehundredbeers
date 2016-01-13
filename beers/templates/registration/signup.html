@@ -68,7 +68,9 @@
       </div>
       {% endif %}
       <div class="login-label">{{ form.untappd_rss.label_tag }}</div>
-      <div class="field-help">{{ form.untappd_rss.help_text }}</div>
+      <div class="field-help">
+        <a href="{% url 'instructions' %}#rss">{{ form.untappd_rss.help_text }}</a>
+      </div>
       <div class="login-field">{{ form.untappd_rss }}</div>
       {% if form.untappd_rss.errors %}
       <div class="error-info">

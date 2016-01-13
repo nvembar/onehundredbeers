@@ -149,3 +149,6 @@ def signup(request):
 	else:
 		f = RegistrationForm()
 	return render(request, 'registration/signup.html', { 'form': f })
+
+def instructions(request):
+	return render(request, 'beers/instructions.html')

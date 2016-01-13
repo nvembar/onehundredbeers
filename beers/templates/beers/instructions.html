@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% block title %}Instructions{% endblock %}
+
+{% block content %}
+<h1>Contest Instructions</h1>
+
+<h2>Pay Your Dues</h2>
+
+<p>
+To be formally entered in the contest you need to send Eileen $10 for our
+joint Kiva fund.  You can use PayPal or slip her some cash.
+If neither of those works, email her and you’ll figure it out.
+</p>
+
+<h2 id="rss">Register at Untappd</h2>
+
+<p>
+We are using <a href="https://untappd.com">Untappd</a> as our main logging
+platform.  Please <a href="{% url 'signup' %}">register</a> for an
+account if you don’t already have one.  We will be making your usernames
+available to all the competitors (hey, we’re all in this together), so you can
+follow along in Untappd or on our website.
+</p>
+
+<p>
+During registration, you'll need to include your Untappd RSS feed - that's what
+will let the system find out what beers you've been drinking.
+To find it, log in on your computer, under account scroll all the way down
+to find the RSS link.  Copy and paste that into your registration.
+</p>
+
+<h2>Drink, Document, and Win!</h2>
+
+You’ve got the list, now get out there and find them!  As you imbibe, snap
+a picture or two for evidence.  Evidence includes, but is not limited to,
+tap handles, menus, labels, receipts, etc.  Untappd lets you upload one pic
+to each check-in - feel free to get creative!
+
+We will be pulling the Untappd data into the 100 Beers and presenting a
+leaderboard and other things.  Those features will roll out soon and I’ll
+let you know as the site gets fancier and more fun.
+
+We all have until the bitter end of 2016 to get after these brews.
+
+<h2>Help Improve the Site</h2>
+
+Email <a href="mailto:navin.vembar@gmail.com">Navin</a> if you have any
+suggestions on making the site better!
+{% endblock %}
