@@ -14,4 +14,5 @@ urlpatterns = [
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/(?P<beer_id>[0-9]+)$', views.contest_beer, name='beer-detail'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/$', views.contest_beers, name='beer-list'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/leaderboard/$', views.contest_leaderboard, name='leaderboard'),
+	url(r'^instructions$', views.instructions, name='instructions'),
 ]
