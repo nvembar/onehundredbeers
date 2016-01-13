@@ -137,7 +137,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, '..')
 BOWER_INSTALLED_APPS = [ 'jquery' ]
 
-LOGIN_REDIRECT_URL = '/beers/'
+LOGIN_REDIRECT_URL = '/'
 
 LOGGING = {
     'version': 1,
