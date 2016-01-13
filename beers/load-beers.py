@@ -53,5 +53,5 @@ with open(args.filename) if args.filename != '<>' else sys.stdin as csvfile:
                     cb.save()
         except BaseException as e:
             print("Line: '{0}'".format(row))
-            print(e.str())
+            print(e)
             raise e
