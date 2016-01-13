@@ -237,17 +237,24 @@ img.column-icon {
 }
 
 /* line 284, ../../../styles/sass/beers.scss */
+.error-info {
+  float: left;
+  font-weight: bold;
+  color: #fe0000;
+}
+
+/* line 290, ../../../styles/sass/beers.scss */
 .login-button-row {
   width: 100%;
   padding-bottom: 0.75em;
 }
-/* line 288, ../../../styles/sass/beers.scss */
+/* line 294, ../../../styles/sass/beers.scss */
 .login-button-row input[type=submit] {
   font-size: 1.25em;
   float: right;
 }
 
-/* line 294, ../../../styles/sass/beers.scss */
+/* line 300, ../../../styles/sass/beers.scss */
 .login-label {
   font-size: 1em;
   font-weight: bold;
@@ -258,7 +265,7 @@ img.column-icon {
   margin-bottom: 0.25em;
 }
 
-/* line 304, ../../../styles/sass/beers.scss */
+/* line 310, ../../../styles/sass/beers.scss */
 .field-help {
   font-size: 0.75rem;
   height: 0.8rem;
