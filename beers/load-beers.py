@@ -28,25 +28,30 @@ with open(args.filename) if args.filename != '<>' else sys.stdin as csvfile:
     reader = csv.reader(csvfile)
     is_first = True
     for row in reader:
-        if is_first:
-            is_first = False
-        else:
-            # The order is Style, Beer, Brewery, City, State
-            beers = Beer.objects.filter(name=row[1], brewery=row[2])[:1]
-            beer = None
-            if len(beers) is 0:
-                beer = Beer.objects.create_beer(name=row[1],
-                                            brewery=row[2],
-                                            style=row[0],
-                                            brewery_city=row[3],
-                                            brewery_state=row[4])
-                print('Saving new beer {0}/{1}'.format(beer.name, beer.brewery))
-                beer.save()
+        try:
+            if is_first:
+                is_first = False
             else:
-                beer = beers[0]
-                print('Found beer {0}/{1}'.format(beer.name, beer.brewery))
-            contest_beers = [Contest.objects.add_beer(c, beer) for c in contests]
-            for cb in contest_beers:
-                print('Adding {0}/{1} to contest {2}'.format(beer.name,
-                        beer.brewery, cb.contest.name))
-                cb.save()
+                # The order is Style, Beer, Brewery, City, State
+                beers = Beer.objects.filter(name=row[1], brewery=row[2])[:1]
+                beer = None
+                if len(beers) is 0:
+                    beer = Beer.objects.create_beer(name=row[1],
+                                                brewery=row[2],
+                                                style=row[0],
+                                                brewery_city=row[3],
+                                                brewery_state=row[4])
+                    print('Saving new beer {0}/{1}'.format(beer.name, beer.brewery))
+                    beer.save()
+                else:
+                    beer = beers[0]
+                    print('Found beer {0}/{1}'.format(beer.name, beer.brewery))
+                contest_beers = [Contest.objects.add_beer(c, beer) for c in contests]
+                for cb in contest_beers:
+                    print('Adding {0}/{1} to contest {2}'.format(beer.name,
+                            beer.brewery, cb.contest.name))
+                    cb.save()
+        except BaseException as e:
+            print("Line: '{0}'".format(row))
+            print(e.str())
+            raise e
