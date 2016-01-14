@@ -7,4 +7,3 @@ pip-selfcheck.json
 .Python
 dev-data
 staticfiles/
-bower_components/
