@@ -135,7 +135,7 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, '..')
-BOWER_INSTALLED_APPS = [ 'jquery' ]
+BOWER_INSTALLED_APPS = [ 'jquery', 'tablesorter' ]
 
 LOGIN_REDIRECT_URL = '/'
 
