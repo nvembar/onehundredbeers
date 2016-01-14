@@ -19,11 +19,13 @@ for p in players:
         feed = feedparser.parse(p.untappd_rss)
         cps = Contest_Player.objects.filter(player_id=p.id)
         for cp in cps:
+            contest = cp.contest
             for c in feed.entries:
                 if Unvalidated_Checkin.objects.filter(contest_player_id=cp.id, untappd_checkin=c.link).count() is 0:
                     # Example: Wed, 02 Dec 2015 00:45:37 +0000
-                    # Get rid of the last set of characters
                     dt = datetime.datetime.strptime(c.published, '%a, %d %b %Y %H:%M:%S %z')
+                    if dt < contest.start_date or dt > contest.end_date:
+                        continue
                     lmatch = re.match(re_has_loc, c.title)
                     title = c.title
                     if lmatch:
