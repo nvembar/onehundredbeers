@@ -1,27 +1,40 @@
 {% extends 'base/base.html' %}
+{% load static from staticfiles %}
 {% block title %}{{ contest.name }} - Beers{% endblock %}
+{% block scripts %}
+  <link rel="stylesheet" href="{% static 'tablesorter/themes/blue/style.css' %}"/>
+  <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'tablesorter/jquery.tablesorter.min.js' %}"></script>
+  <script type="text/javascript">
+    $(document).ready(function() { $("#beerlist").tablesorter(); });
+  </script>
+{% endblock %}
 
 {% block content %}
 <h2>What We're Drinking</h2>
 
 <div class="contest-beerlist">
-  <table>
-    <tr>
-      <th>Beer</th>
-      <th>Brewery</th>
-      <th>Style</th>
-      <th>City</th>
-      <th>State</th>
-    </tr>
-    {% for cb in contest_beers %}
-    <tr>
-      <td>{{ cb.beer.name }}</td>
-      <td>{{ cb.beer.brewery }}</td>
-      <td>{{ cb.beer.style }}</td>
-      <td>{{ cb.beer.brewery_city }}</td>
-      <td>{{ cb.beer.brewery_state }}</td>
-    </tr>
-    {% endfor %}
+  <table id="beerlist" class="tablesorter">
+    <thead>
+      <tr>
+        <th>Beer</th>
+        <th>Brewery</th>
+        <th>Style</th>
+        <th>City</th>
+        <th>State</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cb in contest_beers %}
+      <tr>
+        <td>{{ cb.beer.name }}</td>
+        <td>{{ cb.beer.brewery }}</td>
+        <td>{{ cb.beer.style }}</td>
+        <td>{{ cb.beer.brewery_city }}</td>
+        <td>{{ cb.beer.brewery_state }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
   </table>
 </div>
 {% endblock %}
