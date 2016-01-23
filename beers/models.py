@@ -125,7 +125,7 @@ class Contest_Player(models.Model):
 	beer_count = models.IntegerField(default=0)
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
-	last_checkin_load_start = models.DateTimeField("")
+	last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
 	rank = models.IntegerField(default=0)
 
 	objects = Contest_PlayerManager()
