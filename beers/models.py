@@ -13,6 +13,7 @@ class Player(models.Model):
 	untappd_username = models.CharField(max_length=150, blank=True, default='')
 	untappd_rss = models.URLField(max_length=512, null=True, blank=True)
 
+	# TODO: Move this to a manager
 	@classmethod
 	def create(cls, user, personal_statement=None, untappd_rss=None):
 		player = cls(user=user, personal_statement=personal_statement, untappd_rss=untappd_rss)
@@ -53,7 +54,7 @@ class Beer(models.Model):
 	objects = BeerManager()
 
 	def __str__(self):
-		return self.name
+		return self.name + ' / ' + self.brewery
 
 class ContestManager(models.Manager):
 	"Manager for contests"
@@ -101,7 +102,7 @@ class Contest_Beer(models.Model):
 	total_drank = models.IntegerField("number of players who drank this beer")
 
 	def __str__(self):
-		return "{0}: {1}".format(self.contest, self.beer_name)
+		return "{0}/{1}".format(self.beer.name, self.beer.brewery)
 
 class Contest_PlayerManager(models.Manager):
 	"""Manager for linking contests to players"""
@@ -124,6 +125,7 @@ class Contest_Player(models.Model):
 	beer_count = models.IntegerField(default=0)
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
+	last_checkin_load_start = models.DateTimeField("")
 	rank = models.IntegerField(default=0)
 
 	objects = Contest_PlayerManager()
@@ -163,3 +165,20 @@ class Checkin(models.Model):
 	rating = models.IntegerField(default=-1)
 	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
 	runner_validated = models.BooleanField(default=False)
+
+class Contest_CheckinManager(models.Manager):
+	def create_checkin(self, contest_player, contest_beer, checkin_time,
+			untappd_checkin):
+		cc = self.create(contest_player=contest_player,
+				contest_beer=contest_beer,
+				checkin_time=checkin_time,
+				untappd_checkin=untappd_checkin)
+		return cc
+
+class Contest_Checkin(models.Model):
+	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
+	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE)
+	checkin_time = models.DateTimeField()
+	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
+
+	objects = Contest_CheckinManager()

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = [os.getenv('ALLLOWED_HOSTS', default='*')]
 
 INSTALLED_APPS = [
 	'beers.apps.BeersConfig',
+	'autocomplete_light',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
