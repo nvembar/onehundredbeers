@@ -3,11 +3,12 @@
 
 {% block content %}
 
-		<h1>{{ player.contest.name }} - {{ player.player.user.username }}</h1>
+		<h1>{{ player.player.user.first_name }} {{ player.player.user.last_name}}
+			- {{ player.player.user.username }}</h1>
 
-		{% if player.personal_statement %}
+		{% if player.player.personal_statement %}
 		<p id="pstmt">
-			"{{ player.personal_statement }}"
+			{{ player.player.personal_statement }}
 		</p>
 		{% endif %}
 
@@ -15,25 +16,25 @@
 			<table>
 				<tr>
 					<th>
-						Date
-					</th>
-					<th>
 						Beer
 					</th>
 					<th>
-						Rating
+						Brewery
+					</th>
+					<th>
+						Last Checkin Date
 					</th>
 				</tr>
 				{% for c in checkins %}
 				<tr>
 					<td>
-						{{ c.checkin_time|date:'SHORT_DATE_FORMAT' }}
+						{{ c.contest_beer.beer.name }}
 					</td>
 					<td>
-						{{ c.beer.name }}
+						{{ c.contest_beer.beer.brewery }}
 					</td>
 					<td>
-						{{ c.rating }}
+						{{ c.checkin_time|date:'SHORT_DATETIME_FORMAT' }}
 					</td>
 				</tr>
 				{% empty %}

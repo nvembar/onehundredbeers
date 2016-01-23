@@ -14,7 +14,7 @@ from .views.helper import is_authenticated_user_player, is_authenticated_user_co
 from .models import Contest
 from .models import Beer
 from .models import Player
-from .models import Checkin
+from .models import Contest_Checkin
 from .models import Contest_Beer
 from .models import Contest_Player
 from .models import Unvalidated_Checkin
@@ -63,7 +63,7 @@ def contest(request, contest_id):
 def contest_leaderboard(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
 	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
-	context = { 'contest': contest, 'players': contest_players, 'beers': contest_beers }
+	context = { 'contest': contest, 'players': contest_players }
 	return render(request, 'beers/contest-leaderboard.html', context)
 
 def contest_add(request):
@@ -91,14 +91,29 @@ def contest_player(request, contest_id, username):
 	"""Shows the validated checkins for a player for a given contest"""
 	contest_player = get_object_or_404(Contest_Player.objects.select_related(),
 		contest_id=contest_id, user_name=username)
-	player_checkins = Checkin.objects.filter(player_id=contest_player.player.id).select_related().order_by('-checkin_time')
+	player_checkins = Contest_Checkin.objects.filter(
+		contest_player_id=contest_player.id).select_related().order_by('-checkin_time')
 	context = { 'player': contest_player, 'checkins': player_checkins }
 	return render(request, 'beers/contest-player.html', context)
 
 def contest_beers(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
+	contest_beers = None
+	contest_player = None
 	contest_beers = Contest_Beer.objects.filter(contest_id=contest_id)
 	context = { 'contest': contest, 'contest_beers': contest_beers }
+	if request.user.is_authenticated:
+		try:
+			contest_player = Contest_Player.objects.get(
+				player__user_id=request.user.id)
+			checkins = Contest_Checkin.objects.filter(
+				contest_player_id=contest_player.id)
+			checkin_ids = [c.contest_beer.id for c in checkins]
+			for b in contest_beers:
+				b.checked_into = b.id in checkin_ids
+			context['contest_player'] = contest_player
+		except:
+			pass
 	return render(request, 'beers/contest-beers.html', context)
 
 def contest_beer(request, contest_id, beer_id):
@@ -122,8 +137,6 @@ def contest_join(request, contest_id):
 		contest_player.save()
 		context = { 'contest': contest, 'player': player, 'created_new': True }
 	return render(request, 'beers/contest-join.html', context)
-
-
 
 def instructions(request):
 	return render(request, 'beers/instructions.html')
