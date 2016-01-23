@@ -124,7 +124,7 @@ def unvalidated_checkins(request, contest_id):
 	contest = get_object_or_404(Contest.objects, id=contest_id)
 	if not is_authenticated_user_contest_runner(request):
 		logger.warning("User {0} attempted to validate checkins for contest {1}"
-					.format(request.user.name, contest_id))
+					.format(request.user.username, contest_id))
 		raise PermissionDenied("User is not allowed to validate checkins")
 	if not contest.creator.user.id is request.user.id:
 		logger.warning("User {0} attempted to validate checkins " +
