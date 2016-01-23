@@ -63,6 +63,21 @@ def contest(request, contest_id):
 def contest_leaderboard(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
 	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
+	rank = 0
+	# Start with rank 0 and a number higher than the highest possible beer count
+	# This forces the first iteration to step everything forward
+	last_beer_count = contest.beer_count + 1
+	total_count = 0
+	for p in contest_players:
+		total_count = total_count + 1
+		# Calculate the "1224" style ranking
+		if p.beer_count < last_beer_count:
+			rank = total_count
+			logger.info("Shifting rank for {} to [TC:{}/R:{}] with {} beers".format(
+				p.player.user.username, total_count, rank, p.beer_count
+			))
+		p.rank = rank
+		last_beer_count = p.beer_count
 	context = { 'contest': contest, 'players': contest_players }
 	return render(request, 'beers/contest-leaderboard.html', context)
 
