@@ -21,6 +21,19 @@
 				<a href="{% url 'beer-list' contest.id %}">See the list&gt;</a>
 			</div>
 		</div>
+
+		{% if is_creator %}
+		<div class="outset-column-box">
+			<div class="column-box-content">
+				<h3>Validate Checkins</h3>
+
+				You're running this show! So see which of your players checkins count!
+			</div>
+			<div class="column-box-link">
+				<a href="{% url 'unvalidated-checkins' contest.id %}">Validate&gt;</a>
+			</div>
+		</div>
+		{% endif %}
 	</div>
 
 {% endblock %}

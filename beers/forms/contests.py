@@ -1,8 +1,28 @@
 from django import forms
 from django.utils import timezone
+from django.utils import html
 from beers.models import Contest
+from autocomplete_light.fields import ChoiceField as AlChoiceField
 import datetime
 import re
+
+
+class SubmitButtonWidget(forms.Widget):
+    def render(self, name, value, attrs=None):
+        return '<input type="submit" name="%s" value="%s">' % (html.escape(name), html.escape(value))
+
+
+class SubmitButtonField(forms.Field):
+    def __init__(self, *args, **kwargs):
+        if not kwargs:
+            kwargs = {}
+        kwargs["widget"] = SubmitButtonWidget
+
+        super(SubmitButtonField, self).__init__(*args, **kwargs)
+
+    def clean(self, value):
+        return value
+
 
 class ContestForm(forms.Form):
     "Form for creating a new contest"
@@ -38,3 +58,8 @@ class ContestForm(forms.Form):
             self.add_error('start_date', forms.ValidationError('Start date ' +
                     'must be before end date', code='date_compare'))
         return self.cleaned_data
+
+class ValidateCheckinForm(forms.Form):
+    contest_beer = AlChoiceField('Contest_BeerAutocomplete')
+
+    action = forms.CharField(widget=forms.HiddenInput)

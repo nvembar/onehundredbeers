@@ -120,6 +120,7 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
   width: 100%;
 }
 
+
 .content {
   font-family: $font-list;
   margin-left: 1.5rem;
@@ -284,7 +285,7 @@ $login-field-width: 30em;
 .error-info {
   float: left;
   font-weight: bold;
-  color: darken(red, 0.25);
+  color: darken(red, 25%);
 }
 
 .login-button-row {
@@ -313,4 +314,146 @@ $login-field-width: 30em;
   text-align: left;
   float: left;
   margin-bottom: 0.25rem;
+}
+
+.validations {
+  width: 90%;
+  margin-left: 1em;
+}
+
+$validation-button-color: #599bb3;
+
+.validation-button {
+	-moz-box-shadow: 0px 10px 14px -7px #276873;
+	-webkit-box-shadow: 0px 10px 14px -7px #276873;
+	box-shadow: 0px 10px 14px -7px #276873;
+	background-color: $validation-button-color;
+	-moz-border-radius:0.5rem;
+	-webkit-border-radius:0.5rem;
+	border-radius:0.5rem;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:1em;
+	font-weight:bold;
+	padding: 0.2rem 0.4em;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #3d768a;
+}
+.validation-button:hover {
+	background-color: darken($validation-button-color, 15%);
+}
+.validation-button:active {
+	position:relative;
+	top:1px;
+}
+
+.validation-button:disabled {
+  background-color: dimgrey;
+	-moz-box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
+	-webkit-box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
+	box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
+}
+
+.validation-box {
+  width: 40em;
+  margin-bottom: 0.25em;
+  padding: 0.25em;
+  border-width: thin;
+  border-radius: 0.25em;
+  background-color: lightgrey;
+  display: flex;
+  flex-direction: row;
+}
+
+.validation-column {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.validation-lines {
+  @extend .validation-column;
+  width: 100%;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.validation-buttons {
+  @extend .validation-column;
+  width: 25%;
+  padding-right: 1em;
+}
+
+.validation-button-line {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  width: 100%;
+  text-align: center;
+}
+
+.validation-text-line {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+.validation-beer-line {
+  @extend .validation-text-line;
+  font-size: 1.25em;
+  font-weight: bolder;
+  a {
+    font-size: 0.9rem;
+    font-weight: lighter;
+  }
+}
+
+.validation-brewery-line {
+  @extend .validation-text-line;
+  font-size: 0.9em;
+}
+
+.validation-user-line {
+  @extend .validation-text-line;
+  font-size: 0.9em;
+}
+
+.validation-match-line {
+  @extend .validation-text-line;
+  font-weight: bolder;
+  font-size: 1em;
+  color: lighten(darkgreen, 15%);
+}
+
+.validation-detail {
+  float: left;
+  font-size: 0.75em;
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+}
+
+.validation-link {
+  float: left;
+  font-size: 0.75em;
+}
+
+.pager  {
+  margin-top: 0.25em;
+  margin-bottom: 1em;
+}
+
+.dialog-overlay {
+  visibility: hidden;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 1000;
+}
+
+.dialog-box {
+  background-color: darkgrey;
 }
