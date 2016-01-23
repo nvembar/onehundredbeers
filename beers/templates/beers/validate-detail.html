@@ -1,0 +1,71 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% block title %}Validate Checkin{% endblock %}
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+  {% include 'autocomplete_light/static.html' %}
+  <script>
+    $(document).ready(function() {
+      $("#id_contest_beer-autocomplete").bind('selectChoice',
+        function(e, choice, autocomplete) {
+          $('#validate-beer').prop("disabled",false);
+        }
+      );
+      $(".autocomplete-light-widget").bind('widgetDeselectChoice',
+        function(e) {
+          $('#validate-beer').prop("disabled", true);
+        }
+      );
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+<div class="validations">
+  <form action="{% url 'update-checkin' contest.id uv.id %}" method="post">
+    {% csrf_token %}
+    <div class="validation-box">
+      <div class="validation-lines">
+        <div class="validation-beer-line">
+          <span style="width: 80%">
+            Untappd Name: {{ uv.beer }}
+            <a href="{{ uv.untappd_checkin }}">(Link)</a>
+          </span>
+        </div>
+        {% if uv.possible %}
+        <div class="validation-match-line">
+          Possible match
+        </div>
+        {% endif %}
+        <div class="validation-brewery-line">
+          {{ uv.brewery }}
+        </div>
+        <div class="validation-user-line">
+          <em>{{ uv.contest_player.player.user.username }}</em> on {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
+        </div>
+
+        <div class="validation-match-line">
+          <label for="id_contest-beer-autocomplete">Set beer</label>
+          {{ form.contest_beer }}
+        </div>
+
+      </div>
+      <div class="validation-buttons">
+        <div class="validation-button-line">
+          <button id="validate-beer" name="validate-beer" style="width: 100%;"
+                  type="submit" value="Validate" class="validation-button"
+                  {% if not form.contest_beer %} disabled {% endif %}>
+                Validate
+          </button>
+        </div>
+        <div class="validation-button-line">
+          <button id="remove-beer" name="remove-beer" style="width: 100%;"
+                  type="submit" value="Remove" class="validation-button">
+                Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
