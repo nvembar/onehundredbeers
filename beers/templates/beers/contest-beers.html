@@ -22,16 +22,34 @@
         <th>Style</th>
         <th>City</th>
         <th>State</th>
+        {% if contest_player %}
+        <th>Checkin</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
       {% for cb in contest_beers %}
       <tr>
-        <td>{{ cb.beer.name }}</td>
-        <td>{{ cb.beer.brewery }}</td>
-        <td>{{ cb.beer.style }}</td>
-        <td>{{ cb.beer.brewery_city }}</td>
-        <td>{{ cb.beer.brewery_state }}</td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.beer.name }}
+        </td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.beer.brewery }}
+        </td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.beer.style }}
+        </td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.beer.brewery_city }}
+        </td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.beer.brewery_state }}
+        </td>
+        {% if contest_player %}
+        <td style="text-align: center; {% if cb.checked_into %}background-color: lawngreen{% endif %}">
+          {% if cb.checked_into %}&#x2713;{% else %}&nbsp;{% endif %}
+        </td>
+        {% endif %}
       </tr>
       {% endfor %}
     </tbody>
