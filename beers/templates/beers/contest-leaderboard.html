@@ -9,7 +9,7 @@
   <table>
     <tr>
       <th>
-        #
+        Rank
       </th>
       <th>
         Player
@@ -24,7 +24,7 @@
     {% for p in players %}
     <tr>
       <td>
-        {{ forloop.counter }}
+        {{ p.rank }}
       </td>
       <td>
         <a href="{% url 'player-detail' contest_id=contest.id username=p.user_name %}">{{ p.user_name }}</a>
