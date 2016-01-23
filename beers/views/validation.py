@@ -106,6 +106,10 @@ def update_checkin(request, contest_id, uv_checkin):
 			checkin.save()
 			uv.contest_player.beer_count = Contest_Checkin.objects.filter(
 					contest_player_id=uv.contest_player.id).count()
+			if (uv.contest_player.last_checkin_date is None or
+					uv.untappd_checkin_date > uv.contest_player.last_checkin_date):
+				uv.contest_player.last_checkin_date = uv.untappd_checkin_date
+				uv.contest_player.last_checkin_beer = contest_beer.beer_name
 			uv.contest_player.save()
 		uv.delete()
 		if request.META.get('HTTP_ACCEPT') == 'application/json':
