@@ -1,0 +1,202 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+  Validate Checkins
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+  {% include 'autocomplete_light/static.html' %}
+  <script>
+  (function(exports) {
+    var currentSearch = -1;
+    var currentResult = -1;
+
+    function sendContent(uvId, content) {
+      var url = "{% url 'update-checkin' contest.id 0 %}";
+      url = url.replace('/0/', '/' + uvId + '/');
+      $.ajax({
+        url: url,
+        headers: {
+          Accept: 'application/json'
+        },
+        data: content,
+        dataType: 'json',
+        method: 'POST'
+      }).done(function (result, status, xhr) {
+          console.log('Status: ' + status);
+          if (status == "success") {
+            if (currentSearch == uvId) {
+              exports.clearSearchBox();
+            }
+            $('#id_'+uvId+'_box').fadeOut(400, function() {
+              $('#id_'+uvId+'_box').slideUp(2000, function() {
+                $('#id_'+uvId+'_box').remove();
+              })
+            });
+          } else {
+            alert("Got an error " + status);
+          }
+        }
+      ).fail(function (xhr, status, error) {
+        alert("Error trying to send content: " + content + ": " + error)
+      });
+    }
+
+    exports.dismissUv = function(uvId) {
+      sendContent(uvId, {'remove-beer': 'Remove'});
+      console.log('Dismissing ' + uvId);
+    }
+
+    exports.validateUv = function(uvId, beerId) {
+      sendContent(uvId, { 'validate-beer': 'Validate', 'contest_beer': beerId});
+      console.log('Setting ' + uvId + ' to beer ' + beerId);
+    }
+
+    exports.validateFromSearch = function() {
+      if (currentSearch == -1) {
+        return;
+      }
+      var contestBeer = $('#id_contest_beer option:selected').val()
+      sendContent(currentSearch,
+        { 'validate-beer': 'Validate', 'contest_beer': contestBeer });
+    }
+
+    exports.clearSearchBox = function() {
+      $('#id_'+currentSearch+'_vsbutton').unbind();
+      $('#id_contest_beer-autocomplete').unbind();
+      $('.autocomplete-light-widget').unbind();
+
+      $('#id_'+currentSearch+'_vsbutton').attr('id', 'id_'+currentSearch+'_sbutton');
+      $('#id_'+currentSearch+'_sbutton').html('Search for beer');
+      $("#id_"+currentSearch+"_sbutton").click(function() {
+        exports.addSearchBox(currentSearch);
+      });
+      $('#id_'+currentSearch+'_sbutton').prop('disabled', false);
+      $('#id_contest_beer-wrapper').remove();
+      currentSearch = -1;
+    }
+
+    exports.addSearchBox = function(uvId) {
+      if (currentSearch != -1) {
+        exports.clearSearchBox();
+      }
+      $('#id_'+uvId+'_sdiv').prepend("{{ form.contest_beer|escapejs }}");
+      $('#id_'+uvId+'_vbutton').prop('disabled', true);
+      $('#id_'+uvId+'_sbutton').html('Validate');
+      $('#id_'+uvId+'_sbutton').unbind();
+      $('#id_'+uvId+'_sbutton').attr('id', 'id_'+uvId+'_vsbutton');
+      $('#id_'+uvId+'_vsbutton').click(function() {
+        exports.validateFromSearch();
+      });
+      // Disable the validate buttun until a choice is selected
+      $('#id_'+uvId+'_vsbutton').prop('disabled', true);
+      $('#id_contest_beer-autocomplete').bind('selectChoice',
+        function(e, choice, autocomplete) {
+          $('#id_'+uvId+'_vsbutton').prop("disabled",false);
+        }
+      );
+      $('.autocomplete-light-widget').bind('widgetDeselectChoice',
+        function(e) {
+          $('#id_'+uvId+'_vsbutton').prop('disabled', true);
+        }
+      );
+      currentSearch=uvId;
+    }
+
+    exports.bindButtonsFor = function(uvId, possibleId) {
+      //console.log("Binding buttons for " + uvId);
+      //console.log("Trying button binding for #id_" + uvId + "_dbutton");
+      $("#id_"+uvId+"_dbutton").click(function() {
+        exports.dismissUv(uvId);
+      });
+      $("#id_"+uvId+"_sbutton").click(function() {
+        exports.addSearchBox(uvId);
+      });
+      if (possibleId > 0) {
+        //console.log("Trying button binding for #id_" + uvId + "_vbutton");
+        $("#id_"+uvId+"_vbutton").click(function() {
+          exports.validateUv(uvId, possibleId);
+        });
+      }
+    }
+  })(this.uvPage = {});
+
+  $(document).ready(function() {
+    {% for uv in uvs %}
+    {% if uv.beer_brewery %}
+    uvPage.bindButtonsFor({{ uv.id }}, {{ uv.contest_beer_id }});
+    {% else %}
+    uvPage.bindButtonsFor({{ uv.id }}, -1);
+    {% endif %}
+    {% endfor %}
+  });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="validations">
+    {% for uv in uvs %}
+      <div id="id_{{ uv.id }}_box" class="validation-box">
+        <div class="validation-lines">
+          <div class="validation-text-line">
+            <span style="width: 80%">
+              <em>{{ uv.contest_player.player.user.username }}</em> checked into
+              <a href="{{ uv.untappd_checkin }}" target="_blank">
+                {{ uv.beer }} from {{ uv.brewery }}
+              </a>
+              on {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
+            </span>
+          </div>
+          <div class="validation-button-line">
+            {% if uv.beer_brewery %}
+              <button id="id_{{ uv.id }}_vbutton" class="validation-button">
+                Validate as {{ uv.beer_brewery }}
+              </button>
+            {% endif %}
+            <button id="id_{{ uv.id }}_dbutton" class="validation-button">
+              Dismiss
+            </button>
+          </div>
+          <div id="id_{{ uv.id }}_sdiv" class="validation-button-line">
+            <button id="id_{{ uv.id }}_sbutton" class="validation-button">
+              Search for beer
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <div class="pager">
+      <span class="step-links">
+        {% if uvs.has_previous %}
+          <a href="?page={{ uvs.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+          Page {{ uvs.number }} of {{ uvs.paginator.num_pages }}.
+        </span>
+
+        {% if uvs.has_next %}
+          <a href="?page={{ uvs.next_page_number }}">next</a>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+
+<div class="dialog-overlay" id="validation-dialog">
+  <div class="dialog-box">
+    <span id="dialog-text">
+    </span>
+  </div>
+</div>
+
+<div class="dialog-overlay" id="ignore-dialog">
+  <div class="dialog-box">
+    <span id="dialog-text">
+    </span>
+  </div>
+</div>
+
+{% endblock %}

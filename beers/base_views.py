@@ -8,29 +8,21 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .views.helper import HttpNotImplementedResponse
+from .views.helper import is_authenticated_user_player, is_authenticated_user_contest_runner
 from .models import Contest
 from .models import Beer
 from .models import Player
 from .models import Checkin
 from .models import Contest_Beer
 from .models import Contest_Player
+from .models import Unvalidated_Checkin
 from .forms.registration import RegistrationForm
 from .forms.contests import ContestForm
+import logging
 
-class HttpNotImplementedResponse(HttpResponse):
-	status_code = 501
-
-def is_authenticated_user_contest_runner(request):
-	"""Convenience method to check if the authenticated user is allowed to
-	create contests"""
-	return (request.user.is_authenticated()
-		and len([g for g in request.user.groups.all() if g.name == 'G_ContestRunner']) > 0)
-
-def is_authenticated_user_player(request):
-	"""Convenience method to check if the authenticated user is allowed to
-	create contests"""
-	return (request.user.is_authenticated()
-		and len([g for g in request.user.groups.all() if g.name == 'G_Player']) > 0)
+logger = logging.getLogger(__name__)
 
 def index(request):
 	contests = Contest.objects.order_by('created_on')[:5]
@@ -57,9 +49,15 @@ def contests(request):
 
 def contest(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
-	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
-	contest_beers = Contest_Beer.objects.filter(contest_id =contest_id).order_by('beer_name')
-	context = { 'contest': contest, 'players': contest_players, 'beers': contest_beers }
+	context = { 'contest': contest }
+	if request.user.is_authenticated:
+		try:
+			player = Player.objects.get(user_id=request.user.id)
+			context['player'] = player
+			if contest.creator.id == player.id:
+				context['is_creator'] = True
+		except:
+			pass
 	return render(request, 'beers/contest.html', context)
 
 def contest_leaderboard(request, contest_id):
@@ -125,6 +123,11 @@ def contest_join(request, contest_id):
 		context = { 'contest': contest, 'player': player, 'created_new': True }
 	return render(request, 'beers/contest-join.html', context)
 
+
+
+def instructions(request):
+	return render(request, 'beers/instructions.html')
+
 @transaction.atomic
 def signup(request):
 	f = None
@@ -149,6 +152,3 @@ def signup(request):
 	else:
 		f = RegistrationForm()
 	return render(request, 'registration/signup.html', { 'form': f })
-
-def instructions(request):
-	return render(request, 'beers/instructions.html')
