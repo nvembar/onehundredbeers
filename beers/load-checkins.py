@@ -43,7 +43,7 @@ for p in players:
                     continue
                 if (Unvalidated_Checkin.objects.filter(contest_player_id=cp.id,
                             untappd_checkin=c.link).count() == 0
-                        or Contest_Checkin.objects.filter(contest_player_id=cp.id,
+                        and Contest_Checkin.objects.filter(contest_player_id=cp.id,
                             untappd_checkin=c.link).count() == 0):
                     if last_date is None:
                         last_date = dt
