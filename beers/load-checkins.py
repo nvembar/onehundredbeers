@@ -8,6 +8,7 @@ import logging
 django.setup()
 
 from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin
+from beers.models import Contest_Checkin
 import feedparser
 import datetime
 
@@ -27,7 +28,7 @@ for p in players:
         for cp in cps:
             contest = cp.contest
             last_date = cp.last_checkin_load
-            logger.info('User {} for {} has last load {}'.format(
+            logger.debug('User {} for {} has last load {}'.format(
                 cp.player.user.username, contest.name,
                 last_date))
 
@@ -38,9 +39,12 @@ for p in players:
                 # after the last checkin from the user
                 if (dt < contest.start_date or dt > contest.end_date or
                             dt <= cp.last_checkin_load):
-                        continue
-                if Unvalidated_Checkin.objects.filter(contest_player_id=cp.id,
-                            untappd_checkin=c.link).count() is 0:
+                    logger.debug('Ignoring "{0}" as {1} is out of bounds'.format(c.title, c.published))
+                    continue
+                if (Unvalidated_Checkin.objects.filter(contest_player_id=cp.id,
+                            untappd_checkin=c.link).count() == 0
+                        or Contest_Checkin.objects.filter(contest_player_id=cp.id,
+                            untappd_checkin=c.link).count() == 0):
                     if last_date is None:
                         last_date = dt
                     elif last_date < dt:
@@ -48,7 +52,6 @@ for p in players:
                     lmatch = re.match(re_has_loc, c.title)
                     title = c.title
                     if lmatch:
-                        print('Found a location: {0}'.format(c.title))
                         title = lmatch.group(1)
                     match = re.match(re_title, title)
                     if not match:
@@ -60,5 +63,7 @@ for p in players:
                     logger.info('\tAdding "{0}" to {1} for {2} with date {3}'.format(
                         uv.untappd_title, p.user.username, cp.contest.id, dt))
                     uv.save()
-                cp.last_checkin_load = last_date
-                cp.save()
+                else:
+                    logger.debug('Ignoring "{0}" as it already exists in database'.format(c.title))
+            cp.last_checkin_load = last_date
+            cp.save()
