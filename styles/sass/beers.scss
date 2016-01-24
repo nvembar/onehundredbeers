@@ -103,6 +103,13 @@ $top-padding-horizontal:  5px / $default-font-size * 1em;
     text-decoration: none;
     text-decoration-color: $default-font-color;
   }
+  .profile-image {
+    max-height: 20px;
+    max-width: 20px;
+    height: auto;
+    width: auto;
+    vertical-align: bottom;
+  }
 }
 
 .footer {
