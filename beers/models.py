@@ -15,8 +15,9 @@ class Player(models.Model):
 
 	# TODO: Move this to a manager
 	@classmethod
-	def create(cls, user, personal_statement=None, untappd_rss=None):
-		player = cls(user=user, personal_statement=personal_statement, untappd_rss=untappd_rss)
+	def create(cls, user, personal_statement=None, untappd_rss=None, untappd_username=None):
+		player = cls(user=user, personal_statement=personal_statement,
+				untappd_rss=untappd_rss, untappd_username=untappd_username)
 		return player
 
 	def __str__(self):
@@ -113,6 +114,7 @@ class Contest_PlayerManager(models.Manager):
 					beer_count=0,
 					last_checkin_date=None,
 					last_checkin_beer=None,
+					last_checkin_load=contest.start_date,
 					rank=-1)
 		return cp
 

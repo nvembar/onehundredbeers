@@ -4,10 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 import re
 
-class RegistrationForm(forms.Form):
-    "Form for registering a new user, including profile data"
-
-    username = forms.CharField(max_length=30, required=True)
+class ProfileForm(forms.Form):
+    "Form for editing a profile"
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
     email = forms.EmailField(required=True)
@@ -18,6 +16,11 @@ class RegistrationForm(forms.Form):
     untappd_rss = forms.URLField(max_length=512, required=True,
             label="Untappd RSS Link",
             help_text="Copy the URL from your Untappd account page")
+
+class RegistrationForm(ProfileForm):
+    "Form for registering a new user, including profile data"
+
+    username = forms.CharField(max_length=30, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
     password_repeat = forms.CharField(widget=forms.PasswordInput, required=True)
 
