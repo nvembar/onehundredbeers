@@ -10,12 +10,17 @@
 		<div class="top">
 			<div class="header-title-box"><a href="{% url 'index' %}">One Hundred Beers</a></div>
 			<div class="header-login-box">
+				<span>
 				{% if request.user.is_authenticated %}
-					Welcome, {{ request.user.username }}
-					<a style="font-size: 0.75rem; text-decoration: underline;" href="{% url 'logout' %}">(Logout)</a>
+						Welcome, {{ request.user.username }}
+						<a href="{% url 'profile' %}">
+							<img src="{% static 'images/icon-profile.png' %}" alt="Profile" class="profile-image"/>
+						</a>
+						<a style="font-size: 0.75rem; text-decoration: underline;" href="{% url 'logout' %}">(Logout)</a>
 				{% else %}
 					<a href="{% url 'signup' %}">Signup</a> or <a href="{% url 'login' %}">Login</a>
 				{% endif %}
+				</span>
 			</div>
 		</div>
 		<div class="top-image">

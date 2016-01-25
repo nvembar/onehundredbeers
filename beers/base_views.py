@@ -155,28 +155,3 @@ def contest_join(request, contest_id):
 
 def instructions(request):
 	return render(request, 'beers/instructions.html')
-
-@transaction.atomic
-def signup(request):
-	f = None
-	if request.method == 'POST':
-		f = RegistrationForm(request.POST)
-		if f.is_valid():
-			# Create a new User and Player object
-			data = f.clean()
-			user = User.objects.create_user(data.get('username'),
-					email=data.get('email'),
-					first_name=data.get('first_name'),
-					last_name=data.get('last_name'),
-					password=data.get('password'))
-			# Making an assumption that G_Player exists
-			user.groups.add(Group.objects.get(name='G_Player'))
-			user.save()
-			player = Player.create(user,
-				personal_statement=data.get('personal_statement'),
-				untappd_rss=data.get('untappd_rss'))
-			player.save()
-			return render(request, 'registration/signup_success.html')
-	else:
-		f = RegistrationForm()
-	return render(request, 'registration/signup.html', { 'form': f })

@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+
+{% block titie %}
+  One Hundred Beers - Signup
+{% endblock %}
+
+{% block content %}
+
+  {% if form.non_field_errors %}
+    <ul>
+      {% for k, v in form.errors.items %}
+        {% for e in v %}
+          <li>{{ k }}: {{ e }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form action="{% url 'profile' %}" method="post">
+    {% csrf_token %}
+    <div class="login-form">
+      <div class="login-label">User Name</div>
+      <div class="login-field">{{ user.username }}</div>
+      <div class="login-label">{{ form.first_name.label_tag }}</div>
+      <div class="login-field">{{ form.first_name }}</div>
+      {% if form.first_name.errors %}
+      <div class="error-info">
+        {{ form.first_name.label }} Errors:<br/>
+        {{ form.first_name.errors }}
+      </div>
+      {% endif %}
+      <div class="login-label">{{ form.last_name.label_tag }}</div>
+      <div class="login-field">{{ form.last_name }}</div>
+      {% if form.last_name.errors %}
+      <div class="error-info">
+        {{ form.last_name.label }} Errors:<br/>
+        {{ form.last_name.errors }}
+      </div>
+      {% endif %}
+      <div class="login-label">{{ form.email.label_tag }}</div>
+      <div class="login-field">{{ form.email }}</div>
+      {% if form.email.errors %}
+      <div class="error-info">
+        {{ form.email.label }} Errors:<br/>
+        {{ form.email.errors }}
+      </div>
+      {% endif %}
+      <div class="login-label">{{ form.personal_statement.label_tag }}</div>
+      <div class="login-field">{{ form.personal_statement }}</div>
+      {% if form.personal_statement.errors %}
+      <div class="error-info">
+        {{ form.personal_statement.label }} Errors:<br/>
+        {{ form.personal_statement.errors }}
+      </div>
+      {% endif %}
+      <div class="login-label">{{ form.untappd_username.label_tag }}</div>
+      <div class="login-field">{{ form.untappd_username }}</div>
+      {% if form.untappd_username.errors %}
+      <div class="error-info">
+        {{ form.untappd_username.label }} Errors:<br/>
+        {{ form.untappd_username.errors }}
+      </div>
+      {% endif %}
+      <div class="login-label">{{ form.untappd_rss.label_tag }}</div>
+      <div class="field-help">
+        <a href="{% url 'instructions' %}#rss">{{ form.untappd_rss.help_text }}</a>
+      </div>
+      <div class="login-field">{{ form.untappd_rss }}</div>
+      {% if form.untappd_rss.errors %}
+      <div class="error-info">
+        {{ form.untappd_rss.label }} Errors:<br/>
+        {{ form.untappd_rss.errors }}
+      </div>
+      {% endif %}
+
+      <div class="login-button-row">
+        <input type="submit" value="Update Profile"/>
+      </div>
+    </div>
+  </form>
+{% endblock %}
