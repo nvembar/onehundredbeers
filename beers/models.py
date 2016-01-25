@@ -114,6 +114,7 @@ class Contest_PlayerManager(models.Manager):
 					beer_count=0,
 					last_checkin_date=None,
 					last_checkin_beer=None,
+					last_checkin_load=contest.start_date,
 					rank=-1)
 		return cp
 
