@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contest_player',
             name='last_checkin_load',
-            field=models.DateTimeField(default=datetime.datetime(2014, 1, 1, 0, 0), verbose_name='Latest date in the last load for this player'),
+            field=models.DateTimeField(default=datetime.datetime(2014, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(hours=-5))), verbose_name='Latest date in the last load for this player'),
             preserve_default=False,
         ),
     ]

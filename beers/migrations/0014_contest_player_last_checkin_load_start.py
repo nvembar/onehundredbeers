@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='contest_player',
             name='last_checkin_load_start',
-            field=models.DateTimeField(default=datetime.datetime(2015, 1, 1, 0, 0), verbose_name=''),
+            field=models.DateTimeField(default=datetime.datetime(2015, 1, 1, 0, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(hours=-5))), verbose_name=''),
             preserve_default=False,
         ),
     ]
