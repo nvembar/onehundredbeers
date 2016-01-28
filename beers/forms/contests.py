@@ -46,11 +46,13 @@ class ContestForm(forms.Form):
 
     def clean_end_date(self):
         """Makes the end date a time at the very end of the day"""
-        return datetime.datetime.combine(self.cleaned_data['end_date'], datetime.time(23, 59, 59))
+        dt = datetime.datetime.combine(self.cleaned_data['end_date'], datetime.time(23, 59, 59))
+        return timezone.make_aware(dt)
 
     def clean_start_date(self):
         """Makes the start date a time starting at midnight"""
-        return datetime.datetime.combine(self.cleaned_data['start_date'], datetime.time())
+        dt = datetime.datetime.combine(self.cleaned_data['start_date'], datetime.time())
+        return timezone.make_aware(dt)
 
     def clean(self):
         super(ContestForm, self).clean()
