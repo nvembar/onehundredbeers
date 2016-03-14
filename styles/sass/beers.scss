@@ -464,3 +464,24 @@ $validation-button-color: #599bb3;
 .dialog-box {
   background-color: darkgrey;
 }
+
+.quicklinks {
+  width: 75%;
+  margin-left: 12.5%;
+  margin-right: 12.5%;
+  background-color: lighten(lightgrey, 10%);
+  text-align: center;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+  ul {
+    text-align: left;
+    list-style-type: square;
+  }
+  h4 {
+    font-size: 1.25em;
+    margin-top: 0.20em;
+    margin-bottom: 0.20em;
+  }
+}

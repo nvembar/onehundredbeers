@@ -438,3 +438,27 @@ img.column-icon {
 .dialog-box {
   background-color: darkgrey;
 }
+
+/* line 468, ../../../styles/sass/beers.scss */
+.quicklinks {
+  width: 75%;
+  margin-left: 12.5%;
+  margin-right: 12.5%;
+  background-color: #ededed;
+  text-align: center;
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+/* line 478, ../../../styles/sass/beers.scss */
+.quicklinks ul {
+  text-align: left;
+  list-style-type: square;
+}
+/* line 482, ../../../styles/sass/beers.scss */
+.quicklinks h4 {
+  font-size: 1.25em;
+  margin-top: 0.20em;
+  margin-bottom: 0.20em;
+}
