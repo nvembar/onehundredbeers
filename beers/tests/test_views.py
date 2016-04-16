@@ -54,7 +54,7 @@ class BeersViewsTestCase(TestCase):
         self.contest.save()
 
     def test_profile_view(self):
-        "Tests that a profile can be viewed by the user
+        "Tests that a profile can be viewed by the user"
         c = Client()
         self.assertTrue(c.login(username='runner1', password='runner1_password'))
 
