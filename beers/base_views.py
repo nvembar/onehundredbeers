@@ -26,6 +26,11 @@ logger = logging.getLogger(__name__)
 
 def index(request):
 	contests = Contest.objects.order_by('created_on')[:5]
+	if is_authenticated_user_contest_runner(request):
+		player = Player.objects.get(user_id=request.user.id)
+		for c in contests:
+			if c.creator.id == player.id:
+				c.is_creator = True
 	context = { 'contests': contests }
 	return render(request, 'beers/index.html', context)
 

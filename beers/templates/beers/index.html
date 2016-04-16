@@ -65,7 +65,7 @@
 		<ul>
 		{% for c in contests %}
 		<li>
-			<a href="{% url 'contest' contest_id=c.id %}">{{ c.name }}</a> <span style="font-size: 0.9em">(Other Links: <a href="{% url 'leaderboard' contest_id=c.id %}">Leaderboard</a>&nbsp;&nbsp;<a href="{% url 'beer-list' contest_id=c.id %}">Beers</a>)</span>
+			<a href="{% url 'contest' contest_id=c.id %}">{{ c.name }}</a> <span style="font-size: 0.9em">(Other Links: <a href="{% url 'leaderboard' contest_id=c.id %}">Leaderboard</a>&nbsp;&nbsp;<a href="{% url 'beer-list' contest_id=c.id %}">Beers</a>{% if c.is_creator %}&nbsp;&nbsp;<a href="{% url 'unvalidated-checkins' contest_id=c.id %}">Checkins</a>{% endif %})</span>
 		</li>
 		{% endfor %}
 		</ul>
