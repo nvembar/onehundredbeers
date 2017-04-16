@@ -21,5 +21,6 @@ urlpatterns = [
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/(?P<beer_id>[0-9]+)$', base_views.contest_beer, name='beer-detail'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/$', base_views.contest_beers, name='beer-list'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/leaderboard/$', base_views.contest_leaderboard, name='leaderboard'),
+	url(r'^contests/(?P<contest_id>[0-9]+)/recover$', validation.initiate_recover, name='initiate-recover'),
 	url(r'^instructions$', base_views.instructions, name='instructions'),
 ]
