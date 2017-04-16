@@ -158,3 +158,19 @@ def unvalidated_checkins(request, contest_id):
 			uv.form = ValidateCheckinForm()
 	context = { 'uvs': uvs, 'contest': contest, 'form': ValidateCheckinForm() }
 	return render(request, 'beers/validate.html', context)
+
+@login_required
+def initiate_recover(request, contest_id):
+	contest = get_object_or_404(Contest.objects, id=contest_id)
+	if not is_authenticated_user_contest_runner(request):
+		logger.warning("User {0} attempted to recover a chekcin for contest {1}"
+					.format(request.user.username, contest_id))
+		raise PermissionDenied("User is not allowed to recover checkins")
+	if not contest.creator.user.id is request.user.id:
+		logger.warning("User {0} attempted to recover a checkin " +
+						"for contest '{1}' that they do not own: should be {2}"
+					.format(request.user.username, contest.name,
+					contest.creator.user.username))
+		raise PermissionDenied("User is not the contest runner")
+	context = { 'contest': contest }
+	return render(request, 'beers/initiate-recover.html', context)
