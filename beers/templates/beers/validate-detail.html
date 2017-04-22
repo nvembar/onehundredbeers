@@ -3,15 +3,15 @@
 {% block title %}Validate Checkin{% endblock %}
 {% block scripts %}
   <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-  {% include 'autocomplete_light/static.html' %}
+  {{ form.media }}
   <script>
     $(document).ready(function() {
-      $("#id_contest_beer-autocomplete").bind('selectChoice',
+      $("#id_contest_beer-autocomplete").bind('select2:select',
         function(e, choice, autocomplete) {
           $('#validate-beer').prop("disabled",false);
         }
       );
-      $(".autocomplete-light-widget").bind('widgetDeselectChoice',
+      $(".autocomplete-light-widget").bind('select2:unselect',
         function(e) {
           $('#validate-beer').prop("disabled", true);
         }

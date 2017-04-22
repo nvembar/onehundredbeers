@@ -7,11 +7,16 @@
 
 {% block scripts %}
   <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-  {% include 'autocomplete_light/static.html' %}
+  {% comment %}{% include 'autocomplete_light/static.html' %}{% endcomment %}
+  {{ form.media }}
   <script>
   (function(exports) {
     var currentSearch = -1;
     var currentResult = -1;
+
+    function getCSRF() {
+
+    }
 
     function sendContent(uvId, content) {
       var url = "{% url 'update-checkin' contest.id 0 %}";
