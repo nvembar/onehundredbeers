@@ -1,8 +1,9 @@
 from django import forms
 from django.utils import timezone
 from django.utils import html
-from beers.models import Contest
-from autocomplete_light.fields import ChoiceField as AlChoiceField
+from beers.models import Contest, Contest_Beer
+# from autocomplete_light.fields import ChoiceField as AlChoiceField
+from dal import autocomplete
 import datetime
 import re
 
@@ -10,7 +11,6 @@ import re
 class SubmitButtonWidget(forms.Widget):
     def render(self, name, value, attrs=None):
         return '<input type="submit" name="%s" value="%s">' % (html.escape(name), html.escape(value))
-
 
 class SubmitButtonField(forms.Field):
     def __init__(self, *args, **kwargs):
@@ -62,6 +62,16 @@ class ContestForm(forms.Form):
         return self.cleaned_data
 
 class ValidateCheckinForm(forms.Form):
-    contest_beer = AlChoiceField('Contest_BeerAutocomplete')
+    contest_beer = forms.ModelChoiceField(
+        queryset=Contest_Beer.objects.all(),
+        widget=autocomplete.ModelSelect2(
+            url='contest-beer-autocomplete',
+            attrs={
+                'data-placeholder': 'Search for beer...',
+                'data-minimum-input-length': 1,
+
+            },
+        )
+    )
 
     action = forms.CharField(widget=forms.HiddenInput)
