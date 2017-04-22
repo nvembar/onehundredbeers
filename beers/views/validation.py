@@ -16,11 +16,28 @@ from beers.models import Contest_Beer
 from beers.models import Contest_Player
 from beers.models import Unvalidated_Checkin
 from beers.forms.contests import ValidateCheckinForm
+from dal import autocomplete
 from .helper import is_authenticated_user_contest_runner, is_authenticated_user_player
 from .helper import HttpNotImplementedResponse
 import logging
 
 logger = logging.getLogger(__name__)
+
+class ContestBeerAutocomplete(autocomplete.Select2QuerySetView):
+	"""The autocomplete class for looking up a contest beer"""
+
+	def get_queryset(self):
+		if not self.request.user.is_authenticated():
+			return Contest_Beer.objects.none()
+		qs = Contest_Beer.objects.all()
+		contestId = self.forwarded.get('contest-id', None)
+		if contestId:
+			qs = qs.filter(contest__id=int(contestId))
+		if self.q:
+			qs = qs.filter(beer_name__isstartswith=self.q)
+
+		return qs
+
 
 def BadValidationResponse(BaseException):
 	def __init__(self, value):
