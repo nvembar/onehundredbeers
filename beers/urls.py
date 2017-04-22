@@ -7,7 +7,8 @@ import beers.views.user as user
 urlpatterns = [
 	url(r'^$', base_views.index, name='index'),
 	url(r'^', include('django.contrib.auth.urls')),
-	url(r'^autocomplete/', include('autocomplete_light.urls')),
+	# url(r'^autocomplete/', include('autocomplete_light.urls')),
+	url(r'^cb-autocomplete/$', validation.ContestBeerAutocomplete.as_view(), name='contest-beer-autocomplete'),
 	url(r'^signup$', user.signup, name='signup'),
 	url(r'^profile', user.update_profile, name='profile'),
 	url(r'^contests/$', base_views.contests, name='contests'),
