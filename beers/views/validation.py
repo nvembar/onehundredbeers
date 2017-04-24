@@ -121,8 +121,11 @@ def update_checkin(request, contest_id, uv_checkin):
 					checkin_time=uv.untappd_checkin_date,
 					untappd_checkin=uv.untappd_checkin)
 			checkin.save()
+			# Independently updates points and count
 			uv.contest_player.beer_count = Contest_Checkin.objects.filter(
 					contest_player_id=uv.contest_player.id).count()
+			uv.contest_player.beer_points = Contest_Checkin.objects.filter(
+					contest_player_id=uv.contest_player.id).aggregate(Sum('checkin_points'))['checkin_points__sum']
 			if (uv.contest_player.last_checkin_date is None or
 					uv.untappd_checkin_date > uv.contest_player.last_checkin_date):
 				uv.contest_player.last_checkin_date = uv.untappd_checkin_date
