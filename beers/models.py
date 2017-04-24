@@ -100,6 +100,7 @@ class Contest_Beer(models.Model):
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 	beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
 	beer_name = models.CharField(max_length=250)
+	point_value = models.IntegerField(default=1)
 	total_drank = models.IntegerField("number of players who drank this beer")
 
 	def __str__(self):
@@ -125,6 +126,7 @@ class Contest_Player(models.Model):
 	player = models.ForeignKey(Player, on_delete=models.CASCADE)
 	user_name = models.CharField(max_length=50)
 	beer_count = models.IntegerField(default=0)
+	beer_points = models.IntegerField(default=0)
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
 	last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
