@@ -4,7 +4,7 @@ from django.contrib.auth.models import User, Group, Permission
 from beers.models import Contest, Player, Contest_Player
 import datetime
 
-@override_settings(ROOTURL_CONF='beers.urls', SSLIFY_DISABLE=True)
+@override_settings(ROOTURL_CONF='beers.urls', SECURE_SSL_REDIRECT=False)
 class BeersViewsTestCase(TestCase):
     """Tests the views for the beer models"""
 
