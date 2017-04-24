@@ -176,12 +176,14 @@ class Contest_CheckinManager(models.Manager):
 		cc = self.create(contest_player=contest_player,
 				contest_beer=contest_beer,
 				checkin_time=checkin_time,
+				checkin_points=contest_beer.point_value,
 				untappd_checkin=untappd_checkin)
 		return cc
 
 class Contest_Checkin(models.Model):
 	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
 	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE)
+	checkin_points = models.IntegerField(default=1)
 	checkin_time = models.DateTimeField()
 	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
 
