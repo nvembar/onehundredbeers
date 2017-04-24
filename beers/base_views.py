@@ -67,7 +67,7 @@ def contest(request, contest_id):
 
 def contest_leaderboard(request, contest_id):
 	contest = get_object_or_404(Contest, id=contest_id)
-	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
+	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_points')
 	rank = 0
 	# Start with rank 0 and a number higher than the highest possible beer count
 	# This forces the first iteration to step everything forward
