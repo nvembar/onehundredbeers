@@ -36,7 +36,8 @@
         headers: {
           Accept: 'application/json'
         },
-        data: content,
+        data: JSON.stringify(content),
+        contentType: 'application/json',
         dataType: 'json',
         method: 'POST'
       }).done(function (result, status, xhr) {
@@ -65,7 +66,7 @@
     }
 
     exports.validateUv = function(uvId, beerId) {
-      sendContent(uvId, { 'validate-beer': 'Validate', 'contest_beer': beerId});
+      sendContent(uvId, { 'validate-beer': 'Validate', 'contest-beer': beerId});
       console.log('Setting ' + uvId + ' to beer ' + beerId);
     }
 
@@ -75,7 +76,7 @@
       }
       var contestBeer = $('#id_contest_beer option:selected').val()
       sendContent(currentSearch,
-        { 'validate-beer': 'Validate', 'contest_beer': contestBeer });
+        { 'validate-beer': 'Validate', 'contest-beer': contestBeer });
     }
 
     exports.clearSearchBox = function() {
