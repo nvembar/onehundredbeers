@@ -1,0 +1,214 @@
+- model: auth.user
+  pk: 1
+  fields:
+    username: user1
+    password: pbkdf2_sha256$36000$Yu6n6XrDZmif$+kzygtQflJXUlF7mbks3Vsk53HTZ+CZhwAZZfSk4ZaY=
+    first_name: First1
+    last_name: Last1
+    email: user1@example.com
+    is_superuser: false
+    is_staff: false
+    is_active: true
+    date_joined: '2016-01-01 00:00:00.00+00:00'
+    groups: [2]
+    user_permissions: []
+- model: auth.user
+  pk: 2
+  fields:
+    username: user2
+    password: pbkdf2_sha256$36000$Yu6n6XrDZmif$+kzygtQflJXUlF7mbks3Vsk53HTZ+CZhwAZZfSk4ZaY=
+    first_name: First2
+    last_name: Last2
+    email: user2@example.com
+    is_superuser: false
+    is_staff: false
+    is_active: true
+    date_joined: '2016-01-01 00:00:00.00+00:00'
+    groups: [2]
+    user_permissions: []
+- model: auth.user
+  pk: 3
+  fields:
+    username: user3
+    password: pbkdf2_sha256$36000$Yu6n6XrDZmif$+kzygtQflJXUlF7mbks3Vsk53HTZ+CZhwAZZfSk4ZaY=
+    first_name: First3
+    last_name: Last3
+    email: user3@example.com
+    is_superuser: false
+    is_staff: false
+    is_active: true
+    date_joined: '2016-01-01 00:00:00.00+00:00'
+    groups: [2]
+    user_permissions: []
+- model: auth.user
+  pk: 4
+  fields:
+    username: runner1
+    password: pbkdf2_sha256$36000$Yu6n6XrDZmif$+kzygtQflJXUlF7mbks3Vsk53HTZ+CZhwAZZfSk4ZaY=
+    first_name: First4
+    last_name: Last4
+    email: user4@example.com
+    is_superuser: false
+    is_staff: false
+    is_active: true
+    date_joined: '2016-01-01 00:00:00.00+00:00'
+    groups: [1,2]
+    user_permissions: []
+- model: beers.player
+  pk: 1
+  fields:
+    user: 1
+    personal_statement: Personal Statement 1
+    city: City 1
+    untappd_username: untapped1
+    untappd_rss: 'https://example.com/rss/untapped1'
+- model: beers.player
+  pk: 2
+  fields:
+    user: 2
+    personal_statement: Personal Statement 2
+    city: City 2
+    untappd_username: untapped2
+    untappd_rss: 'https://example.com/rss/untapped2'
+- model: beers.player
+  pk: 3
+  fields:
+    user: 3
+    personal_statement: Personal Statement 3
+    city: City 3
+    untappd_username: untapped3
+    untappd_rss: 'https://example.com/rss/untapped3'
+- model: beers.player
+  pk: 4
+  fields:
+    user: 4
+    personal_statement: Personal Statement 3
+    city: City 3
+    untappd_username: untapped3
+    untappd_rss: 'https://example.com/rss/untapped3'
+- model: beers.beer
+  pk: 1
+  fields:
+    name: Beer 1
+    brewery: Brewery 1
+    style: Style 1
+    description: ''
+    brewery_city: City 1
+    brewery_state: DC
+    brewery_country: ''
+    brewery_lat: null
+    brewery_lon: null
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.beer
+  pk: 2
+  fields:
+    name: Beer 2
+    brewery: Brewery 2
+    style: Style 2
+    description: ''
+    brewery_city: City 2
+    brewery_state: DC
+    brewery_country: ''
+    brewery_lat: null
+    brewery_lon: null
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.beer
+  pk: 3
+  fields:
+    name: Beer 3
+    brewery: Brewery 3
+    style: Style 3
+    description: ''
+    brewery_city: City 3
+    brewery_state: DC
+    brewery_country: ''
+    brewery_lat: null
+    brewery_lon: null
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.contest
+  pk: 1
+  fields:
+    name: Contest 1
+    creator: 4
+    active: true
+    created_on: '2016-01-01 00:00:00.00Z'
+    last_updated: '2016-01-01 00:00:00.00Z'
+    start_date: '2016-01-01 00:00:00.00Z'
+    end_date: '2017-01-01 00:00:00.00Z'
+    user_count: 4
+    beer_count: 3
+- model: beers.contest_beer
+  pk: 1
+  fields:
+    contest: 1
+    beer: 1
+    beer_name: Beer 1
+    point_value: 1
+    total_drank: 0
+- model: beers.contest_beer
+  pk: 2
+  fields:
+    contest: 1
+    beer: 2
+    beer_name: Beer 2
+    point_value: 1
+    total_drank: 0
+- model: beers.contest_beer
+  pk: 3
+  fields:
+    contest: 1
+    beer: 3
+    beer_name: Beer 3
+    point_value: 3
+    total_drank: 0
+- model: beers.contest_player
+  pk: 1
+  fields:
+    contest: 1
+    player: 1
+    user_name: user1
+    beer_count: 0
+    beer_points: 0
+    last_checkin_date: null
+    last_checkin_beer: null
+    last_checkin_load: '2016-01-01 00:00:00.00+00:00'
+    rank: -1
+- model: beers.contest_player
+  pk: 2
+  fields:
+    contest: 1
+    player: 2
+    user_name: user2
+    beer_count: 0
+    beer_points: 0
+    last_checkin_date: null
+    last_checkin_beer: null
+    last_checkin_load: '2016-01-01 00:00:00.00+00:00'
+    rank: -1
+- model: beers.contest_player
+  pk: 3
+  fields:
+    contest: 1
+    player: 3
+    user_name: user3
+    beer_count: 0
+    beer_points: 0
+    last_checkin_date: null
+    last_checkin_beer: null
+    last_checkin_load: '2016-01-01 00:00:00.00+00:00'
+    rank: -1
+- model: beers.contest_player
+  pk: 4
+  fields:
+    contest: 1
+    player: 4
+    user_name: user4
+    beer_count: 0
+    beer_points: 0
+    last_checkin_date: null
+    last_checkin_beer: null
+    last_checkin_load: '2016-01-01 00:00:00.00+00:00'
+    rank: -1
