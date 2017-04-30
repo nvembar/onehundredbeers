@@ -70,9 +70,10 @@ class ContestManager(models.Manager):
 				user_count=0, beer_count=0)
 		return contest
 
-	def add_beer(self, contest, beer):
+	def add_beer(self, contest, beer, point_value=1):
 		contest_beer = Contest_Beer(contest=contest, beer=beer,
-							beer_name=beer.name, total_drank=0)
+							beer_name=beer.name, point_value=point_value,
+							total_drank=0,)
 		return contest_beer
 
 class Contest(models.Model):
