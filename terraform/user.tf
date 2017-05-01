@@ -28,7 +28,7 @@ resource "aws_iam_role" "beer_loader_role" {
 data "aws_iam_policy_document" "loader_s3_role_policy" {
   statement {
     actions = [ "s3:*" ]
-    resources = [ "arn:aws:s3:::${var.loader_s3_bucket_name}" ]
+    resources = [ "arn:aws:s3:::${var.loader_s3_bucket_name}", "arn:aws:s3:::${var.loader_s3_bucket_name}/*" ]
   }
 }
 
