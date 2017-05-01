@@ -1,4 +1,5 @@
 from beers.models import Beer, Contest_Beer, Contest, Contest_Player, Player
+from django.db import transaction
 import csv
 import logging
 
@@ -10,7 +11,7 @@ UNTAPPD_LINK_INDEX=2
 BEER_STATE_INDEX=3
 BEER_POINTS_INDEX=4
 
-
+@transaction.atomic
 def create_contest_from_csv(name, start_date, end_date, runner, stream):
     """
     Creates a contest from a CSV stream with the given name with the given runner.
