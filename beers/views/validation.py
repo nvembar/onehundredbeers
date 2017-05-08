@@ -176,6 +176,8 @@ def unvalidated_checkins(request, contest_id):
 		uvs = paginator.page(1)
 	except EmptyPage:
 		uvs = paginator.page(paginator.num_pages)
+	beers = Contest_Beer.objects.filter(contest_id=contest_id).order_by('beer_name')
+	"""
 	for uv in uvs:
 		# Just get the first possible match
 		possibles = Contest_Beer.objects.filter(contest_id=contest_id,
@@ -190,5 +192,6 @@ def unvalidated_checkins(request, contest_id):
 			uv.beer_brewery = str(possibles[0].beer)
 		else:
 			uv.form = ValidateCheckinForm()
-	context = { 'uvs': uvs, 'contest': contest, 'form': ValidateCheckinForm() }
+	"""
+	context = { 'uvs': uvs, 'contest': contest, 'beers': beers, 'form': ValidateCheckinForm(), }
 	return render(request, 'beers/validate.html', context)
