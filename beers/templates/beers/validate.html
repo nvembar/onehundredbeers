@@ -43,6 +43,10 @@
       }).done(function (result, status, xhr) {
           console.log('Status: ' + status);
           if (status == "success") {
+            $('#id_'+uvId+'_vbutton').fadeOut(400).remove();
+            $('#id_'+uvId+'_dbutton').fadeOut(400).remove();
+            $('#id_'+uvId+'_select').prop('disabled', true);
+            {% comment %}
             if (currentSearch == uvId) {
               exports.clearSearchBox();
             }
@@ -51,6 +55,7 @@
                 $('#id_'+uvId+'_box').remove();
               })
             });
+            {% endcomment %}
           } else {
             alert("Got an error " + status);
           }
@@ -59,6 +64,11 @@
         alert("Error trying to send content: " + content + ": " + error)
       });
     }
+
+    exports.data = [
+      {% for b in beers %}{ id: {{ b.id }}, text: '{{ b.beer_name }}'},
+      {% endfor %}
+    ];
 
     exports.dismissUv = function(uvId) {
       sendContent(uvId, {'remove-beer': 'Remove'});
@@ -70,82 +80,43 @@
       console.log('Setting ' + uvId + ' to beer ' + beerId);
     }
 
-    exports.validateFromSearch = function() {
-      if (currentSearch == -1) {
-        return;
-      }
-      var contestBeer = $('#id_contest_beer option:selected').val()
-      sendContent(currentSearch,
-        { 'validate-beer': 'Validate', 'contest-beer': contestBeer });
-    }
-
-    exports.clearSearchBox = function() {
-      $('#id_'+currentSearch+'_vsbutton').unbind();
-      $('#id_contest_beer-autocomplete').unbind();
-      $('.autocomplete-light-widget').unbind();
-
-      $('#id_'+currentSearch+'_vsbutton').attr('id', 'id_'+currentSearch+'_sbutton');
-      $('#id_'+currentSearch+'_sbutton').html('Search for beer');
-      $("#id_"+currentSearch+"_sbutton").click(function() {
-        exports.addSearchBox(currentSearch);
-      });
-      $('#id_'+currentSearch+'_sbutton').prop('disabled', false);
-      $('#id_contest_beer-wrapper').remove();
-      currentSearch = -1;
-    }
-
-    exports.addSearchBox = function(uvId) {
-      if (currentSearch != -1) {
-        exports.clearSearchBox();
-      }
-      $('#id_'+uvId+'_sdiv').prepend("{{ form.contest_beer|escapejs }}");
-      $('#id_'+uvId+'_vbutton').prop('disabled', true);
-      $('#id_'+uvId+'_sbutton').html('Validate');
-      $('#id_'+uvId+'_sbutton').unbind();
-      $('#id_'+uvId+'_sbutton').attr('id', 'id_'+uvId+'_vsbutton');
-      $('#id_'+uvId+'_vsbutton').click(function() {
-        exports.validateFromSearch();
-      });
-      // Disable the validate buttun until a choice is selected
-      $('#id_'+uvId+'_vsbutton').prop('disabled', true);
-      $('#id_contest_beer-autocomplete').bind('selectChoice',
-        function(e, choice, autocomplete) {
-          $('#id_'+uvId+'_vsbutton').prop("disabled",false);
-        }
-      );
-      $('.autocomplete-light-widget').bind('widgetDeselectChoice',
-        function(e) {
-          $('#id_'+uvId+'_vsbutton').prop('disabled', true);
-        }
-      );
-      currentSearch=uvId;
-    }
-
-    exports.bindButtonsFor = function(uvId, possibleId) {
-      //console.log("Binding buttons for " + uvId);
-      //console.log("Trying button binding for #id_" + uvId + "_dbutton");
+    exports.bindButtonsFor = function(uvId, beer) {
       $("#id_"+uvId+"_dbutton").click(function() {
         exports.dismissUv(uvId);
       });
-      $("#id_"+uvId+"_sbutton").click(function() {
-        exports.addSearchBox(uvId);
-      });
-      if (possibleId > 0) {
-        //console.log("Trying button binding for #id_" + uvId + "_vbutton");
-        $("#id_"+uvId+"_vbutton").click(function() {
-          exports.validateUv(uvId, possibleId);
-        });
+      var b = exports.data.find((e) => { return e.text == beer; });
+      if (b) {
+        $("#id_"+uvId+"_select").val(b.id);
+        $("#id_"+uvId+"_vbutton").prop('disabled', false);
+      } else {
+        $("#id_"+uvId+"_select").val(null).trigger("change");
+        $("#id_"+uvId+"_vbutton").prop('disabled', true);
       }
     }
   })(this.uvPage = {});
 
   $(document).ready(function() {
-    {% for uv in uvs %}
-    {% if uv.beer_brewery %}
-    uvPage.bindButtonsFor({{ uv.id }}, {{ uv.contest_beer_id }});
-    {% else %}
-    uvPage.bindButtonsFor({{ uv.id }}, -1);
-    {% endif %}
+    $(".beer-list").select2({ placeholder: "Select a beer", allowClear: true, data: uvPage.data, })
+    {% for uv in uvs %}uvPage.bindButtonsFor({{ uv.id }}, "{{ uv.beer }}");
+    {# Enable valiation upon selection #}
+    $("#id_{{ uv.id }}_select").on("select2:select", (e) => {
+      $("#id_{{ uv.id }}_vbutton").prop('disabled', false);
+    });
+    {# Disable validation upon deselection #}
+    $("#id_{{ uv.id }}_select").on("select2:unselect", (e) => {
+      $("#id_{{ uv.id }}_vbutton").prop('disabled', true);
+    });
+    {# Send a validation if a selection has been made and validation was clicked #}
+    $("#id_{{ uv.id }}_vbutton").click(() => {
+      var selected = $("#id_{{ uv.id }}_select option:selected").val();
+      if (selected) {
+        uvPage.validateUv({{ uv.id }}, selected);
+      }
+    });
+    {# Send a dismissal if a selection has been made and dismiss was clicked #}
+    $("#id_{{ uv.id }}_dbutton").click(() => {
+      uvPage.dismissUv({{ uv.id }});
+    });
     {% endfor %}
   });
   </script>
@@ -153,36 +124,44 @@
 
 {% block content %}
   <div class="validations">
-    {% for uv in uvs %}
-      <div id="id_{{ uv.id }}_box" class="validation-box">
-        <div class="validation-lines">
-          <div class="validation-text-line">
-            <span style="width: 80%">
-              <em>{{ uv.contest_player.player.user.username }}</em> checked into
-              <a href="{{ uv.untappd_checkin }}" target="_blank">
-                {{ uv.beer }} from {{ uv.brewery }}
-              </a>
-              on {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
-            </span>
-          </div>
-          <div class="validation-button-line">
-            {% if uv.beer_brewery %}
-              <button id="id_{{ uv.id }}_vbutton" class="validation-button">
-                Validate as {{ uv.beer_brewery }}
-              </button>
-            {% endif %}
-            <button id="id_{{ uv.id }}_dbutton" class="validation-button">
-              Dismiss
-            </button>
-          </div>
-          <div id="id_{{ uv.id }}_sdiv" class="validation-button-line">
-            <button id="id_{{ uv.id }}_sbutton" class="validation-button">
-              Search for beer
-            </button>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+    <table>
+      <tr>
+        <th>Player</th>
+        <th>Beer/Brewery Checkin</th>
+        <th>Checkin Date</th>
+        <th>Select Contest Beer</th>
+        <th>Validate</th>
+        <th>Dismiss</th>
+      </tr>
+      {% for uv in uvs %}
+      <tr>
+        <td>
+          {{ uv.contest_player.player.user.username }}
+        </td>
+        <td>
+          <a href="{{ uv.untappd_checkin }}" target="_blank">
+            {{ uv.beer }} from {{ uv.brewery }}
+          </a>
+        </td>
+        <td>
+          {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
+        </td>
+        <td>
+          <select id="id_{{ uv.id }}_select" class="beer-list"></select>
+        </td>
+        <td>
+          <button id="id_{{ uv.id }}_vbutton" class="validation-button">
+            Validate
+          </button>
+        </td>
+        <td>
+          <button id="id_{{ uv.id }}_dbutton" class="validation-button">
+            Dismiss
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
     <div class="pager">
       <span class="step-links">
         {% if uvs.has_previous %}
