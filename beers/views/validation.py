@@ -177,21 +177,5 @@ def unvalidated_checkins(request, contest_id):
 	except EmptyPage:
 		uvs = paginator.page(paginator.num_pages)
 	beers = Contest_Beer.objects.filter(contest_id=contest_id).order_by('beer_name')
-	"""
-	for uv in uvs:
-		# Just get the first possible match
-		possibles = Contest_Beer.objects.filter(contest_id=contest_id,
-											beer__name__iexact=uv.beer)[:1]
-		if possibles.count() > 0:
-			logger.info("\tFound a possible match on checkin {0}: {1}/{2}"
-							.format(uv.untappd_checkin, uv.beer, uv.brewery))
-			uv.form = ValidateCheckinForm(
-				initial={'contest_beer': possibles[0].id,
-						 'auto_id': 'id_%s_'.format(uv.id) + '%s'})
-			uv.contest_beer_id = possibles[0].id
-			uv.beer_brewery = str(possibles[0].beer)
-		else:
-			uv.form = ValidateCheckinForm()
-	"""
 	context = { 'uvs': uvs, 'contest': contest, 'beers': beers, 'form': ValidateCheckinForm(), }
 	return render(request, 'beers/validate.html', context)
