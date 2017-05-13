@@ -126,8 +126,7 @@ def contest_beers(request, contest_id):
 		try:
 			contest_player = Contest_Player.objects.get(
 				contest=contest, player__user_id=request.user.id)
-			checkins = Contest_Checkin.objects.filter(contest_player=contest_player,
-				contest_player_id=contest_player.id)
+			checkins = Contest_Checkin.objects.filter(contest_player=contest_player)
 			checkin_ids = [c.contest_beer.id for c in checkins]
 			for b in contest_beers:
 				b.checked_into = b.id in checkin_ids
