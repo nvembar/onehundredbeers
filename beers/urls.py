@@ -16,6 +16,7 @@ urlpatterns = [
 	url(r'^contests/(?P<contest_id>[0-9]+)/$', base_views.contest, name='contest'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/join$', base_views.contest_join, name='contest-join'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate$', validation.unvalidated_checkins, name='unvalidated-checkins'),
+	url(r'^contests/(?P<contest_id>[0-9]+)/validate_api$', validation.unvalidated_checkins_json, name='unvalidated-checkins-json'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate/(?P<uv_checkin>[0-9]+)$', validation.checkin_validate, name='checkin-validate'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate/(?P<uv_checkin>[0-9]+)/update$', validation.update_checkin, name='update-checkin'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/players/(?P<username>[^/]+)$', base_views.contest_player, name='player-detail'),
