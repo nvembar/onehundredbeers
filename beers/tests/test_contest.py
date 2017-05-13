@@ -56,3 +56,54 @@ class ContestTestCase(TestCase):
         self.assertEqual(contest_player.beer_count, 0)
         self.assertEqual(contest_player.beer_points, 0)
         self.assertEqual(Unvalidated_Checkin.objects.filter(untappd_title='Unvalidated Checkin 2').count(), 0)
+
+    def test_unvalidated_api_single(self):
+        """Tests if the JSON API gets the right values for a single request"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
+                            { 'slice_start': 2, 'slice_end': 3})
+        self.assertEqual(response.status_code, 200)
+        checkins = json.loads(response.content)
+        self.assertEqual(checkins['page_count'], 1)
+        self.assertEqual(checkins['page_index'], 1)
+        self.assertEqual(len(checkins['checkins']), 1)
+        checkin = checkins['checkins'][0]
+        self.assertEqual(checkin['id'], 3)
+        self.assertEqual(checkin['index'], 2)
+        self.assertEqual(checkin['player'], 'user1')
+        self.assertEqual(checkin['brewery'], 'Brewery 3')
+        self.assertEqual(checkin['beer'], 'Beer 3')
+
+    def test_unvalidated_api_many(self):
+        """Tests if the JSON API gets the right values for multiple results"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
+                            { 'slice_start': 3, 'slice_end': 6})
+        self.assertEqual(response.status_code, 200)
+        checkins = json.loads(response.content)
+        self.assertEqual(checkins['page_count'], 1)
+        self.assertEqual(checkins['page_index'], 1)
+        self.assertEqual(len(checkins['checkins']), 3)
+        cid = 4
+        cindex = 3
+        for checkin in checkins['checkins']:
+            self.assertEqual(checkin['id'], cid)
+            self.assertEqual(checkin['index'], cindex)
+            self.assertEqual(checkin['player'], 'user1')
+            self.assertEqual(checkin['brewery'], 'Brewery {}'.format(cid))
+            self.assertEqual(checkin['beer'], 'Beer {}'.format(cid))
+            cid = cid + 1
+            cindex = cindex + 1
+
+    def test_unvalidated_api_past_end(self):
+        """Tests if the JSON API returns nothing when the slice goes beyond the end of the page"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
+                            { 'slice_start': 100, 'slice_end': 105})
+        self.assertEqual(response.status_code, 200)
+        checkins = json.loads(response.content)
+        self.assertEqual(checkins['page_count'], 1)
+        self.assertEqual(len(checkins['checkins']), 0)
