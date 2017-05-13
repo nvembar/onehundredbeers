@@ -20,8 +20,10 @@ from beers.forms.contests import ValidateCheckinForm
 from dal import autocomplete
 from .helper import is_authenticated_user_contest_runner, is_authenticated_user_player
 from .helper import HttpNotImplementedResponse
+import math
 import logging
 import json
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +153,55 @@ def update_checkin(request, contest_id, uv_checkin):
 		return HttpResponse('{ "success": true }', content_type='application/json')
 	else:
 		return redirect('unvalidated-checkins', contest_id)
+
+@login_required
+@require_http_methods(['GET'])
+def unvalidated_checkins_json(request, contest_id):
+	"""
+	Provides a JSON object with all the checkins between the two slices
+	slice_start is the first index to pull
+	slice_end is the non-inclusive end index
+	"""
+	contest = get_object_or_404(Contest.objects, id=contest_id)
+	if not is_authenticated_user_contest_runner(request):
+		logger.warning("User {0} attempted to validate checkins for contest {1}"
+					.format(request.user.username, contest_id))
+		raise PermissionDenied("User is not allowed to validate checkins")
+	if not contest.creator.user.id is request.user.id:
+		logger.warning("User {0} attempted to validate checkins " +
+						"for contest '{1}' that they do not own"
+					.format(request.user.username, contest.name))
+		raise PermissionDenied("User is not the contest runner")
+	def get_slice_index(name):
+		try:
+			return int(request.GET[name])
+		except KeyError as e:
+			raise HttpResponseBadRequest("Request must include '{}'".format(name))
+		except ValueError as e:
+			raise HttpResponseBadRequest("Parameter '{}' must be an integer".format(name))
+	slice_start = get_slice_index('slice_start')
+	slice_end = get_slice_index('slice_end')
+	if slice_start >= slice_end:
+		raise HttpResponseBadRequest("Slice start must be less than slice end")
+	uvs = Unvalidated_Checkin.objects.filter(
+			contest_player__contest_id=contest_id).order_by('untappd_checkin_date')
+	pageCnt = math.ceil(uvs.count() / 25)
+	pageIndex = math.ceil(slice_start / 25)
+	f = lambda uv, i: {
+				'id': uv.id,
+				'index': i,
+				'player': uv.contest_player.user_name,
+				'checkin_url': uv.untappd_checkin,
+				'beer': uv.beer,
+				'brewery': uv.brewery,
+				'checkin_date': uv.untappd_checkin_date.strftime('%m/%d/%Y'),
+			}
+	result = {
+		'page_count': pageCnt,
+		'page_index': pageIndex,
+		'checkins': list(map(f, uvs[slice_start:slice_end], range(slice_start,slice_end)))
+	}
+	return HttpResponse(json.dumps(result, indent=True), content_type='application/json')
 
 @login_required
 def unvalidated_checkins(request, contest_id):
