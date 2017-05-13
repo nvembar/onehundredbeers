@@ -67,6 +67,7 @@ class ContestTestCase(TestCase):
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(checkins['page_index'], 1)
+        self.assertEqual(checkins['page_size'], 25)
         self.assertEqual(len(checkins['checkins']), 1)
         checkin = checkins['checkins'][0]
         self.assertEqual(checkin['id'], 3)
@@ -85,6 +86,7 @@ class ContestTestCase(TestCase):
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(checkins['page_index'], 1)
+        self.assertEqual(checkins['page_size'], 25)
         self.assertEqual(len(checkins['checkins']), 3)
         cid = 4
         cindex = 3
