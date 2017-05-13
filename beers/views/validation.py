@@ -172,21 +172,23 @@ def unvalidated_checkins_json(request, contest_id):
 						"for contest '{1}' that they do not own"
 					.format(request.user.username, contest.name))
 		raise PermissionDenied("User is not the contest runner")
-	def get_slice_index(name):
+	def get_integer_param(name, default=None):
 		try:
-			return int(request.GET[name])
+			r = int(request.GET.get(name, default))
+			if r is None:
+				raise HttpResponseBadRequest("Parameter '{}' must be an integer".format(name))
+			return r
 		except KeyError as e:
 			raise HttpResponseBadRequest("Request must include '{}'".format(name))
-		except ValueError as e:
-			raise HttpResponseBadRequest("Parameter '{}' must be an integer".format(name))
-	slice_start = get_slice_index('slice_start')
-	slice_end = get_slice_index('slice_end')
+	slice_start = get_integer_param('slice_start')
+	slice_end = get_integer_param('slice_end')
+	page_size = get_integer_param('page_size', 25)
 	if slice_start >= slice_end:
 		raise HttpResponseBadRequest("Slice start must be less than slice end")
 	uvs = Unvalidated_Checkin.objects.filter(
 			contest_player__contest_id=contest_id).order_by('untappd_checkin_date')
-	pageCnt = math.ceil(uvs.count() / 25)
-	pageIndex = math.ceil(slice_start / 25)
+	page_count = math.ceil(uvs.count() / page_size)
+	page_index = math.ceil(slice_start / page_size)
 	f = lambda uv, i: {
 				'id': uv.id,
 				'index': i,
@@ -197,9 +199,10 @@ def unvalidated_checkins_json(request, contest_id):
 				'checkin_date': uv.untappd_checkin_date.strftime('%m/%d/%Y'),
 			}
 	result = {
-		'page_count': pageCnt,
-		'page_index': pageIndex,
-		'checkins': list(map(f, uvs[slice_start:slice_end], range(slice_start,slice_end)))
+		'page_count': page_count,
+		'page_index': page_index,
+		'page_size': page_size,
+		'checkins': list(map(f, uvs[slice_start:slice_end], range(slice_start,slice_end))),
 	}
 	return HttpResponse(json.dumps(result, indent=True), content_type='application/json')
 
