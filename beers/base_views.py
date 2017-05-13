@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.db import transaction
 from django.contrib.auth import authenticate
 from django.contrib.auth import views as auth_views
@@ -125,15 +125,15 @@ def contest_beers(request, contest_id):
 	if request.user.is_authenticated:
 		try:
 			contest_player = Contest_Player.objects.get(
-				player__user_id=request.user.id)
-			checkins = Contest_Checkin.objects.filter(
+				contest=contest, player__user_id=request.user.id)
+			checkins = Contest_Checkin.objects.filter(contest_player=contest_player,
 				contest_player_id=contest_player.id)
 			checkin_ids = [c.contest_beer.id for c in checkins]
 			for b in contest_beers:
 				b.checked_into = b.id in checkin_ids
 			context['contest_player'] = contest_player
-		except:
-			pass
+		except Contest_Player.DoesNotExist:
+			logger.error('Request for user {} for contest {} is not valid'.format(request.user.id, contest))
 	return render(request, 'beers/contest-beers.html', context)
 
 def contest_beer(request, contest_id, beer_id):
