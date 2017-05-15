@@ -80,51 +80,46 @@
       console.log('Setting ' + uvId + ' to beer ' + beerId);
     }
 
-    exports.bindButtonsFor = function(uvId, beer) {
-      $("#id_"+uvId+"_dbutton").click(function() {
-        exports.dismissUv(uvId);
-      });
-      var b = exports.data.find((e) => { return e.text == beer; });
-      if (b) {
-        $("#id_"+uvId+"_select").val(b.id);
-        $("#id_"+uvId+"_vbutton").prop('disabled', false);
-      } else {
-        $("#id_"+uvId+"_select").val(null).trigger("change");
-        $("#id_"+uvId+"_vbutton").prop('disabled', true);
-      }
-    }
   })(this.uvPage = {});
 
   $(document).ready(function() {
+    /* Convert to select2 for dropdown */
     $(".beer-list").select2({ placeholder: "Select a beer", allowClear: true, data: uvPage.data, })
-    {% for uv in uvs %}uvPage.bindButtonsFor({{ uv.id }}, "{{ uv.beer }}");
-    {# Enable valiation upon selection #}
-    $("#id_{{ uv.id }}_select").on("select2:select", (e) => {
-      $("#id_{{ uv.id }}_vbutton").prop('disabled', false);
-    });
-    {# Disable validation upon deselection #}
-    $("#id_{{ uv.id }}_select").on("select2:unselect", (e) => {
-      $("#id_{{ uv.id }}_vbutton").prop('disabled', true);
-    });
-    {# Send a validation if a selection has been made and validation was clicked #}
-    $("#id_{{ uv.id }}_vbutton").click(() => {
-      var selected = $("#id_{{ uv.id }}_select option:selected").val();
+    /* When a beer is selected, enable validation */
+    $(".beer-list").on("select2:select", function (e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', false);
+      }
+    );
+    /* When a beer is unselected, disable validation */
+    $(".beer-list").on("select2:unselect", function (e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', true);
+      }
+    );
+    /* When a validate button is clicked, submit the validation information */
+    $(".validation-click").click(function () {
+      // The parent validation-row contains the validation ID in its data
+      var row = $(this).parents(".validation-row");
+      var uvId = $(row).data("validationId");
+      var selected = $(row).find(".beer-list option:selected").val();
       if (selected) {
-        uvPage.validateUv({{ uv.id }}, selected);
+        uvPage.validateUv(uvId, selected);
       }
     });
-    {# Send a dismissal if a selection has been made and dismiss was clicked #}
-    $("#id_{{ uv.id }}_dbutton").click(() => {
-      uvPage.dismissUv({{ uv.id }});
+    /* When a dismissal is clicked, submit the dismissal information */
+    $(".dismissal-click").click(function () {
+      // The parent validation-row contains the validation ID in its data
+      console.log("Attempting dismissal on " + $(this).text())
+      var uvId = $(this).parents(".validation-row").data("validationId");
+      console.log("Found uvId " + uvId);
+      uvPage.dismissUv(uvId);
     });
-    {% endfor %}
   });
   </script>
 {% endblock %}
 
 {% block content %}
   <div class="validations">
-    <table>
+    <table id="validation-table">
       <tr>
         <th>Player</th>
         <th>Beer/Brewery Checkin</th>
@@ -134,7 +129,7 @@
         <th>Dismiss</th>
       </tr>
       {% for uv in uvs %}
-      <tr>
+      <tr class="validation-row" id="id_{{ uv.id }}_row" data-validation-id="{{ uv.id }}">
         <td>
           {{ uv.contest_player.player.user.username }}
         </td>
@@ -147,15 +142,21 @@
           {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
         </td>
         <td>
-          <select id="id_{{ uv.id }}_select" class="beer-list"></select>
+          <select id="id_{{ uv.id }}_select" class="beer-list">
+            {% if uv.possible %}
+            <option value="{{ uv.possible.id }}">{{ uv.possible.beer_name }}</option>
+            {% else %}
+            <option></option>
+            {% endif %}
+          </select>
         </td>
         <td>
-          <button id="id_{{ uv.id }}_vbutton" class="validation-button">
+          <button id="id_{{ uv.id }}_vbutton" class="validation-button validation-click" {% if not uv.possible %}disabled{% endif %}>
             Validate
           </button>
         </td>
         <td>
-          <button id="id_{{ uv.id }}_dbutton" class="validation-button">
+          <button id="id_{{ uv.id }}_dbutton" class="validation-button dismissal-click">
             Dismiss
           </button>
         </td>
