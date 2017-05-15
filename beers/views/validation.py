@@ -231,5 +231,11 @@ def unvalidated_checkins(request, contest_id):
 	except EmptyPage:
 		uvs = paginator.page(paginator.num_pages)
 	beers = Contest_Beer.objects.filter(contest_id=contest_id).order_by('beer_name')
+	for uv in uvs:
+		try:
+			b = beers.get(beer_name=uv.beer)
+			uv.possible = b
+		except:
+			pass
 	context = { 'uvs': uvs, 'contest': contest, 'beers': beers, 'form': ValidateCheckinForm(), }
 	return render(request, 'beers/validate.html', context)
