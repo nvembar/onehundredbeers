@@ -54,6 +54,20 @@
     date_joined: '2016-01-01 00:00:00.00+00:00'
     groups: [1,2]
     user_permissions: []
+- model: auth.user
+  pk: 5
+  fields:
+    username: user5
+    password: pbkdf2_sha256$36000$Yu6n6XrDZmif$+kzygtQflJXUlF7mbks3Vsk53HTZ+CZhwAZZfSk4ZaY=
+    first_name: First5
+    last_name: Last5
+    email: user5@example.com
+    is_superuser: false
+    is_staff: false
+    is_active: true
+    date_joined: '2016-01-01 00:00:00.00+00:00'
+    groups: [2]
+    user_permissions: []
 - model: beers.player
   pk: 1
   fields:
@@ -82,7 +96,15 @@
   pk: 4
   fields:
     user: 4
-    personal_statement: Personal Statement 3
-    city: City 3
-    untappd_username: untapped3
-    untappd_rss: 'https://example.com/rss/untapped3'
+    personal_statement: Personal Statement 4
+    city: City 4
+    untappd_username: untapped4
+    untappd_rss: 'https://example.com/rss/untapped4'
+- model: beers.player
+  pk: 5
+  fields:
+    user: 5
+    personal_statement: Personal Statement 5
+    city: City 5
+    untappd_username: untapped5
+    untappd_rss: 'https://example.com/rss/untapped5'
