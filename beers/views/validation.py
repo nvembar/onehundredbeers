@@ -189,20 +189,29 @@ def unvalidated_checkins_json(request, contest_id):
 			contest_player__contest_id=contest_id).order_by('untappd_checkin_date')
 	page_count = math.ceil(uvs.count() / page_size)
 	page_index = math.ceil(slice_start / page_size)
-	f = lambda uv, i: {
-				'id': uv.id,
-				'index': i,
-				'player': uv.contest_player.user_name,
-				'checkin_url': uv.untappd_checkin,
-				'beer': uv.beer,
-				'brewery': uv.brewery,
-				'checkin_date': uv.untappd_checkin_date.strftime('%m/%d/%Y'),
-			}
+	beers = Contest_Beer.objects.filter(contest_id=contest_id).order_by('beer_name')
+	def to_result(uv, i):
+		result = {
+			'id': uv.id,
+			'index': i,
+			'player': uv.contest_player.user_name,
+			'checkin_url': uv.untappd_checkin,
+			'beer': uv.beer,
+			'brewery': uv.brewery,
+			'checkin_date': uv.untappd_checkin_date.strftime('%m/%d/%Y'),
+		}
+		try:
+			b = beers.get(beer_name=uv.beer)
+			result['possible_name'] = b.beer_name
+			result['possible_id'] = b.id
+		except:
+			pass
+		return result
 	result = {
 		'page_count': page_count,
 		'page_index': page_index,
 		'page_size': page_size,
-		'checkins': list(map(f, uvs[slice_start:slice_end], range(slice_start,slice_end))),
+		'checkins': list(map(to_result, uvs[slice_start:slice_end], range(slice_start,slice_end))),
 	}
 	return HttpResponse(json.dumps(result, indent=True), content_type='application/json')
 

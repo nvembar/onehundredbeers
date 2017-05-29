@@ -25,44 +25,115 @@
   </script>
   <script>
   (function(exports) {
-    var currentSearch = -1;
-    var currentResult = -1;
+
 
     function sendContent(uvId, content) {
       var url = "{% url 'update-checkin' contest.id 0 %}";
       url = url.replace('/0/', '/' + uvId + '/');
-      $.ajax({
+      return $.ajax({
         url: url,
-        headers: {
-          Accept: 'application/json'
-        },
+        headers: { Accept: 'application/json' },
         data: JSON.stringify(content),
         contentType: 'application/json',
         dataType: 'json',
         method: 'POST'
-      }).done(function (result, status, xhr) {
-          console.log('Status: ' + status);
-          if (status == "success") {
-            $('#id_'+uvId+'_vbutton').fadeOut(400).remove();
-            $('#id_'+uvId+'_dbutton').fadeOut(400).remove();
-            $('#id_'+uvId+'_select').prop('disabled', true);
-            {% comment %}
-            if (currentSearch == uvId) {
-              exports.clearSearchBox();
-            }
-            $('#id_'+uvId+'_box').fadeOut(400, function() {
-              $('#id_'+uvId+'_box').slideUp(2000, function() {
-                $('#id_'+uvId+'_box').remove();
-              })
-            });
-            {% endcomment %}
-          } else {
-            alert("Got an error " + status);
-          }
-        }
-      ).fail(function (xhr, status, error) {
-        alert("Error trying to send content: " + content + ": " + error)
       });
+    }
+
+    function removeRow(uvId) {
+      return function (result, status, xhr) {
+        console.log("removeRow status " + status);
+        console.log("removeRow result " + result);
+        $('#id_'+uvId+'_row').slideUp('slow');
+        return $('#id_'+uvId+'_row').promise().then( function() { $(this).remove(); } );
+      }
+    }
+
+    function getNextUnvalidatedCheckin(index) {
+      return function () {
+        var url = "{% url 'unvalidated-checkins-json' contest.id %}";
+        return $.ajax({
+            url: url,
+            headers: { Accept: 'application/json' },
+            data: { 'slice_start': index, 'slice_end': index + 1, },
+            method: 'GET',
+            contentType: 'application/json',
+        });
+      }
+    }
+
+    function addRow(checkin) {
+      console.log("addRow argument " + checkin);
+      $('#validation-table').append(
+        '<tr class="validation-row" id="id_' + checkin.id + '_row" data-validation-id="' + checkin.id + '">' + "\n" +
+        '<td>' + checkin.player + "</td>\n" +
+        '<td><a href="' + checkin.checkin_url + '" target="_blank">' + checkin.beer + ' from ' + checkin.brewery + "</a></td>\n" +
+        '<td>' + checkin.checkin_date + "</td>\n" +
+        '<td><select id="id_' + checkin.id + '_select" class="beer-list"></select></td>' + "\n" +
+        '<td><button id="id_' + checkin.id + '_vbutton" class="validation-button validation-click" disabled>Validate</button></td>' + "\n" +
+        '<td><button id="id_' + checkin.id + '_dbutton" class="validation-button dismissal-click">Dismiss</button></td>' + "\n" +
+        "</tr>\n"
+      );
+      var select = $("#id_" + checkin.id + "_select");
+      if ("possible_id" in checkin) {
+        $("#id_" + checkin.id + "_vbutton").prop("disabled", false);
+        select.append(
+          '<option value="' + checkin.possible_id + '">' + checkin.possible_name + '</option>'
+        );
+      } else {
+        select.append('<option></option>');
+      }
+      select.select2({ placeholder: "Select a beer", allowClear: true, data: exports.data });
+      select.on("select2:select", exports.beerListOnSelect);
+      select.on("select2:unselect", exports.beerListOnUnselect);
+      $("#id_" + checkin.id + "_vbutton").click(exports.validationClick);
+      $("#id_" + checkin.id + "_dbutton").click(exports.dismissalClick);
+    }
+
+    function refreshList() {
+      return function (result, status, xhr) {
+        try {
+          for (var i = 0; i < result.checkins.length; i++) {
+            addRow(result.checkins[i]);
+          }
+          if (result.page_index > 1) {
+            console.log("Setting previous to " + (result.page_index - 1));
+            $("#previous-link").attr("href", "?page=" + (result.page_index - 1));
+          } else {
+            $("#previous-link").remove();
+          }
+          if (result.page_index < result.page_count) {
+            console.log("Setting next to " + (result.page_index + 1));
+            $("#next-link").attr("href", "?page=" + (result.page_index + 1));
+          } else {
+            $("#next-link").remove();
+          }
+          $("#page-description").text("Page " + result.page_index + " of " + result.page_count + ".");
+          return "success";
+        } catch (err) {
+          return $.Deferred().fail(err);
+        }
+      }
+    }
+
+    function dismissUv(uvId) {
+      var initialPage = {{ uvs.number }};
+      var initialPageEndIndex = {{ uvs.end_index }} - 1;
+      console.log('Dismissing ' + uvId);
+      sendContent(uvId, {'remove-beer': 'Remove'})
+        .then(removeRow(uvId))
+        .then(getNextUnvalidatedCheckin(initialPageEndIndex))
+        .then(refreshList());
+    }
+
+    function validateUv(uvId, beerId) {
+      var initialPage = {{ uvs.number }};
+      var initialPageEndIndex = {{ uvs.end_index }} - 1;
+      console.log('Setting ' + uvId + ' to beer ' + beerId);
+      sendContent(uvId, { 'validate-beer': 'Validate', 'contest-beer': beerId})
+        .then(removeRow(uvId))
+        .then(getNextUnvalidatedCheckin(initialPageEndIndex))
+        .then(refreshList());
     }
 
     exports.data = [
@@ -70,49 +141,44 @@
       {% endfor %}
     ];
 
-    exports.dismissUv = function(uvId) {
-      sendContent(uvId, {'remove-beer': 'Remove'});
-      console.log('Dismissing ' + uvId);
-    }
-
-    exports.validateUv = function(uvId, beerId) {
-      sendContent(uvId, { 'validate-beer': 'Validate', 'contest-beer': beerId});
-      console.log('Setting ' + uvId + ' to beer ' + beerId);
-    }
-
-  })(this.uvPage = {});
-
-  $(document).ready(function() {
-    /* Convert to select2 for dropdown */
-    $(".beer-list").select2({ placeholder: "Select a beer", allowClear: true, data: uvPage.data, })
-    /* When a beer is selected, enable validation */
-    $(".beer-list").on("select2:select", function (e) {
-        $(this).parents(".validation-row").find(".validation-click").prop('disabled', false);
-      }
-    );
-    /* When a beer is unselected, disable validation */
-    $(".beer-list").on("select2:unselect", function (e) {
-        $(this).parents(".validation-row").find(".validation-click").prop('disabled', true);
-      }
-    );
-    /* When a validate button is clicked, submit the validation information */
-    $(".validation-click").click(function () {
+    exports.validationClick = function() {
       // The parent validation-row contains the validation ID in its data
       var row = $(this).parents(".validation-row");
       var uvId = $(row).data("validationId");
       var selected = $(row).find(".beer-list option:selected").val();
       if (selected) {
-        uvPage.validateUv(uvId, selected);
+        validateUv(uvId, selected);
       }
-    });
+    }
+
+    exports.dismissalClick = function() {
+        // The parent validation-row contains the validation ID in its data
+        var uvId = $(this).parents(".validation-row").data("validationId");
+        dismissUv(uvId);
+    }
+
+    exports.beerListOnSelect = function(e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', false);
+    }
+
+    exports.beerListOnUnselect = function(e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', true);
+    }
+
+  })(this.uvPage = {});
+
+
+  $(document).ready(function() {
+    /* Convert to select2 for dropdown */
+    $(".beer-list").select2({ placeholder: "Select a beer", allowClear: true, data: uvPage.data, })
+    /* When a beer is selected, enable validation */
+    $(".beer-list").on("select2:select", uvPage.beerListOnSelect);
+    /* When a beer is unselected, disable validation */
+    $(".beer-list").on("select2:unselect", uvPage.beerListOnUnselect);
+    /* When a validate button is clicked, submit the validation information */
+    $(".validation-click").click(uvPage.validationClick);
     /* When a dismissal is clicked, submit the dismissal information */
-    $(".dismissal-click").click(function () {
-      // The parent validation-row contains the validation ID in its data
-      console.log("Attempting dismissal on " + $(this).text())
-      var uvId = $(this).parents(".validation-row").data("validationId");
-      console.log("Found uvId " + uvId);
-      uvPage.dismissUv(uvId);
-    });
+    $(".dismissal-click").click(uvPage.dismissalClick);
   });
   </script>
 {% endblock %}
@@ -166,15 +232,15 @@
     <div class="pager">
       <span class="step-links">
         {% if uvs.has_previous %}
-          <a href="?page={{ uvs.previous_page_number }}">previous</a>
+          <a id="previous-link" href="?page={{ uvs.previous_page_number }}">previous</a>
         {% endif %}
 
-        <span class="current">
+        <span id="page-description" class="current">
           Page {{ uvs.number }} of {{ uvs.paginator.num_pages }}.
         </span>
 
         {% if uvs.has_next %}
-          <a href="?page={{ uvs.next_page_number }}">next</a>
+          <a id="next-link" href="?page={{ uvs.next_page_number }}">next</a>
         {% endif %}
       </span>
     </div>
