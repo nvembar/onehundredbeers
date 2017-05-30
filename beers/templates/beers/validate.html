@@ -6,8 +6,10 @@
 {% endblock %}
 
 {% block scripts %}
+  <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}"/>
   <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
+  <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
   {{ form.media }}
   <script>
   function csrfSafeMethod(method) {
