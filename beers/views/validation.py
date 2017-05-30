@@ -16,8 +16,6 @@ from beers.models import Contest_Checkin
 from beers.models import Contest_Beer
 from beers.models import Contest_Player
 from beers.models import Unvalidated_Checkin
-from beers.forms.contests import ValidateCheckinForm
-from dal import autocomplete
 from .helper import is_authenticated_user_contest_runner, is_authenticated_user_player
 from .helper import HttpNotImplementedResponse
 import math
@@ -26,22 +24,6 @@ import json
 import datetime
 
 logger = logging.getLogger(__name__)
-
-class ContestBeerAutocomplete(autocomplete.Select2QuerySetView):
-	"""The autocomplete class for looking up a contest beer"""
-
-	def get_queryset(self):
-		if not self.request.user.is_authenticated():
-			return Contest_Beer.objects.none()
-		qs = Contest_Beer.objects.all()
-		contestId = self.forwarded.get('contest-id', None)
-		if contestId:
-			qs = qs.filter(contest__id=int(contestId))
-		if self.q:
-			qs = qs.filter(beer_name__isstartswith=self.q)
-
-		return qs
-
 
 def BadValidationResponse(BaseException):
 	def __init__(self, value):
@@ -66,28 +48,6 @@ def align_contest_and_checkin(request, contest_id, uv_checkin):
 					.format(request.user.username, contest.name,
 					contest.creator.user.username))
 	return { 'contest': contest, 'uv': uv }
-
-@login_required
-def checkin_validate(request, contest_id, uv_checkin):
-	values = None
-	try:
-		values = align_contest_and_checkin(request, contest_id, uv_checkin)
-	except BadValidationResponse as e:
-		return HttpResponseBadRequest(e.value)
-	uv = values['uv']
-	contest = values['contest']
-	possibles = Contest_Beer.objects.filter(contest_id=contest_id,
-									beer__name__iexact=uv.beer)
-	# Just get the first possible match
-	form = None
-	if possibles.count() > 0:
-		logger.info("\tFound a possible match on checkin {0}: {1}/{2}"
-					.format(uv.untappd_checkin, uv.beer, uv.brewery))
-		form = ValidateCheckinForm(initial={ 'contest_beer': possibles[0].id })
-	else:
-		form = ValidateCheckinForm
-	context = { 'uv': uv, 'contest': contest, 'form': form }
-	return render(request, 'beers/validate-detail.html', context)
 
 @login_required
 @require_http_methods(['POST'])
@@ -246,5 +206,5 @@ def unvalidated_checkins(request, contest_id):
 			uv.possible = b
 		except:
 			pass
-	context = { 'uvs': uvs, 'contest': contest, 'beers': beers, 'form': ValidateCheckinForm(), }
+	context = { 'uvs': uvs, 'contest': contest, 'beers': beers }
 	return render(request, 'beers/validate.html', context)
