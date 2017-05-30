@@ -2,8 +2,6 @@ from django import forms
 from django.utils import timezone
 from django.utils import html
 from beers.models import Contest, Contest_Beer
-# from autocomplete_light.fields import ChoiceField as AlChoiceField
-from dal import autocomplete
 import datetime
 import re
 
@@ -60,18 +58,3 @@ class ContestForm(forms.Form):
             self.add_error('start_date', forms.ValidationError('Start date ' +
                     'must be before end date', code='date_compare'))
         return self.cleaned_data
-
-class ValidateCheckinForm(forms.Form):
-    contest_beer = forms.ModelChoiceField(
-        queryset=Contest_Beer.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url='contest-beer-autocomplete',
-            attrs={
-                'data-placeholder': 'Search for beer...',
-                'data-minimum-input-length': 1,
-
-            },
-        )
-    )
-
-    action = forms.CharField(widget=forms.HiddenInput)
