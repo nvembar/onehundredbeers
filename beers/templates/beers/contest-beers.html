@@ -23,9 +23,8 @@
       <tr>
         <th>Beer</th>
         <th>Brewery</th>
-        <th>Style</th>
-        <th>City</th>
         <th>State</th>
+        <th>Points</th>
         {% if contest_player %}
         <th>Checkin</th>
         {% endif %}
@@ -41,13 +40,10 @@
           {{ cb.beer.brewery }}
         </td>
         <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
-          {{ cb.beer.style }}
-        </td>
-        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
-          {{ cb.beer.brewery_city }}
-        </td>
-        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
           {{ cb.beer.brewery_state }}
+        </td>
+        <td {% if cb.checked_into %}style="background-color: lawngreen"{% endif %}>
+          {{ cb.point_value }}
         </td>
         {% if contest_player %}
         <td style="text-align: center; {% if cb.checked_into %}background-color: lawngreen{% endif %}">

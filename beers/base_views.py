@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.db import transaction
+from django.db.models import Sum
 from django.contrib.auth import authenticate
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.models import User, Group
@@ -66,23 +67,24 @@ def contest(request, contest_id):
 	return render(request, 'beers/contest.html', context)
 
 def contest_leaderboard(request, contest_id):
+	"""Renders the leaderboard for a particular contest"""
 	contest = get_object_or_404(Contest, id=contest_id)
-	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_count')
+	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_points', 'user_name')
+	max_points = Contest_Beer.objects.filter(contest_id=contest).aggregate(Sum('point_value'))['point_value__sum']
 	rank = 0
 	# Start with rank 0 and a number higher than the highest possible beer count
 	# This forces the first iteration to step everything forward
-	last_beer_count = contest.beer_count + 1
-	total_count = 0
+	last_beer_points = max_points + 1
+	player_count = 0
 	for p in contest_players:
-		total_count = total_count + 1
+		player_count = player_count + 1
 		# Calculate the "1224" style ranking
-		if p.beer_count < last_beer_count:
-			rank = total_count
-			logger.info("Shifting rank for {} to [TC:{}/R:{}] with {} beers".format(
-				p.player.user.username, total_count, rank, p.beer_count
-			))
+		if p.beer_points < last_beer_points:
+			rank = player_count
+			logger.info("Shifting rank for {} to [PC:{}/R:{}] with {} beer poins".format(
+				p.player.user.username, player_count, rank, p.beer_points))
 		p.rank = rank
-		last_beer_count = p.beer_count
+		last_beer_points = p.beer_points
 	context = { 'contest': contest, 'players': contest_players }
 	return render(request, 'beers/contest-leaderboard.html', context)
 
@@ -125,15 +127,14 @@ def contest_beers(request, contest_id):
 	if request.user.is_authenticated:
 		try:
 			contest_player = Contest_Player.objects.get(
-				player__user_id=request.user.id)
-			checkins = Contest_Checkin.objects.filter(
-				contest_player_id=contest_player.id)
+				contest=contest, player__user_id=request.user.id)
+			checkins = Contest_Checkin.objects.filter(contest_player=contest_player)
 			checkin_ids = [c.contest_beer.id for c in checkins]
 			for b in contest_beers:
 				b.checked_into = b.id in checkin_ids
 			context['contest_player'] = contest_player
-		except:
-			pass
+		except Contest_Player.DoesNotExist:
+			logger.error('Request for user {} for contest {} is not valid'.format(request.user.id, contest))
 	return render(request, 'beers/contest-beers.html', context)
 
 def contest_beer(request, contest_id, beer_id):

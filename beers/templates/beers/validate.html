@@ -6,179 +6,243 @@
 {% endblock %}
 
 {% block scripts %}
+  <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}"/>
   <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-  {% include 'autocomplete_light/static.html' %}
+  <script type="text/javascript" src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
+  <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
+  {{ form.media }}
+  <script>
+  function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      var csrftoken = Cookies.get('csrftoken');
+      if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
+  </script>
   <script>
   (function(exports) {
-    var currentSearch = -1;
-    var currentResult = -1;
+
 
     function sendContent(uvId, content) {
       var url = "{% url 'update-checkin' contest.id 0 %}";
       url = url.replace('/0/', '/' + uvId + '/');
-      $.ajax({
+      return $.ajax({
         url: url,
-        headers: {
-          Accept: 'application/json'
-        },
-        data: content,
+        headers: { Accept: 'application/json' },
+        data: JSON.stringify(content),
+        contentType: 'application/json',
         dataType: 'json',
         method: 'POST'
-      }).done(function (result, status, xhr) {
-          console.log('Status: ' + status);
-          if (status == "success") {
-            if (currentSearch == uvId) {
-              exports.clearSearchBox();
-            }
-            $('#id_'+uvId+'_box').fadeOut(400, function() {
-              $('#id_'+uvId+'_box').slideUp(2000, function() {
-                $('#id_'+uvId+'_box').remove();
-              })
-            });
-          } else {
-            alert("Got an error " + status);
-          }
-        }
-      ).fail(function (xhr, status, error) {
-        alert("Error trying to send content: " + content + ": " + error)
       });
     }
 
-    exports.dismissUv = function(uvId) {
-      sendContent(uvId, {'remove-beer': 'Remove'});
-      console.log('Dismissing ' + uvId);
-    }
-
-    exports.validateUv = function(uvId, beerId) {
-      sendContent(uvId, { 'validate-beer': 'Validate', 'contest_beer': beerId});
-      console.log('Setting ' + uvId + ' to beer ' + beerId);
-    }
-
-    exports.validateFromSearch = function() {
-      if (currentSearch == -1) {
-        return;
+    function removeRow(uvId) {
+      return function (result, status, xhr) {
+        console.log("removeRow status " + status);
+        console.log("removeRow result " + result);
+        $('#id_'+uvId+'_row').slideUp('slow');
+        return $('#id_'+uvId+'_row').promise().then( function() { $(this).remove(); } );
       }
-      var contestBeer = $('#id_contest_beer option:selected').val()
-      sendContent(currentSearch,
-        { 'validate-beer': 'Validate', 'contest_beer': contestBeer });
     }
 
-    exports.clearSearchBox = function() {
-      $('#id_'+currentSearch+'_vsbutton').unbind();
-      $('#id_contest_beer-autocomplete').unbind();
-      $('.autocomplete-light-widget').unbind();
-
-      $('#id_'+currentSearch+'_vsbutton').attr('id', 'id_'+currentSearch+'_sbutton');
-      $('#id_'+currentSearch+'_sbutton').html('Search for beer');
-      $("#id_"+currentSearch+"_sbutton").click(function() {
-        exports.addSearchBox(currentSearch);
-      });
-      $('#id_'+currentSearch+'_sbutton').prop('disabled', false);
-      $('#id_contest_beer-wrapper').remove();
-      currentSearch = -1;
-    }
-
-    exports.addSearchBox = function(uvId) {
-      if (currentSearch != -1) {
-        exports.clearSearchBox();
-      }
-      $('#id_'+uvId+'_sdiv').prepend("{{ form.contest_beer|escapejs }}");
-      $('#id_'+uvId+'_vbutton').prop('disabled', true);
-      $('#id_'+uvId+'_sbutton').html('Validate');
-      $('#id_'+uvId+'_sbutton').unbind();
-      $('#id_'+uvId+'_sbutton').attr('id', 'id_'+uvId+'_vsbutton');
-      $('#id_'+uvId+'_vsbutton').click(function() {
-        exports.validateFromSearch();
-      });
-      // Disable the validate buttun until a choice is selected
-      $('#id_'+uvId+'_vsbutton').prop('disabled', true);
-      $('#id_contest_beer-autocomplete').bind('selectChoice',
-        function(e, choice, autocomplete) {
-          $('#id_'+uvId+'_vsbutton').prop("disabled",false);
-        }
-      );
-      $('.autocomplete-light-widget').bind('widgetDeselectChoice',
-        function(e) {
-          $('#id_'+uvId+'_vsbutton').prop('disabled', true);
-        }
-      );
-      currentSearch=uvId;
-    }
-
-    exports.bindButtonsFor = function(uvId, possibleId) {
-      //console.log("Binding buttons for " + uvId);
-      //console.log("Trying button binding for #id_" + uvId + "_dbutton");
-      $("#id_"+uvId+"_dbutton").click(function() {
-        exports.dismissUv(uvId);
-      });
-      $("#id_"+uvId+"_sbutton").click(function() {
-        exports.addSearchBox(uvId);
-      });
-      if (possibleId > 0) {
-        //console.log("Trying button binding for #id_" + uvId + "_vbutton");
-        $("#id_"+uvId+"_vbutton").click(function() {
-          exports.validateUv(uvId, possibleId);
+    function getNextUnvalidatedCheckin(index) {
+      return function () {
+        var url = "{% url 'unvalidated-checkins-json' contest.id %}";
+        return $.ajax({
+            url: url,
+            headers: { Accept: 'application/json' },
+            data: { 'slice_start': index, 'slice_end': index + 1, },
+            method: 'GET',
+            contentType: 'application/json',
         });
       }
     }
+
+    function addRow(checkin) {
+      console.log("addRow argument " + checkin);
+      $('#validation-table').append(
+        '<tr class="validation-row" id="id_' + checkin.id + '_row" data-validation-id="' + checkin.id + '">' + "\n" +
+        '<td>' + checkin.player + "</td>\n" +
+        '<td><a href="' + checkin.checkin_url + '" target="_blank">' + checkin.beer + ' from ' + checkin.brewery + "</a></td>\n" +
+        '<td>' + checkin.checkin_date + "</td>\n" +
+        '<td><select id="id_' + checkin.id + '_select" class="beer-list"></select></td>' + "\n" +
+        '<td><button id="id_' + checkin.id + '_vbutton" class="validation-button validation-click" disabled>Validate</button></td>' + "\n" +
+        '<td><button id="id_' + checkin.id + '_dbutton" class="validation-button dismissal-click">Dismiss</button></td>' + "\n" +
+        "</tr>\n"
+      );
+      var select = $("#id_" + checkin.id + "_select");
+      if ("possible_id" in checkin) {
+        $("#id_" + checkin.id + "_vbutton").prop("disabled", false);
+        select.append(
+          '<option value="' + checkin.possible_id + '">' + checkin.possible_name + '</option>'
+        );
+      } else {
+        select.append('<option></option>');
+      }
+      select.select2({ placeholder: "Select a beer", allowClear: true, data: exports.data });
+      select.on("select2:select", exports.beerListOnSelect);
+      select.on("select2:unselect", exports.beerListOnUnselect);
+      $("#id_" + checkin.id + "_vbutton").click(exports.validationClick);
+      $("#id_" + checkin.id + "_dbutton").click(exports.dismissalClick);
+    }
+
+    function refreshList() {
+      return function (result, status, xhr) {
+        try {
+          for (var i = 0; i < result.checkins.length; i++) {
+            addRow(result.checkins[i]);
+          }
+          if (result.page_index > 1) {
+            console.log("Setting previous to " + (result.page_index - 1));
+            $("#previous-link").attr("href", "?page=" + (result.page_index - 1));
+          } else {
+            $("#previous-link").remove();
+          }
+          if (result.page_index < result.page_count) {
+            console.log("Setting next to " + (result.page_index + 1));
+            $("#next-link").attr("href", "?page=" + (result.page_index + 1));
+          } else {
+            $("#next-link").remove();
+          }
+          $("#page-description").text("Page " + result.page_index + " of " + result.page_count + ".");
+          return "success";
+        } catch (err) {
+          return $.Deferred().fail(err);
+        }
+      }
+    }
+
+    function dismissUv(uvId) {
+      var initialPage = {{ uvs.number }};
+      var initialPageEndIndex = {{ uvs.end_index }} - 1;
+      console.log('Dismissing ' + uvId);
+      sendContent(uvId, {'remove-beer': 'Remove'})
+        .then(removeRow(uvId))
+        .then(getNextUnvalidatedCheckin(initialPageEndIndex))
+        .then(refreshList());
+    }
+
+    function validateUv(uvId, beerId) {
+      var initialPage = {{ uvs.number }};
+      var initialPageEndIndex = {{ uvs.end_index }} - 1;
+      console.log('Setting ' + uvId + ' to beer ' + beerId);
+      sendContent(uvId, { 'validate-beer': 'Validate', 'contest-beer': beerId})
+        .then(removeRow(uvId))
+        .then(getNextUnvalidatedCheckin(initialPageEndIndex))
+        .then(refreshList());
+    }
+
+    exports.data = [
+      {% for b in beers %}{ id: {{ b.id }}, text: '{{ b.beer_name }}'},
+      {% endfor %}
+    ];
+
+    exports.validationClick = function() {
+      // The parent validation-row contains the validation ID in its data
+      var row = $(this).parents(".validation-row");
+      var uvId = $(row).data("validationId");
+      var selected = $(row).find(".beer-list option:selected").val();
+      if (selected) {
+        validateUv(uvId, selected);
+      }
+    }
+
+    exports.dismissalClick = function() {
+        // The parent validation-row contains the validation ID in its data
+        var uvId = $(this).parents(".validation-row").data("validationId");
+        dismissUv(uvId);
+    }
+
+    exports.beerListOnSelect = function(e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', false);
+    }
+
+    exports.beerListOnUnselect = function(e) {
+        $(this).parents(".validation-row").find(".validation-click").prop('disabled', true);
+    }
+
   })(this.uvPage = {});
 
+
   $(document).ready(function() {
-    {% for uv in uvs %}
-    {% if uv.beer_brewery %}
-    uvPage.bindButtonsFor({{ uv.id }}, {{ uv.contest_beer_id }});
-    {% else %}
-    uvPage.bindButtonsFor({{ uv.id }}, -1);
-    {% endif %}
-    {% endfor %}
+    /* Convert to select2 for dropdown */
+    $(".beer-list").select2({ placeholder: "Select a beer", allowClear: true, data: uvPage.data, })
+    /* When a beer is selected, enable validation */
+    $(".beer-list").on("select2:select", uvPage.beerListOnSelect);
+    /* When a beer is unselected, disable validation */
+    $(".beer-list").on("select2:unselect", uvPage.beerListOnUnselect);
+    /* When a validate button is clicked, submit the validation information */
+    $(".validation-click").click(uvPage.validationClick);
+    /* When a dismissal is clicked, submit the dismissal information */
+    $(".dismissal-click").click(uvPage.dismissalClick);
   });
   </script>
 {% endblock %}
 
 {% block content %}
   <div class="validations">
-    {% for uv in uvs %}
-      <div id="id_{{ uv.id }}_box" class="validation-box">
-        <div class="validation-lines">
-          <div class="validation-text-line">
-            <span style="width: 80%">
-              <em>{{ uv.contest_player.player.user.username }}</em> checked into
-              <a href="{{ uv.untappd_checkin }}" target="_blank">
-                {{ uv.beer }} from {{ uv.brewery }}
-              </a>
-              on {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
-            </span>
-          </div>
-          <div class="validation-button-line">
-            {% if uv.beer_brewery %}
-              <button id="id_{{ uv.id }}_vbutton" class="validation-button">
-                Validate as {{ uv.beer_brewery }}
-              </button>
+    <table id="validation-table">
+      <tr>
+        <th>Player</th>
+        <th>Beer/Brewery Checkin</th>
+        <th>Checkin Date</th>
+        <th>Select Contest Beer</th>
+        <th>Validate</th>
+        <th>Dismiss</th>
+      </tr>
+      {% for uv in uvs %}
+      <tr class="validation-row" id="id_{{ uv.id }}_row" data-validation-id="{{ uv.id }}">
+        <td>
+          {{ uv.contest_player.player.user.username }}
+        </td>
+        <td>
+          <a href="{{ uv.untappd_checkin }}" target="_blank">
+            {{ uv.beer }} from {{ uv.brewery }}
+          </a>
+        </td>
+        <td>
+          {{ uv.untappd_checkin_date|date:"SHORT_DATE_FORMAT" }}
+        </td>
+        <td>
+          <select id="id_{{ uv.id }}_select" class="beer-list">
+            {% if uv.possible %}
+            <option value="{{ uv.possible.id }}">{{ uv.possible.beer_name }}</option>
+            {% else %}
+            <option></option>
             {% endif %}
-            <button id="id_{{ uv.id }}_dbutton" class="validation-button">
-              Dismiss
-            </button>
-          </div>
-          <div id="id_{{ uv.id }}_sdiv" class="validation-button-line">
-            <button id="id_{{ uv.id }}_sbutton" class="validation-button">
-              Search for beer
-            </button>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
+          </select>
+        </td>
+        <td>
+          <button id="id_{{ uv.id }}_vbutton" class="validation-button validation-click" {% if not uv.possible %}disabled{% endif %}>
+            Validate
+          </button>
+        </td>
+        <td>
+          <button id="id_{{ uv.id }}_dbutton" class="validation-button dismissal-click">
+            Dismiss
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
     <div class="pager">
       <span class="step-links">
         {% if uvs.has_previous %}
-          <a href="?page={{ uvs.previous_page_number }}">previous</a>
+          <a id="previous-link" href="?page={{ uvs.previous_page_number }}">previous</a>
         {% endif %}
 
-        <span class="current">
+        <span id="page-description" class="current">
           Page {{ uvs.number }} of {{ uvs.paginator.num_pages }}.
         </span>
 
         {% if uvs.has_next %}
-          <a href="?page={{ uvs.next_page_number }}">next</a>
+          <a id="next-link" href="?page={{ uvs.next_page_number }}">next</a>
         {% endif %}
       </span>
     </div>
