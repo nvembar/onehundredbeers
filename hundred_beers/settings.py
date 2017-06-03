@@ -32,7 +32,6 @@ ALLOWED_HOSTS = [os.getenv('ALLLOWED_HOSTS', default='*')]
 
 INSTALLED_APPS = [
 	'beers.apps.BeersConfig',
-	'autocomplete_light',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE_CLASSES = [
-	'sslify.middleware.SSLifyMiddleware',
+	# 'sslify.middleware.SSLifyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,7 +75,9 @@ WSGI_APPLICATION = 'hundred_beers.wsgi.application'
 
 # Setting the SSLify values
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SSLIFY_DISABLE = os.getenv('SSLIFY_DISABLE', default='0') is '1'
+# SSLIFY_DISABLE = os.getenv('SSLIFY_DISABLE', default='0') is '1'
+SECURE_SSL_REDIRECT = os.getenv('SSL_REDIRECT', default='1') is '1'
+
 
 
 # Database
@@ -117,6 +118,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+# ARN for Role that the loader should take on
+LOADER_ROLE_ARN = os.getenv("LOADER_ROLE_ARN")
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -136,7 +140,7 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, '..')
-BOWER_INSTALLED_APPS = [ 'jquery', 'tablesorter' ]
+BOWER_INSTALLED_APPS = ( 'jquery#^3.2.1', 'tablesorter', 'js-cookie', 'select2' )
 
 LOGIN_REDIRECT_URL = '/'
 

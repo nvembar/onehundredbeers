@@ -1,0 +1,63 @@
+- model: beers.unvalidated_checkin
+  pk: 1
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 1
+    untappd_checkin: https://example.com/unvalidated_1
+    untappd_checkin_date: '2016-01-01 00:00:00.00+00:00'
+    brewery: Brewery 1
+    beer: Beer 1
+- model: beers.unvalidated_checkin
+  pk: 2
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 2
+    untappd_checkin: https://example.com/unvalidated_2
+    untappd_checkin_date: '2016-01-02 00:00:00.00+00:00'
+    brewery: Brewery 2
+    beer: Beer 2
+- model: beers.unvalidated_checkin
+  pk: 3
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 3
+    untappd_checkin: https://example.com/unvalidated_3
+    untappd_checkin_date: '2016-01-03 00:00:00.00+00:00'
+    brewery: Brewery 3
+    beer: Beer 3
+- model: beers.unvalidated_checkin
+  pk: 4
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 4
+    untappd_checkin: https://example.com/unvalidated_4
+    untappd_checkin_date: '2016-01-04 00:00:00.00+00:00'
+    brewery: Brewery 4
+    beer: Beer 4
+- model: beers.unvalidated_checkin
+  pk: 5
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 5
+    untappd_checkin: https://example.com/unvalidated_5
+    untappd_checkin_date: '2016-01-05 00:00:00.00+00:00'
+    brewery: Brewery 5
+    beer: Beer 5
+- model: beers.unvalidated_checkin
+  pk: 6
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 6
+    untappd_checkin: https://example.com/unvalidated_6
+    untappd_checkin_date: '2016-01-06 00:00:00.00+00:00'
+    brewery: Brewery 6
+    beer: Beer 6
+- model: beers.unvalidated_checkin
+  pk: 7
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 7
+    untappd_checkin: https://example.com/unvalidated_7
+    untappd_checkin_date: '2016-01-07 00:00:00.00+00:00'
+    brewery: Brewery 7
+    beer: Beer 7

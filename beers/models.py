@@ -70,9 +70,10 @@ class ContestManager(models.Manager):
 				user_count=0, beer_count=0)
 		return contest
 
-	def add_beer(self, contest, beer):
+	def add_beer(self, contest, beer, point_value=1):
 		contest_beer = Contest_Beer(contest=contest, beer=beer,
-							beer_name=beer.name, total_drank=0)
+							beer_name=beer.name, point_value=point_value,
+							total_drank=0,)
 		return contest_beer
 
 class Contest(models.Model):
@@ -100,6 +101,7 @@ class Contest_Beer(models.Model):
 	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
 	beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
 	beer_name = models.CharField(max_length=250)
+	point_value = models.IntegerField(default=1)
 	total_drank = models.IntegerField("number of players who drank this beer")
 
 	def __str__(self):
@@ -125,6 +127,7 @@ class Contest_Player(models.Model):
 	player = models.ForeignKey(Player, on_delete=models.CASCADE)
 	user_name = models.CharField(max_length=50)
 	beer_count = models.IntegerField(default=0)
+	beer_points = models.IntegerField(default=0)
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
 	last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
@@ -174,12 +177,14 @@ class Contest_CheckinManager(models.Manager):
 		cc = self.create(contest_player=contest_player,
 				contest_beer=contest_beer,
 				checkin_time=checkin_time,
+				checkin_points=contest_beer.point_value,
 				untappd_checkin=untappd_checkin)
 		return cc
 
 class Contest_Checkin(models.Model):
 	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
 	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE)
+	checkin_points = models.IntegerField(default=1)
 	checkin_time = models.DateTimeField()
 	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
 
