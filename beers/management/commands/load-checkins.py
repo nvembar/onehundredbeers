@@ -18,19 +18,19 @@ class Command(BaseCommand):
         parser.add_argument('--contest', nargs=1, help='Contest ID')
         parser.add_argument('--after-date', nargs=1, help='After date')
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **opts):
         player = None
         contest_id = None
         after_date = None
-        if opts['player'] and len(opts['player']) > 0:
+        if opts.get('player') and len(opts['player']) > 0:
             player = opts['player'][0]
-        if opts['contest'] and len(opts['contest']) > 0:
+        if opts.get('contest') in opts and len(opts['contest']) > 0:
             try:
                 contest_id = int(opts['contest'][0])
             except ValueError:
                 logger.error('Error: load-checkins got a contest that was not an integer: {}'.opts['contest'][0])
                 return
-        if opts['after-date'] and len(opts['after-date']) > 0:
+        if opts.get('after-date') in opts and len(opts['after-date']) > 0:
             try:
                 after_date = parse(opts['after-date'][0])
             except ValueError:
@@ -40,4 +40,4 @@ class Command(BaseCommand):
         if not player is None:
             players = players.filter(user__username=player)
         for p in players:
-            load_player_checkins(p, from_date=after_date, contest_id=contest)
+            load_player_checkins(p, from_date=after_date, contest_id=contest_id)
