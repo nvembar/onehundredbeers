@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from django.test import Client
 from django.contrib.auth.models import User, Group, Permission
+from django.core.management import call_command
 from beers.models import Contest_Beer, Beer, Contest, Player, Contest_Player, Unvalidated_Checkin
 from beers.utils.loader import create_contest_from_csv
 from beers.utils.checkin import load_player_checkins
@@ -88,4 +89,18 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         cp = Contest_Player.objects.link(contest, player)
         cp.save()
         load_player_checkins(player)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(contest_player=cp).count(), 25)
+
+    def test_successful_checkin_command(self):
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.untappd_rss = os.path.join(BASE_DIR, '..', 'test-data', 'test-checkins.xml')
+        player.save()
+        contest = Contest.objects.create_contest('Contest', runner,
+                timezone.make_aware(datetime.datetime(2017, 1, 1)),
+                timezone.make_aware(datetime.datetime(2017, 12, 31)))
+        contest.save()
+        cp = Contest_Player.objects.link(contest, player)
+        cp.save()
+        call_command('load-checkins', '--player', player.user.username)
         self.assertEqual(Unvalidated_Checkin.objects.filter(contest_player=cp).count(), 25)
