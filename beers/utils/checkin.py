@@ -1,5 +1,4 @@
-from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin
-from beers.models import Contest_Checkin
+from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin, Contest_Checkin, Brewery, Contest_Brewery
 import feedparser
 import datetime
 import re
@@ -73,3 +72,11 @@ def load_player_checkins(p, contest_id=None, from_date=None):
                     logger.debug('Ignoring "{0}" as it already exists in database'.format(c.title))
             cp.last_checkin_load = last_date
             cp.save()
+
+def checkin_brewery(uv_checkin, contest_brewery, save_checkin=False):
+    """
+    Checks in a brewery from an unvalidated checkin for a user.
+
+    save_checkin=True will prevent the unvalidated checkin from being deleted
+    """
+    return None
