@@ -36,6 +36,7 @@ class BreweryTestCase(TestCase):
         self.assertIsNotNone(checkin)
         self.assertEqual(checkin.contest_brewery, cb)
         self.assertIsNone(checkin.contest_beer)
+        self.assertEqual(cb.point_value, checkin.checkin_points)
         with self.assertRaises(Unvalidated_Checkin.DoesNotExist):
             Unvalidated_Checkin.objects.get(id=uv_id)
         cp_update = Contest_Player.objects.get(contest__id=1, user_name='user1')
@@ -53,6 +54,7 @@ class BreweryTestCase(TestCase):
         uv = Unvalidated_Checkin.objects.get(brewery='Brewery 2')
         uv_id = uv.id
         uv_url = uv.untappd_checkin
+        uv_date = uv.untappd_checkin_date
         cp = Contest_Player.objects.get(contest__id=1, user_name='user1')
         total_points = cp.total_points
         beer_points = cp.beer_points
@@ -61,6 +63,7 @@ class BreweryTestCase(TestCase):
         checkin = checkin_brewery(uv, cb, save_checkin=True)
         self.assertIsNotNone(checkin)
         self.assertEqual(checkin.contest_brewery, cb)
+        self.assertEqual(cb.point_value, checkin.checkin_points)
         self.assertIsNone(checkin.contest_beer)
         uv_update = Unvalidated_Checkin.objects.get(id=uv_id)
         self.assertIsNotNone(uv_update)
@@ -81,6 +84,7 @@ class BreweryTestCase(TestCase):
         uv = uvs[0]
         uv_id = uv.id
         uv_url = uv.untappd_checkin
+        uv_date = uv.untappd_checkin_date
         cp = Contest_Player.objects.get(contest__id=1, user_name='user1')
         total_points = cp.total_points
         beer_points = cp.beer_points
@@ -89,6 +93,7 @@ class BreweryTestCase(TestCase):
         checkin = checkin_brewery(uv, cb)
         self.assertIsNotNone(checkin)
         self.assertEqual(checkin.contest_brewery, cb)
+        self.assertEqual(cb.point_value, checkin.checkin_points)
         self.assertIsNone(checkin.contest_beer)
         checkin_id = checkin.id
         uv_update = Unvalidated_Checkin.objects.get(id=uv_id)
@@ -101,7 +106,7 @@ class BreweryTestCase(TestCase):
         redundant_uv = uvs[1]
         redundant_uv_date = redundant_uv.untappd_checkin_date
         second_checkin = checkin_brewery(redundant_uv, cb)
-        assertIsNone(redundant_uv)
+        self.assertIsNone(redundant_uv)
         cp_update = Contest_Player.objects.get(contest__id=1, user_name='user1')
         self.assertEqual(beer_points, cp_update.beer_points)
         self.assertEqual(brewery_points + cb.point_value, cp_update.brewery_points)
