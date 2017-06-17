@@ -221,6 +221,15 @@ class Contest_CheckinManager(models.Manager):
 				untappd_checkin=untappd_checkin)
 		return cc
 
+	def create_brewery_checkin(self, contest_player, contest_brewery, checkin_time,
+			untappd_checkin):
+		cc = self.create(contest_player=contest_player,
+				contest_brewery=contest_brewery,
+				checkin_time=checkin_time,
+				checkin_points=contest_brewery.point_value,
+				untappd_checkin=untappd_checkin)
+		return cc
+
 class Contest_Checkin(models.Model):
 	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
 	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE, blank=True, null=True,)
