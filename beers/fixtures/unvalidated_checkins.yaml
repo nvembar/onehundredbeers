@@ -61,3 +61,12 @@
     untappd_checkin_date: '2016-01-07 00:00:00.00+00:00'
     brewery: Brewery 7
     beer: Beer 7
+- model: beers.unvalidated_checkin
+  pk: 8
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 8
+    untappd_checkin: https://example.com/unvalidated_8
+    untappd_checkin_date: '2016-01-08 00:00:00.00+00:00'
+    brewery: Brewery 1
+    beer: Beer 1
