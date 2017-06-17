@@ -16,12 +16,7 @@ class ContestTestCase(TestCase):
         pass
 
     def tearDown(self):
-        # Removes all checkin data and resets everyone's point values and beer counts
-        # Unvalidated_Checkin.objects.all().delete()
-        Contest_Checkin.objects.all().delete()
-        Contest_Player.objects.all().update(beer_count=0, beer_points=0,
-                    last_checkin_date=None, last_checkin_beer=None,
-                    last_checkin_load=timezone.make_aware(datetime.datetime(2016, 1, 1)),)
+        pass
 
     def test_successful_checkin_validate(self):
         """Logs in as the correct user and validates a beer"""
