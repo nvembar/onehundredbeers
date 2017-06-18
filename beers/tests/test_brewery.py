@@ -116,3 +116,73 @@ class BreweryTestCase(TestCase):
         self.assertEqual(total_points + cb.point_value, cp_update.total_points)
         self.assertEqual(cb.brewery_name, cp_update.last_checkin_brewery)
         self.assertEqual(cp_update.last_checkin_date, redundant_uv_date)
+
+    def test_successful_add_brewery_api(self):
+        """
+        Tests that the API call for adding a new brewery checkin works. Could be more
+        comprehensive but relying on the above
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(id=1)
+        uv = Unvalidated_Checkin.objects.get(id=2)
+        cp = uv.contest_player
+        total_points = cp.total_points
+        brewery_points = cp.brewery_points
+        uv_id = uv.id
+        brewery = uv.brewery
+        cb = Contest_Brewery.objects.get(contest=contest, brewery__name=brewery)
+        response = c.post(reverse('add-brewery-checkin', kwargs={ 'contest_id': contest.id, 'uv_checkin': uv.id}),
+                    content_type='application/json',
+                    data=json.dumps({'as_brewery': cb.id, }),
+                    HTTP_ACCEPT='application/json',)
+        with self.assertRaises(Unvalidated_Checkin.DoesNotExist):
+            Unvalidated_Checkin.objects.get(id=uv_id)
+        cp_update = Contest_Player.objects.get(id=cp.id)
+        self.assertEqual(total_points + cb.point_value, cp_update.total_points)
+        self.assertEqual(brewery_points + cb.point_value, cp_update.brewery_points)
+        self.assertGreater(Contest_Checkin.objects.filter(contest_player=cp, contest_brewery=cb).count(), 0)
+
+    def test_successful_add_brewery_api_with_preserve(self):
+        """
+        Tests that the API call for adding a new brewery checkin works. Could be more
+        comprehensive but relying on the above
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(id=1)
+        uv = Unvalidated_Checkin.objects.get(id=2)
+        cp = uv.contest_player
+        total_points = cp.total_points
+        brewery_points = cp.brewery_points
+        uv_id = uv.id
+        brewery = uv.brewery
+        cb = Contest_Brewery.objects.get(contest=contest, brewery__name=brewery)
+        response = c.post(reverse('add-brewery-checkin', kwargs={ 'contest_id': contest.id, 'uv_checkin': uv.id}),
+                    content_type='application/json',
+                    data=json.dumps({'as_brewery': cb.id, 'preserve': True, }),
+                    HTTP_ACCEPT='application/json',)
+        preserved = Unvalidated_Checkin.objects.get(id=uv_id)
+        self.assertIsNotNone(preserved)
+        cp_update = Contest_Player.objects.get(id=cp.id)
+        self.assertEqual(total_points + cb.point_value, cp_update.total_points)
+        self.assertEqual(brewery_points + cb.point_value, cp_update.brewery_points)
+        self.assertGreater(Contest_Checkin.objects.filter(contest_player=cp, contest_brewery=cb).count(), 0)
+
+    def test_404_on_invalid_checkin(self):
+        """
+        Tests that the API call for adding a new brewery checkin works. Could be more
+        comprehensive but relying on the above
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(id=1)
+        uv = Unvalidated_Checkin.objects.get(id=2)
+        brewery = uv.brewery
+        cb = Contest_Brewery.objects.get(contest=contest, brewery__name=brewery)
+        response = c.post(reverse('add-brewery-checkin',
+                    kwargs={ 'contest_id': contest.id, 'uv_checkin': 100 }),
+                    content_type='application/json',
+                    data=json.dumps({'as_brewery': cb.id, }),
+                    HTTP_ACCEPT='application/json',)
+        self.assertEqual(response.status_code, 404)
