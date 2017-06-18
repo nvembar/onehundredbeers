@@ -8,14 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, MultipleObjectsReturned
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from beers.models import Contest
-from beers.models import Beer
-from beers.models import Player
-from beers.models import Checkin
-from beers.models import Contest_Checkin
-from beers.models import Contest_Beer
-from beers.models import Contest_Player
-from beers.models import Unvalidated_Checkin
+from beers.models import Contest, Beer, Player, Checkin, Contest_Checkin, Contest_Beer, Contest_Player, Contest_Brewery, Unvalidated_Checkin
+from beers.utils.checkin import checkin_brewery
 from .helper import is_authenticated_user_contest_runner, is_authenticated_user_player
 from .helper import HttpNotImplementedResponse
 import math
@@ -25,7 +19,7 @@ import datetime
 
 logger = logging.getLogger(__name__)
 
-def BadValidationResponse(BaseException):
+class BadValidationResponse(BaseException):
 	def __init__(self, value):
 		self.value = value
 
@@ -52,7 +46,47 @@ def align_contest_and_checkin(request, contest_id, uv_checkin):
 @login_required
 @require_http_methods(['POST'])
 @transaction.atomic
+def add_brewery_checkin(request, contest_id, uv_checkin):
+	"""
+	Adds a checkin to a brewery via a POST (like it should do)
+
+	Expects data in the form { 'as_brewery': id, 'preserve': true/false }
+
+	as_brewery: The contest brewery ID
+	preserve: Whether to save the unvalidated checkin or not
+	"""
+	values = None
+	try:
+		values = align_contest_and_checkin(request, contest_id, uv_checkin)
+	except BadValidationResponse as e:
+		return HttpResponseBadRequest(e.value)
+	uv = values['uv']
+	contest = values['contest']
+	data = None
+	try:
+		data = json.loads(request.body)
+	except json.JSONDecoderError as e:
+		return HttpResponseBadRequest('Invalid request, not JSON: {}'.format(e))
+	contest_brewery = None
+	try:
+		contest_brewery = Contest_Brewery.objects.get(id=data['as_brewery'])
+	except Contest_Brewery.DoesNotExist as e:
+		return HttpResponseBadRequest(
+			'No such beer with id {}'.format(data['as_brewery']))
+	checkin = checkin_brewery(uv, contest_brewery, save_checkin=data.get('preserve', False))
+	if request.META.get('HTTP_ACCEPT') == 'application/json':
+		return HttpResponse(
+			json.dumps({ 'success': True, 'checkin_id': checkin.id, }),
+			content_type='application/json',
+			)
+	else:
+		return redirect('unvalidated-checkins', contest_id)
+
+@login_required
+@require_http_methods(['POST'])
+@transaction.atomic
 def update_checkin(request, contest_id, uv_checkin):
+	# XXX: Refactor this into something more like add_brwery_checkin()
 	values = None
 	try:
 		values = align_contest_and_checkin(request, contest_id, uv_checkin)
