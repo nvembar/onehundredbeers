@@ -129,6 +129,9 @@ class Brewery(models.Model):
 
 	objects = Brewery_Manager()
 
+	def __str__(self):
+		return self.name
+
 class Contest_BreweryManager(models.Manager):
 
 	def link(contest, brewery, value):
@@ -143,6 +146,9 @@ class Contest_Brewery(models.Model):
 	total_visited = models.IntegerField("number of players who drank at this brewery")
 
 	objects = Contest_BreweryManager()
+
+	def __str__(self):
+		return '{}/{}'.format(self.contest.name, self.brewery.name)
 
 class Contest_PlayerManager(models.Manager):
 	"""Manager for linking contests to players"""
