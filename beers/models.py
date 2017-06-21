@@ -70,11 +70,13 @@ class ContestManager(models.Manager):
 				user_count=0, beer_count=0)
 		return contest
 
+	# XXX: Move this to Contest.add_beer
 	def add_beer(self, contest, beer, point_value=1):
 		contest_beer = Contest_Beer(contest=contest, beer=beer,
 							beer_name=beer.name, point_value=point_value,
 							total_drank=0,)
 		return contest_beer
+
 
 class Contest(models.Model):
 	"Represents a contest"
@@ -91,9 +93,15 @@ class Contest(models.Model):
 
 	objects = ContestManager()
 
+	def add_brewery(self, brewery, point_value=1):
+		"Adds a brewery to the contest"
+		cb = Contest_Brewery(contest=self, brewery=brewery,
+				brewery_name=brewery.name, point_value=point_value,)
+		cb.save()
+		return cb
+
 	def __str__(self):
 		return self.name
-
 
 class Contest_Beer(models.Model):
 	"Represents a many-to-many connection between a beer and a contest"
@@ -106,6 +114,41 @@ class Contest_Beer(models.Model):
 
 	def __str__(self):
 		return "{0}/{1}".format(self.beer.name, self.beer.brewery)
+
+class Brewery_Manager(models.Manager):
+
+	def create_brewery(self, name, untappd_id):
+		return self.create(name=name, untappd_id=untappd_id)
+
+class Brewery(models.Model):
+	name = models.CharField(max_length=250)
+	untappd_id = models.CharField(max_length=25, null=True, blank=True,)
+	untappd_url = models.URLField(null=True, blank=True,)
+	state = models.CharField(max_length=250)
+	last_updated = models.DateTimeField()
+
+	objects = Brewery_Manager()
+
+	def __str__(self):
+		return self.name
+
+class Contest_BreweryManager(models.Manager):
+
+	def link(contest, brewery, value):
+		return self.create(contest=contest, brewery=brewery,
+			brewery_name=brewery.name, point_value=value, total_drank=0,)
+
+class Contest_Brewery(models.Model):
+	contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+	brewery = models.ForeignKey(Brewery, on_delete=models.CASCADE)
+	brewery_name = models.CharField(max_length=250)
+	point_value = models.IntegerField(default=1)
+	total_visited = models.IntegerField("number of players who drank at this brewery")
+
+	objects = Contest_BreweryManager()
+
+	def __str__(self):
+		return '{}/{}'.format(self.contest.name, self.brewery.name)
 
 class Contest_PlayerManager(models.Manager):
 	"""Manager for linking contests to players"""
@@ -128,8 +171,11 @@ class Contest_Player(models.Model):
 	user_name = models.CharField(max_length=50)
 	beer_count = models.IntegerField(default=0)
 	beer_points = models.IntegerField(default=0)
+	brewery_points = models.IntegerField(default=0)
+	total_points = models.IntegerField(default=0)
 	last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
 	last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
+	last_checkin_brewery  = models.CharField("Denormalized brewery name from last checkin", null=True, max_length=250, blank=True)
 	last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
 	rank = models.IntegerField(default=0)
 
@@ -181,9 +227,19 @@ class Contest_CheckinManager(models.Manager):
 				untappd_checkin=untappd_checkin)
 		return cc
 
+	def create_brewery_checkin(self, contest_player, contest_brewery, checkin_time,
+			untappd_checkin):
+		cc = self.create(contest_player=contest_player,
+				contest_brewery=contest_brewery,
+				checkin_time=checkin_time,
+				checkin_points=contest_brewery.point_value,
+				untappd_checkin=untappd_checkin)
+		return cc
+
 class Contest_Checkin(models.Model):
 	contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
-	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE)
+	contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE, blank=True, null=True,)
+	contest_brewery = models.ForeignKey(Contest_Brewery, on_delete=models.CASCADE, blank=True, null=True,)
 	checkin_points = models.IntegerField(default=1)
 	checkin_time = models.DateTimeField()
 	untappd_checkin = models.URLField(max_length=250, null=True, blank=True)

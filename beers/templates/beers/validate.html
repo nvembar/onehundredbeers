@@ -31,7 +31,20 @@
 
     function sendContent(uvId, content) {
       var url = "{% url 'update-checkin' contest.id 0 %}";
-      url = url.replace('/0/', '/' + uvId + '/');
+      url = url.replace(/\/0((\/.*){0,1})$/, '/' + uvId + '$1');
+      return $.ajax({
+        url: url,
+        headers: { Accept: 'application/json' },
+        data: JSON.stringify(content),
+        contentType: 'application/json',
+        dataType: 'json',
+        method: 'POST'
+      });
+    }
+
+    function sendAddBrewery(uvId, content) {
+      var url = "{% url 'add-brewery-checkin' contest.id 0 %}";
+      url = url.replace(/\/0((\/.*){0,1})$/, '/' + uvId + '$1');
       return $.ajax({
         url: url,
         headers: { Accept: 'application/json' },
@@ -85,7 +98,7 @@
       } else {
         select.append('<option></option>');
       }
-      select.select2({ placeholder: "Select a beer", allowClear: true, data: exports.data });
+      select.select2({ placeholder: "Select a beer or brewery", allowClear: true, data: exports.data });
       select.on("select2:select", exports.beerListOnSelect);
       select.on("select2:unselect", exports.beerListOnUnselect);
       $("#id_" + checkin.id + "_vbutton").click(exports.validationClick);
@@ -132,15 +145,37 @@
       var initialPage = {{ uvs.number }};
       var initialPageEndIndex = {{ uvs.end_index }} - 1;
       console.log('Setting ' + uvId + ' to beer ' + beerId);
-      sendContent(uvId, { 'validate-beer': 'Validate', 'contest-beer': beerId})
-        .then(removeRow(uvId))
+      var promise = null;
+      if (beerId.startsWith('beer:')) {
+        promise = sendContent(uvId,
+            { 'validate-beer': 'Validate',
+              'contest-beer': beerId.substring(5),
+            })
+      } else if (beerId.startsWith('brewery:')) {
+        promise = sendAddBrewery(uvId, { 'as_brewery': beerId.substring(8), })
+      } else {
+        return;
+      }
+      promise.then(removeRow(uvId))
         .then(getNextUnvalidatedCheckin(initialPageEndIndex))
         .then(refreshList());
     }
 
     exports.data = [
-      {% for b in beers %}{ id: {{ b.id }}, text: '{{ b.beer_name }}'},
-      {% endfor %}
+      {
+        text: 'Beers',
+        children: [
+          {% for b in beers %}{ id: 'beer:{{ b.id }}', text: '{{ b.beer_name }}'},
+          {% endfor %}
+        ]
+      },
+      {
+        text: 'Breweries',
+        children: [
+          {% for b in breweries %}{ id: 'brewery:{{ b.id }}', text: '{{ b.brewery_name }}'},
+          {% endfor %}
+        ]
+      }
     ];
 
     exports.validationClick = function() {
@@ -211,8 +246,10 @@
         </td>
         <td>
           <select id="id_{{ uv.id }}_select" class="beer-list">
-            {% if uv.possible %}
-            <option value="{{ uv.possible.id }}">{{ uv.possible.beer_name }}</option>
+            {% if uv.possible_beer %}
+            <option value="beer:{{ uv.possible_beer.id }}">{{ uv.possible_beer.beer_name }}</option>
+            {% elif uv.possible_brewery %}
+            <option value="brewery:{{ uv.possible_brewery.id }}">{{ uv.possible_brewery.brewery_name }}</option>
             {% else %}
             <option></option>
             {% endif %}

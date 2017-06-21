@@ -1,5 +1,5 @@
-from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin
-from beers.models import Contest_Checkin
+from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin, Contest_Checkin, Brewery, Contest_Brewery
+from django.db import transaction
 import feedparser
 import datetime
 import re
@@ -73,3 +73,31 @@ def load_player_checkins(p, contest_id=None, from_date=None):
                     logger.debug('Ignoring "{0}" as it already exists in database'.format(c.title))
             cp.last_checkin_load = last_date
             cp.save()
+
+
+@transaction.atomic
+def checkin_brewery(uv_checkin, contest_brewery, save_checkin=False):
+    """
+    Checks in a brewery from an unvalidated checkin for a user.
+
+    save_checkin=True will prevent the unvalidated checkin from being deleted
+    """
+    cp = uv_checkin.contest_player
+    checkins = Contest_Checkin.objects.filter(contest_player=cp,
+                                    contest_brewery=contest_brewery,)
+    checkin = None
+    if checkins.count() == 0:
+        checkin = Contest_Checkin.objects.create_brewery_checkin(
+                contest_player=cp, contest_brewery=contest_brewery,
+                checkin_time=uv_checkin.untappd_checkin_date,
+                untappd_checkin=uv_checkin.untappd_checkin,
+                )
+        cp.total_points = cp.total_points + contest_brewery.point_value
+        cp.brewery_points = cp.brewery_points + contest_brewery.point_value
+    cp.last_checkin_date = uv_checkin.untappd_checkin_date
+    cp.last_checkin_brewery = uv_checkin.brewery
+    cp.last_checkin_beer = None
+    cp.save()
+    if not save_checkin:
+        uv_checkin.delete()
+    return checkin
