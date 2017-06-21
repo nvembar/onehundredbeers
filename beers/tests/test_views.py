@@ -93,16 +93,24 @@ class BeersViewsTestCase(TestCase):
         user4 = Contest_Player.objects.get(user_name='user4')
         contest = Contest.objects.get(name='Contest 1')
         user1.beer_count = 2
-        user1.beer_points = 6
+        user1.total_points = 6
+        user1.beer_points = 3
+        user1.brewery_points = 3
         user1.save()
         user2.beer_count = 2
+        user2.total_points = 4
         user2.beer_points = 4
+        user2.brewery_points = 0
         user2.save()
         user3.beer_count = 1
+        user3.total_points = 3
         user3.beer_points = 3
+        user3.brewery_points = 0
         user3.save()
         user4.beer_count = 1
-        user4.beer_points = 1
+        user4.total_points = 1
+        user4.beer_points = 0
+        user4.brewery_points = 1
         user4.save()
         checkin_date = timezone.make_aware(datetime.datetime(2016, 6, 1))
         Contest_Checkin.objects.create_checkin(user1,
@@ -146,16 +154,24 @@ class BeersViewsTestCase(TestCase):
         user4 = Contest_Player.objects.get(user_name='user4')
         contest = Contest.objects.get(name='Contest 1')
         user1.beer_count = 2
-        user1.beer_points = 6
+        user1.total_points = 6
+        user1.beer_points = 3
+        user1.brewery_points = 3
         user1.save()
         user2.beer_count = 2
+        user2.total_points = 4
         user2.beer_points = 4
+        user2.brewery_points = 0
         user2.save()
         user3.beer_count = 2
+        user3.total_points = 4
         user3.beer_points = 4
+        user3.brewery_points = 0
         user3.save()
         user4.beer_count = 1
-        user4.beer_points = 1
+        user4.total_points = 1
+        user4.beer_points = 0
+        user4.brewery_points = 1
         user4.save()
         checkin_date = timezone.make_aware(datetime.datetime(2016, 6, 1))
         Contest_Checkin.objects.create_checkin(user1,
@@ -202,16 +218,24 @@ class BeersViewsTestCase(TestCase):
         user4 = Contest_Player.objects.get(user_name='user4')
         contest = Contest.objects.get(name='Contest 1')
         user1.beer_count = 2
-        user1.beer_points = 6
+        user1.total_points = 6
+        user1.beer_points = 3
+        user1.brewery_points = 3
         user1.save()
         user2.beer_count = 2
+        user2.total_points = 4
         user2.beer_points = 4
+        user2.brewery_points = 0
         user2.save()
         user3.beer_count = 1
-        user3.beer_points = 1
+        user3.total_points = 1
+        user3.beer_points = 0
+        user3.brewery_points = 1
         user3.save()
         user4.beer_count = 1
-        user4.beer_points = 1
+        user4.total_points = 1
+        user4.beer_points = 0
+        user4.brewery_points = 1
         user4.save()
         checkin_date = timezone.make_aware(datetime.datetime(2016, 6, 1))
         Contest_Checkin.objects.create_checkin(user1,
