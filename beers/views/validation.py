@@ -72,7 +72,7 @@ def add_brewery_checkin(request, contest_id, uv_checkin):
 		contest_brewery = Contest_Brewery.objects.get(id=data['as_brewery'])
 	except Contest_Brewery.DoesNotExist as e:
 		return HttpResponseBadRequest(
-			'No such beer with id {}'.format(data['as_brewery']))
+			'No such brewery with id {}'.format(data['as_brewery']))
 	checkin = checkin_brewery(uv, contest_brewery, save_checkin=data.get('preserve', False))
 	if request.META.get('HTTP_ACCEPT') == 'application/json':
 		return HttpResponse(
@@ -234,13 +234,17 @@ def unvalidated_checkins(request, contest_id):
 	except EmptyPage:
 		uvs = paginator.page(paginator.num_pages)
 	beers = Contest_Beer.objects.filter(contest_id=contest_id).order_by('beer_name')
+	breweries = Contest_Brewery.objects.filter(contest_id=contest_id).order_by('brewery_name')
 	for uv in uvs:
 		try:
-			b = beers.get(beer_name=uv.beer)
-			uv.possible = b
-		except:
+			uv.possible_beer = beers.get(beer_name=uv.beer)
+		except Contest_Beer.DoesNotExist:
 			pass
-	context = { 'uvs': uvs, 'contest': contest, 'beers': beers }
+		try:
+			uv.possible_brewery  = breweries.get(brewery_name=uv.brewery)
+		except Contest_Brewery.DoesNotExist:
+			pass
+	context = { 'uvs': uvs, 'contest': contest, 'beers': beers, 'breweries': breweries, }
 	return render(request, 'beers/validate.html', context)
 
 @login_required
