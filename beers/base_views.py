@@ -69,22 +69,22 @@ def contest(request, contest_id):
 def contest_leaderboard(request, contest_id):
 	"""Renders the leaderboard for a particular contest"""
 	contest = get_object_or_404(Contest, id=contest_id)
-	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-beer_points', 'user_name')
+	contest_players = Contest_Player.objects.filter(contest_id=contest_id).order_by('-total_points', 'user_name')
 	max_points = Contest_Beer.objects.filter(contest_id=contest).aggregate(Sum('point_value'))['point_value__sum']
 	rank = 0
 	# Start with rank 0 and a number higher than the highest possible beer count
 	# This forces the first iteration to step everything forward
-	last_beer_points = max_points + 1
+	last_total_points = max_points + 1
 	player_count = 0
 	for p in contest_players:
 		player_count = player_count + 1
 		# Calculate the "1224" style ranking
-		if p.beer_points < last_beer_points:
+		if p.total_points < last_total_points:
 			rank = player_count
-			logger.info("Shifting rank for {} to [PC:{}/R:{}] with {} beer poins".format(
-				p.player.user.username, player_count, rank, p.beer_points))
+			logger.info("Shifting rank for {} to [PC:{}/R:{}] with {} total points".format(
+				p.player.user.username, player_count, rank, p.total_points))
 		p.rank = rank
-		last_beer_points = p.beer_points
+		last_total_points = p.total_points
 	context = { 'contest': contest, 'players': contest_players }
 	return render(request, 'beers/contest-leaderboard.html', context)
 
