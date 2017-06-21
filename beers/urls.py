@@ -15,6 +15,7 @@ urlpatterns = [
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate$', validation.unvalidated_checkins, name='unvalidated-checkins'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate_api$', validation.unvalidated_checkins_json, name='unvalidated-checkins-json'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/validate/(?P<uv_checkin>[0-9]+)/update$', validation.update_checkin, name='update-checkin'),
+	url(r'^contests/(?P<contest_id>[0-9]+)/validate/(?P<uv_checkin>[0-9]+)$', validation.add_brewery_checkin, name='add-brewery-checkin'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/players/(?P<username>[^/]+)$', base_views.contest_player, name='player-detail'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/(?P<beer_id>[0-9]+)$', base_views.contest_beer, name='beer-detail'),
 	url(r'^contests/(?P<contest_id>[0-9]+)/beers/$', base_views.contest_beers, name='beer-list'),

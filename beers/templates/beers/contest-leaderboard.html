@@ -19,13 +19,16 @@
         Player
       </th>
       <th>
-        Total Beers
+        Beer Points
       </th>
       <th>
-        Points
+        Brewery Points
       </th>
       <th>
-        Last Beer Drank
+        Total Points
+      </th>
+      <th>
+        Last Beer Drank/Brewery Visit
       </th>
     </tr>
     {% for p in players %}
@@ -37,13 +40,20 @@
         <a href="{% url 'player-detail' contest_id=contest.id username=p.user_name %}">{{ p.user_name }}</a>
       </td>
       <td>
-        {{ p.beer_count }}
-      </td>
-      <td>
         {{ p.beer_points }}
       </td>
       <td>
-        {{ p.last_checkin_beer }}
+        {{ p.brewery_points }}
+      </td>
+      <td>
+        {{ p.total_points }}
+      </td>
+      <td>
+        {% if p.last_checkin_beer %}
+          {{ p.last_checkin_beer }}
+        {% elif p.last_checkin_brewery %}
+          {{ p.last_checkin_brewery }}
+        {% endif %}
       </td>
     </tr>
     {% empty %}

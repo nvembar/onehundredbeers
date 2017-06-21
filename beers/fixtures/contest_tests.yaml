@@ -68,6 +68,41 @@
     brewery_lon: null
     untappd_id: null
     last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.brewery
+  pk: 1
+  fields:
+    name: Brewery 1
+    state: DC
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.brewery
+  pk: 2
+  fields:
+    name: Brewery 2
+    state: DC
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.brewery
+  pk: 3
+  fields:
+    name: Brewery 3
+    state: DC
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.brewery
+  pk: 4
+  fields:
+    name: Brewery 4
+    state: DC
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.brewery
+  pk: 5
+  fields:
+    name: Brewery 5
+    state: DC
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.contest
   pk: 1
   fields:
@@ -120,6 +155,46 @@
     beer_name: Beer 5
     point_value: 3
     total_drank: 0
+- model: beers.contest_brewery
+  pk: 1
+  fields:
+    contest: 1
+    brewery: 1
+    brewery_name: Brewery 1
+    point_value: 3
+    total_visited: 0
+- model: beers.contest_brewery
+  pk: 2
+  fields:
+    contest: 1
+    brewery: 2
+    brewery_name: Brewery 2
+    point_value: 3
+    total_visited: 0
+- model: beers.contest_brewery
+  pk: 3
+  fields:
+    contest: 1
+    brewery: 3
+    brewery_name: Brewery 3
+    point_value: 1
+    total_visited: 0
+- model: beers.contest_brewery
+  pk: 4
+  fields:
+    contest: 1
+    brewery: 4
+    brewery_name: Brewery 4
+    point_value: 1
+    total_visited: 0
+- model: beers.contest_brewery
+  pk: 5
+  fields:
+    contest: 1
+    brewery: 5
+    brewery_name: Brewery 5
+    point_value: 1
+    total_visited: 0
 - model: beers.contest_player
   pk: 1
   fields:
