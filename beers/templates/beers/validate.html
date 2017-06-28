@@ -256,7 +256,7 @@
           </select>
         </td>
         <td>
-          <button id="id_{{ uv.id }}_vbutton" class="validation-button validation-click" {% if not uv.possible %}disabled{% endif %}>
+          <button id="id_{{ uv.id }}_vbutton" class="validation-button validation-click" {% if not uv.possible_beer and not uv.possible_brewery %}disabled{% endif %}>
             Validate
           </button>
         </td>
