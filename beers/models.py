@@ -181,6 +181,20 @@ class Contest_Player(models.Model):
 
 	objects = Contest_PlayerManager()
 
+	def compute_points(self):
+		"""Computes the brewery and beer points for this user"""
+		checkins = Contest_Checkin.objects.filter(contest_player=self)
+		beer_points = checkins.filter(contest_beer__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+		brewery_points = checkins.filter(contest_brewery__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+		if beer_points is None:
+			beer_points = 0
+		if brewery_points is None:
+			brewery_points = 0
+		self.beer_points = beer_points
+		self.brewery_points = brewery_points
+		self.total_points = self.beer_points + self.brewery_points
+		self.save()
+
 	def __str__(self):
 		return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
