@@ -2,7 +2,7 @@ from django.test import TestCase, TransactionTestCase, override_settings
 from django.test import Client
 from django.contrib.auth.models import User, Group, Permission
 from django.core.urlresolvers import reverse
-from beers.models import Contest, Player, Contest_Player, Unvalidated_Checkin, Contest_Checkin
+from beers.models import Contest, Player, Contest_Player, Unvalidated_Checkin, Contest_Checkin, Contest_Beer, Contest_Brewery
 from django.utils import timezone
 import datetime
 import json
@@ -104,3 +104,59 @@ class ContestTestCase(TestCase):
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(len(checkins['checkins']), 0)
+
+    def __test_beer_and_brewery_sum(self, cp, beers, breweries):
+        beer_points = 0
+        brewery_points = 0
+        for beer in beers:
+            Contest_Checkin.objects.create_checkin(cp, beer, datetime.datetime.now(), 'https://checkin.com/beer')
+            beer_points = beer_points + beer.point_value
+        for brewery in breweries:
+            Contest_Checkin.objects.create_brewery_checkin(cp, brewery, datetime.datetime.now(), 'https://checkin.com/brewery')
+            brewery_points = brewery_points + brewery.point_value
+        cp.compute_points()
+        self.assertEqual(cp.brewery_points, brewery_points)
+        self.assertEqual(cp.beer_points, beer_points)
+        self.assertEqual(cp.total_points, beer_points + brewery_points)
+
+    def test_beers_and_brewery_point_computation(self):
+        """
+        This tests that a non-zero and non-one count of beers and breweries sum correctly
+        """
+        cp = Contest_Player.objects.get(id=1)
+        beers = [Contest_Beer.objects.get(id=1),
+                 Contest_Beer.objects.get(id=2),
+                 Contest_Beer.objects.get(id=3),]
+        breweries = [Contest_Brewery.objects.get(id=1),
+                     Contest_Brewery.objects.get(id=2),]
+        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+
+    def test_beers_and_no_brewery_point_computation(self):
+        """
+        This tests that non-zero beers and zero breweries sum correctly
+        """
+        cp = Contest_Player.objects.get(id=1)
+        beers = [Contest_Beer.objects.get(id=1),
+                 Contest_Beer.objects.get(id=2),
+                 Contest_Beer.objects.get(id=3),]
+        breweries = []
+        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+
+    def test_no_beers_and_brewery_point_computation(self):
+        """
+        This tests that zero beers and non-zero breweries sum correctly
+        """
+        cp = Contest_Player.objects.get(id=1)
+        beers = []
+        breweries = [Contest_Brewery.objects.get(id=1),
+                     Contest_Brewery.objects.get(id=2),]
+        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+
+    def test_one_beer_and_brewery_point_computation(self):
+        """
+        This tests that one beer and one brewery sum correctly
+        """
+        cp = Contest_Player.objects.get(id=1)
+        beers = [Contest_Beer.objects.get(id=1),]
+        breweries = [Contest_Brewery.objects.get(id=1),]
+        self.__test_beer_and_brewery_sum(cp, beers, breweries)
