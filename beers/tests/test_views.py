@@ -1,10 +1,12 @@
-from django.test import TransactionTestCase, TestCase, override_settings
+"""Tests views for the beers app"""
+
+import datetime
+from django.test import TestCase, override_settings
 from django.test import Client
-from django.contrib.auth.models import User, Group, Permission
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from beers.models import Contest, Player, Contest_Player, Contest_Checkin, Contest_Beer
-import datetime
+
 
 @override_settings(ROOTURL_CONF='beers.urls', SECURE_SSL_REDIRECT=False)
 class BeersViewsTestCase(TestCase):
@@ -13,29 +15,28 @@ class BeersViewsTestCase(TestCase):
     fixtures = ['permissions', 'users', 'contest_tests']
 
     def setUp(self):
-        # Create a player and a contest runner (who is also aplayer)
-        # Gotta make a fixture for this....
-        runner = Player.objects.get(user__username='runner1')
+        pass
 
     def test_profile_view(self):
         "Tests that a profile can be viewed by the user"
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
 
-        response = c.get('/profile')
+        response = c.get(reverse('profile'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'registration/profile.html')
         # self.assertInHTML('none', str(response.content))
+
     def test_create_contest_success(self):
         "Tests that a contest runner can create a new contest"
         c = Client()
         runner = Player.objects.get(user__username='runner1')
         self.assertTrue(c.login(username='runner1', password='password1%'))
 
-        response = c.post('/contests/add',
-                            data={ 'name': 'Contest-Success-1',
-                                  'start_date': '2016-01-01',
-                                  'end_date': '2017-01-01' })
+        response = c.post(reverse('contest-add'),
+                          data={'name': 'Contest-Success-1',
+                                'start_date': '2016-01-01',
+                                'end_date': '2017-01-01'})
         self.assertEqual(Contest.objects.filter(name='Contest-Success-1').count(), 1)
         contest = Contest.objects.get(name='Contest-Success-1')
         self.assertEqual(response.status_code, 200)
@@ -49,7 +50,7 @@ class BeersViewsTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='user1', password='password1%'))
 
-        response = c.post('/contests/add',
+        response = c.post(reverse('contest-add'),
                           data={'name': 'Contest-Failure-1',
                                 'start_date': '2016-01-01',
                                 'end_date': '2017-01-01'})
@@ -63,10 +64,10 @@ class BeersViewsTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
 
-        response = c.post('/contests/add',
-                            data={ 'name': 'Contest-Failure-1',
-                                  'start_date': '2016-01-01',
-                                  'end_date': '2015-01-01' })
+        response = c.post(reverse('contest-add'),
+                          data={'name': 'Contest-Failure-1',
+                                'start_date': '2016-01-01',
+                                'end_date': '2015-01-01'})
         self.assertEqual(Contest.objects.filter(name='Contest-Failure-1').count(), 0)
         self.assertTemplateNotUsed(response, 'beers/contest-add-success.html')
 
@@ -79,8 +80,9 @@ class BeersViewsTestCase(TestCase):
         self.assertTrue(player.user.username, 'runner1')
         contest = Contest.objects.get(name='Contest 1')
         self.assertTrue(c.login(username='user5', password='password1%'))
-        response = c.post(reverse('contest-join', args=[contest.id]), data={'action': 'join'})
-        self.assertTrue(Contest_Player.objects.filter(contest_id=contest.id, user_name='user5').count(), 1)
+        response = c.post(reverse('contest-join', args=[contest.id]),
+                          data={'action': 'join'})
+        self.assertTrue(Contest_Player.objects.filter(contest=contest, user_name='user5').count(), 1)
 
     def test_basic_leaderboard(self):
         """
