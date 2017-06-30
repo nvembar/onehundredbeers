@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+class PlayerManager(models.Manager):
+    """A model manager for the Player object"""
+
+    def create_player(self, user, personal_statement=None,
+                      untappd_rss=None, untappd_username=None):
+        """Creates a new player"""
+        return self.create(user=user,
+                           personal_statement=personal_statement,
+                           untappd_rss=untappd_rss,
+                           untappd_username=untappd_username)
+
+
 # The user profile.
 class Player(models.Model):
     "Represents a player profile"
@@ -12,12 +24,7 @@ class Player(models.Model):
     untappd_username = models.CharField(max_length=150, blank=True, default='')
     untappd_rss = models.URLField(max_length=512, null=True, blank=True)
 
-    # TODO: Move this to a manager
-    @classmethod
-    def create(cls, user, personal_statement=None, untappd_rss=None, untappd_username=None):
-        player = cls(user=user, personal_statement=personal_statement,
-                     untappd_rss=untappd_rss, untappd_username=untappd_username)
-        return player
+    objects = PlayerManager()
 
     def __str__(self):
         return self.user.username
@@ -102,6 +109,31 @@ class Contest(models.Model):
                                   point_value=point_value,)
         brewery.save()
         return brewery
+
+    def ranked_players(self):
+        """
+        Returns a list of players, in total_points ranked order, with an
+        additional field 'rank' which includes the ranking of the player
+        """
+        contest_players = Contest_Player.objects.filter(contest=self)
+        contest_players = list(contest_players.order_by('-total_points',
+                                                        'user_name'))
+        max_points = Contest_Beer.objects.filter(contest=self).aggregate(
+            models.Sum('point_value'))['point_value__sum']
+        rank = 0
+        # Start with rank 0 and a number higher than the highest possible beer
+        # count. This forces the first iteration to step everything forward
+        last_total_points = max_points + 1
+        player_count = 0
+        for p in contest_players:
+            player_count = player_count + 1
+            # Calculate the "1224" style ranking
+            if p.total_points < last_total_points:
+                rank = player_count
+            p.rank = rank
+            last_total_points = p.total_points
+        return contest_players
+
 
     def __str__(self):
         return self.name
