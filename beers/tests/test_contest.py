@@ -23,10 +23,11 @@ class ContestTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
         uv = Unvalidated_Checkin.objects.get(untappd_title='Unvalidated Checkin 2')
-        response = c.post(reverse('update-checkin', kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
-                content_type='application/json',
-                data=json.dumps({ 'validate-beer': 'Validate', 'contest-beer': 1,}),
-                HTTP_ACCEPT='application/json')
+        response = c.post(reverse('update-checkin',
+                                  kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
+                          content_type='application/json',
+                          data=json.dumps({'validate-beer': 'Validate', 'contest-beer': 1,}),
+                          HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
         q = Contest_Checkin.objects.filter(contest_beer__id=1, contest_player__id=1)
         self.assertEqual(q.count(), 1)
@@ -42,10 +43,11 @@ class ContestTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
         uv = Unvalidated_Checkin.objects.get(untappd_title='Unvalidated Checkin 2')
-        response = c.post(reverse('update-checkin', kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
-                content_type='application/json',
-                data=json.dumps({ 'remove-beer': 'Remove',}),
-                HTTP_ACCEPT='application/json')
+        response = c.post(reverse('update-checkin',
+                                  kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
+                          content_type='application/json',
+                          data=json.dumps({'remove-beer': 'Remove',}),
+                          HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
         contest_player = Contest_Player.objects.get(id=1)
         self.assertEqual(contest_player.beer_count, 0)
@@ -56,8 +58,9 @@ class ContestTestCase(TestCase):
         """Tests if the JSON API gets the right values for a single request"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
-                            { 'slice_start': 2, 'slice_end': 3})
+        response = c.get(reverse('unvalidated-checkins-json',
+                                 kwargs={'contest_id': 1}),
+                         {'slice_start': 2, 'slice_end': 3})
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
@@ -75,8 +78,9 @@ class ContestTestCase(TestCase):
         """Tests if the JSON API gets the right values for multiple results"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
-                            { 'slice_start': 3, 'slice_end': 6})
+        response = c.get(reverse('unvalidated-checkins-json',
+                                 kwargs={'contest_id': 1}),
+                         {'slice_start': 3, 'slice_end': 6})
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
@@ -98,8 +102,9 @@ class ContestTestCase(TestCase):
         """Tests if the JSON API returns nothing when the slice goes beyond the end of the page"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json', kwargs={'contest_id': 1}),
-                            { 'slice_start': 100, 'slice_end': 105})
+        response = c.get(reverse('unvalidated-checkins-json',
+                                 kwargs={'contest_id': 1}),
+                         {'slice_start': 100, 'slice_end': 105})
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
         self.assertEqual(checkins['page_count'], 1)
@@ -109,10 +114,16 @@ class ContestTestCase(TestCase):
         beer_points = 0
         brewery_points = 0
         for beer in beers:
-            Contest_Checkin.objects.create_checkin(cp, beer, datetime.datetime.now(), 'https://checkin.com/beer')
+            Contest_Checkin.objects.create_checkin(cp,
+                                                   beer,
+                                                   datetime.datetime.now(),
+                                                   'https://checkin.com/beer')
             beer_points = beer_points + beer.point_value
         for brewery in breweries:
-            Contest_Checkin.objects.create_brewery_checkin(cp, brewery, datetime.datetime.now(), 'https://checkin.com/brewery')
+            Contest_Checkin.objects.create_brewery_checkin(cp,
+                                                           brewery,
+                                                           datetime.datetime.now(),
+                                                           'https://checkin.com/brewery')
             brewery_points = brewery_points + brewery.point_value
         cp.compute_points()
         self.assertEqual(cp.brewery_points, brewery_points)
@@ -126,7 +137,8 @@ class ContestTestCase(TestCase):
         cp = Contest_Player.objects.get(id=1)
         beers = [Contest_Beer.objects.get(id=1),
                  Contest_Beer.objects.get(id=2),
-                 Contest_Beer.objects.get(id=3),]
+                 Contest_Beer.objects.get(id=3),
+                ]
         breweries = [Contest_Brewery.objects.get(id=1),
                      Contest_Brewery.objects.get(id=2),]
         self.__test_beer_and_brewery_sum(cp, beers, breweries)
