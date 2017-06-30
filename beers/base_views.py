@@ -1,27 +1,16 @@
+import logging
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.db import transaction
-from django.db.models import Sum
-from django.contrib.auth import authenticate
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .views.helper import HttpNotImplementedResponse
 from .views.helper import is_authenticated_user_player, is_authenticated_user_contest_runner
 from .models import Contest
-from .models import Beer
 from .models import Player
 from .models import Contest_Checkin
 from .models import Contest_Beer
 from .models import Contest_Player
-from .models import Unvalidated_Checkin
-from .forms.registration import RegistrationForm
 from .forms.contests import ContestForm
-import logging
 
 logger = logging.getLogger(__name__)
 
