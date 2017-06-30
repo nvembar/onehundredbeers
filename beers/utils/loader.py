@@ -15,9 +15,9 @@ BEER_POINTS_INDEX = 4
 @transaction.atomic
 def create_contest_from_csv(name, start_date, end_date, runner, stream):
     """
-    Creates a contest from a CSV stream with the given name with the given runner.
-    The runner should be a Player in the G_ContestRunner group, and it will be added
-    to the list of players.
+    Creates a contest from a CSV stream with the given name with the given
+    runner. The runner should be a Player in the G_ContestRunner group, and
+    it will be added to the list of players.
     The CSV file should contain the beer list.
     """
 
@@ -31,7 +31,7 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
                                              creator=runner,
                                              start_date=start_date,
                                              end_date=end_date)
-    cp = Contest_Player.objects.link(contest=contest, player=runner)
+    Contest_Player.objects.link(contest=contest, player=runner)
 
     reader = csv.DictReader(stream,
                             fieldnames=('brewery',
@@ -45,26 +45,23 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
         if is_first:
             is_first = False
         else:
-            name = row['name']
-            brewery = row['brewery']
-            state = row['state']
             points = None
             try:
                 points = int(row['points'])
             except ValueError as e:
                 raise ValueError('Invalid point value {} on line {}'.format(row['points'], line))
-            beers = Beer.objects.filter(name=name, brewery=brewery)
+            beers = Beer.objects.filter(name=name, brewery=row['brewery'])
             beer = None
             # If the beer already exists, don't recreate it
             if beers.count() == 0:
-                beer = Beer.objects.create_beer(name=name,
-                                                brewery=brewery,
-                                                brewery_state=state,)
+                beer = Beer.objects.create_beer(name=row['name'],
+                                                brewery=row['brewery'],
+                                                brewery_state=row['state'],)
                 logger.info('Saving new beer %s/%s', beer.name, beer.brewery)
                 beer.save()
             else:
                 beer = beers.get()
-                logger.info('Found beer %s/%s'.format(beer.name, beer.brewery))
+                logger.info('Found beer %s/%s', beer.name, beer.brewery)
             # Add the beer we found to the new contest
-            cb = contest.add_beer(beer, point_value=points)
+            contest.add_beer(beer, point_value=points)
         line = line + 1
