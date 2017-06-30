@@ -1,6 +1,9 @@
+"""Models supporting One Hundred Beers"""
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+
 
 class PlayerManager(models.Manager):
     """A model manager for the Player object"""
@@ -93,6 +96,18 @@ class Contest(models.Model):
 
     objects = ContestManager()
 
+    def add_player(self, player):
+        """Adds a player into the contest - should deprecate link()"""
+        contest_player = Contest_Player(contest=self, player=player,
+                                        user_name=player.user.username,
+                                        beer_count=0,
+                                        last_checkin_date=None,
+                                        last_checkin_beer=None,
+                                        last_checkin_load=self.start_date,
+                                        rank=-1)
+        contest_player.save()
+        return contest_player
+
     def add_beer(self, beer, point_value=1):
         """Adds a beer into the contest"""
         beer = Contest_Beer(contest=self, beer=beer,
@@ -133,7 +148,6 @@ class Contest(models.Model):
             p.rank = rank
             last_total_points = p.total_points
         return contest_players
-
 
     def __str__(self):
         return self.name
@@ -186,19 +200,6 @@ class Contest_Brewery(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.contest.name, self.brewery.name)
 
-class Contest_PlayerManager(models.Manager):
-    """Manager for linking contests to players"""
-
-    def link(self, contest, player):
-        cp = self.create(contest=contest, player=player,
-                         user_name=player.user.username,
-                         beer_count=0,
-                         last_checkin_date=None,
-                         last_checkin_beer=None,
-                         last_checkin_load=contest.start_date,
-                         rank=-1)
-        return cp
-
 class Contest_Player(models.Model):
     """ Links a player's activities relative to a contest
         A reverse sort by contest and beer count gives you a leaderboard"""
@@ -214,8 +215,6 @@ class Contest_Player(models.Model):
     last_checkin_brewery  = models.CharField("Denormalized brewery name from last checkin", null=True, max_length=250, blank=True)
     last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
-
-    objects = Contest_PlayerManager()
 
     def compute_points(self):
         """Computes the brewery and beer points for this user"""
