@@ -1,16 +1,15 @@
+"""View functions for seeing contest information and the index"""
+
 import logging
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
-from .views.helper import HttpNotImplementedResponse
-from .views.helper import is_authenticated_user_player, is_authenticated_user_contest_runner
-from .models import Contest
-from .models import Player
-from .models import Contest_Checkin
-from .models import Contest_Beer
-from .models import Contest_Player
-from .forms.contests import ContestForm
+from beers.models import Contest, Player, Contest_Checkin, Contest_Beer, Contest_Player
+from beers.forms.contests import ContestForm
+from .helper import HttpNotImplementedResponse
+from .helper import is_authenticated_user_player, is_authenticated_user_contest_runner
+
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +105,7 @@ def contest_beers(request, contest_id):
     context = {'contest': this_contest, 'contest_beers': beers}
     if request.user.is_authenticated:
         try:
-            cp = Contest_Player.objects.get(contest=contest,
+            cp = Contest_Player.objects.get(contest=this_contest,
                                             player__user_id=request.user.id)
             checkins = Contest_Checkin.objects.filter(contest_player=cp)
             checkin_ids = [c.contest_beer.id for c in checkins]
