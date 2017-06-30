@@ -69,13 +69,6 @@ class ContestManager(models.Manager):
                               user_count=0, beer_count=0)
         return contest
 
-    # TODO: Move this to Contest.add_beer
-    def add_beer(self, contest, beer, point_value=1):
-        contest_beer = Contest_Beer(contest=contest, beer=beer,
-                                    beer_name=beer.name,
-                                    point_value=point_value,
-                                    total_drank=0,)
-        return contest_beer
 
 
 class Contest(models.Model):
@@ -93,13 +86,22 @@ class Contest(models.Model):
 
     objects = ContestManager()
 
+    def add_beer(self, beer, point_value=1):
+        """Adds a beer into the contest"""
+        beer = Contest_Beer(contest=self, beer=beer,
+                            beer_name=beer.name,
+                            point_value=point_value,
+                            total_drank=0,)
+        beer.save()
+        return beer
+
     def add_brewery(self, brewery, point_value=1):
-        "Adds a brewery to the contest"
-        cb = Contest_Brewery(contest=self, brewery=brewery,
-                             brewery_name=brewery.name,
-                             point_value=point_value,)
-        cb.save()
-        return cb
+        """Adds a brewery to the contest"""
+        brewery = Contest_Brewery(contest=self, brewery=brewery,
+                                  brewery_name=brewery.name,
+                                  point_value=point_value,)
+        brewery.save()
+        return brewery
 
     def __str__(self):
         return self.name
