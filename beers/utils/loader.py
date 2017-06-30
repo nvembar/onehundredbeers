@@ -1,15 +1,16 @@
-from beers.models import Beer, Contest_Beer, Contest, Contest_Player, Player
-from django.db import transaction
 import csv
 import logging
+from beers.models import Beer, Contest, Contest_Player, Player
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
-BREWERY_NAME_INDEX=0
-BEER_NAME_INDEX=1
-UNTAPPD_LINK_INDEX=2
-BEER_STATE_INDEX=3
-BEER_POINTS_INDEX=4
+BREWERY_NAME_INDEX = 0
+BEER_NAME_INDEX = 1
+UNTAPPD_LINK_INDEX = 2
+BEER_STATE_INDEX = 3
+BEER_POINTS_INDEX = 4
+
 
 @transaction.atomic
 def create_contest_from_csv(name, start_date, end_date, runner, stream):
@@ -27,13 +28,17 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
         raise ValueError("The runner needs to be in the contest runner group")
 
     contest = Contest.objects.create_contest(name=name,
-        creator=runner,
-        start_date=start_date,
-        end_date=end_date,
-    )
+                                             creator=runner,
+                                             start_date=start_date,
+                                             end_date=end_date)
     cp = Contest_Player.objects.link(contest=contest, player=runner)
 
-    reader = csv.DictReader(stream, fieldnames=('brewery', 'name', 'untappd', 'state', 'points'))
+    reader = csv.DictReader(stream,
+                            fieldnames=('brewery',
+                                        'name',
+                                        'untappd',
+                                        'state',
+                                        'points'))
     is_first = True
     line = 0
     for row in reader:
@@ -48,14 +53,13 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
                 points = int(row['points'])
             except ValueError as e:
                 raise ValueError('Invalid point value {} on line {}'.format(row['points'], line))
-            link = row['untappd']
             beers = Beer.objects.filter(name=name, brewery=brewery)
             beer = None
             # If the beer already exists, don't recreate it
             if beers.count() == 0:
                 beer = Beer.objects.create_beer(name=name,
-                                            brewery=brewery,
-                                            brewery_state=state,)
+                                                brewery=brewery,
+                                                brewery_state=state,)
                 logger.info('Saving new beer %s/%s', beer.name, beer.brewery)
                 beer.save()
             else:
