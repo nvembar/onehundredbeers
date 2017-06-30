@@ -50,9 +50,9 @@ class BeersViewsTestCase(TestCase):
         self.assertTrue(c.login(username='user1', password='password1%'))
 
         response = c.post('/contests/add',
-                            data={ 'name': 'Contest-Failure-1',
-                                  'start_date': '2016-01-01',
-                                  'end_date': '2017-01-01' })
+                          data={'name': 'Contest-Failure-1',
+                                'start_date': '2016-01-01',
+                                'end_date': '2017-01-01'})
         self.assertNotEqual(response.status_code, 200)
         self.assertEqual(Contest.objects.filter(name='Contest-Failure-1').count(), 0)
 
