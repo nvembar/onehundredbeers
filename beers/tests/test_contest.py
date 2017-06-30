@@ -9,7 +9,7 @@ from beers.models import Contest_Checkin, Contest_Beer, Contest_Brewery
 @override_settings(SECURE_SSL_REDIRECT=False, ROOTURL_CONF='beers.urls')
 class ContestTestCase(TestCase):
 
-    fixtures = [ 'permissions', 'users', 'contest_tests', 'unvalidated_checkins']
+    fixtures = ['permissions', 'users', 'contest_tests', 'unvalidated_checkins']
 
     def setUp(self):
         pass
