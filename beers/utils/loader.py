@@ -62,6 +62,5 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
                 beer = beers.get()
                 logger.info('Found beer %s/%s'.format(beer.name, beer.brewery))
             # Add the beer we found to the new contest
-            cb = Contest.objects.add_beer(contest, beer, point_value=points)
-            cb.save()
+            cb = contest.add_beer(beer, point_value=points)
         line = line + 1
