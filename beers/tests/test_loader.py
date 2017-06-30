@@ -86,7 +86,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
                 timezone.make_aware(datetime.datetime(2017, 1, 1)),
                 timezone.make_aware(datetime.datetime(2017, 12, 31)))
         contest.save()
-        cp = Contest_Player.objects.link(contest, player)
+        cp = contest.add_player(player)
         cp.save()
         load_player_checkins(player)
         self.assertEqual(Unvalidated_Checkin.objects.filter(contest_player=cp).count(), 25)
@@ -100,7 +100,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
                 timezone.make_aware(datetime.datetime(2017, 1, 1)),
                 timezone.make_aware(datetime.datetime(2017, 12, 31)))
         contest.save()
-        cp = Contest_Player.objects.link(contest, player)
+        cp = contest.add_player(player)
         cp.save()
         call_command('load-checkins', '--player', player.user.username)
         self.assertEqual(Unvalidated_Checkin.objects.filter(contest_player=cp).count(), 25)

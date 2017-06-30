@@ -128,8 +128,7 @@ def contest_join(request, contest_id):
                                                 player_id=player.id)
         context = { 'contest': contest, 'player': player, 'created_new': False }
     except Contest_Player.DoesNotExist:
-        contest_player = Contest_Player.objects.link(contest, player)
-        contest_player.save()
+        contest_player = contest.add_player(player)
         context = { 'contest': contest, 'player': player, 'created_new': True }
     return render(request, 'beers/contest-join.html', context)
 
