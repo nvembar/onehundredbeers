@@ -103,7 +103,7 @@ def contest_beers(request, contest_id):
     """
     this_contest = get_object_or_404(Contest, id=contest_id)
     beers = Contest_Beer.objects.filter(contest=this_contest)
-    context = {'contest': contest, 'contest_beers': beers}
+    context = {'contest': this_contest, 'contest_beers': beers}
     if request.user.is_authenticated:
         try:
             cp = Contest_Player.objects.get(contest=contest,
