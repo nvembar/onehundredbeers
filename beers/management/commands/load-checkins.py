@@ -1,13 +1,21 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Model
-from django.utils import timezone
-from beers.models import Beer, Player, Contest_Checkin, Contest_Beer, Contest, Contest_Player
-from beers.utils.checkin import load_player_checkins
-from dateutil.parser import parse
-from django.conf import settings
+"""Command that will load checkins for a user"""
+
 import logging
+import argparse
+from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
+from beers.models import Player, Contest
+from beers.utils.checkin import load_player_checkins
+from dateutil.parser import parse as date_parse
 
 logger = logging.getLogger(__name__)
+
+def convert_to_date(arg):
+    try:
+        after_date = date_parse(arg)
+    except ValueError:
+        raise argparse.ArgumentTypeError('Error: load-checkins got a malformed date: {}'.format(arg))
+    return timezone.make_aware(after_date)
 
 class Command(BaseCommand):
 
@@ -15,29 +23,24 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--player', nargs=1, help='Player')
-        parser.add_argument('--contest', nargs=1, help='Contest ID')
-        parser.add_argument('--after-date', nargs=1, help='After date')
+        parser.add_argument('--contest', nargs=1, help='Contest ID', type=int)
+        parser.add_argument('--after-date', nargs=1, help='After date', type=convert_to_date)
 
     def handle(self, *args, **opts):
-        player = None
+        players = Player.objects.all()
         contest_id = None
         after_date = None
-        if opts.get('player') and len(opts['player']) > 0:
-            player = opts['player'][0]
-        if opts.get('contest') in opts and len(opts['contest']) > 0:
+        if 'player' in opts and opts['player']:
+            players = players.filter(user__username=opts['player'][0])
+            if players.count() == 0:
+                raise CommandError('Error: no such player: {}'.format(opts['player'][0]))
+        if 'contest' in opts and opts['contest']:
             try:
-                contest_id = int(opts['contest'][0])
-            except ValueError:
-                logger.error('Error: load-checkins got a contest that was not an integer: {}'.opts['contest'][0])
-                return
-        if opts.get('after-date') in opts and len(opts['after-date']) > 0:
-            try:
-                after_date = parse(opts['after-date'][0])
-            except ValueError:
-                logger.error('Error: load-checkins got a malformed date: {}'.opts['after-date'][0])
-                return
-        players = Player.objects.all()
-        if not player is None:
-            players = players.filter(user__username=player)
+                contest_id = opts['contest'][0]
+                Contest.objects.get(id=contest_id)
+            except Contest.DoesNotExist:
+                raise CommandError('Error: load-checkins got a contest ID that did not exist: {}'.format(contest_id))
+        if 'after_date' in opts and opts['after_date']:
+            after_date = opts['after_date'][0]
         for p in players:
             load_player_checkins(p, from_date=after_date, contest_id=contest_id)

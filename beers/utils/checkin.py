@@ -17,7 +17,6 @@ def load_player_checkins(p, contest_id=None, from_date=None):
     re_has_loc = re.compile(r'^(.+)\s+at\s+(.+)$')
     re_title = re.compile(r'^(?P<user>.+)\s+is\s+drinking\s+a(n){0,1}\s+(?P<beer>.+)\s+by\s+(?P<brewery>.+)(\s+at\s+.+){0,1}$')
 
-    logger.info("Trying to print")
     logger.debug('Parsing "{}" for player {}'.format(p.untappd_rss, p.user.username))
     if p.untappd_rss:
         feed = feedparser.parse(p.untappd_rss)
@@ -61,12 +60,12 @@ def load_player_checkins(p, contest_id=None, from_date=None):
                         title = lmatch.group(1)
                     match = re.match(re_title, title)
                     if not match:
-                        logger.info("{0} did not match '{1}'".format(re_title, c.title))
+                        logger.info("{0} did not match '{1}': url: {}".format(re_title, c.title, c.link))
                         continue
                     uv = Unvalidated_Checkin.objects.create_checkin(cp, c.title,
                             match.group('brewery').strip(),
                             match.group('beer').strip(), c.link, dt)
-                    logger.info('\tAdding "{0}" to {1} for {2} with date {3}'.format(
+                    logger.debug('\tAdding "{0}" to {1} for {2} with date {3}'.format(
                         uv.untappd_title, p.user.username, cp.contest.id, dt))
                     uv.save()
                 else:

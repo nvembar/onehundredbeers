@@ -1,6 +1,8 @@
+"""Utility to load a contest from a CSV file"""
+
 import csv
 import logging
-from beers.models import Beer, Contest, Contest_Player, Player
+from beers.models import Beer, Contest, Player
 from django.db import transaction
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,7 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
                                              creator=runner,
                                              start_date=start_date,
                                              end_date=end_date)
-    Contest_Player.objects.link(contest=contest, player=runner)
+    contest.add_player(runner)
 
     reader = csv.DictReader(stream,
                             fieldnames=('brewery',
