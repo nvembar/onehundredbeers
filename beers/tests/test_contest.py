@@ -1,16 +1,15 @@
-from django.test import TestCase, TransactionTestCase, override_settings
-from django.test import Client
-from django.contrib.auth.models import User, Group, Permission
-from django.core.urlresolvers import reverse
-from beers.models import Contest, Player, Contest_Player, Unvalidated_Checkin, Contest_Checkin, Contest_Beer, Contest_Brewery
-from django.utils import timezone
 import datetime
 import json
+from django.test import TestCase, override_settings, Client
+from django.core.urlresolvers import reverse
+from django.utils import timezone
+from beers.models import Contest_Player, Unvalidated_Checkin
+from beers.models import Contest_Checkin, Contest_Beer, Contest_Brewery
 
 @override_settings(SECURE_SSL_REDIRECT=False, ROOTURL_CONF='beers.urls')
 class ContestTestCase(TestCase):
 
-    fixtures = [ 'permissions', 'users', 'contest_tests', 'unvalidated_checkins']
+    fixtures = ['permissions', 'users', 'contest_tests', 'unvalidated_checkins']
 
     def setUp(self):
         pass
@@ -116,13 +115,13 @@ class ContestTestCase(TestCase):
         for beer in beers:
             Contest_Checkin.objects.create_checkin(cp,
                                                    beer,
-                                                   datetime.datetime.now(),
+                                                   timezone.make_aware(datetime.datetime.now()),
                                                    'https://checkin.com/beer')
             beer_points = beer_points + beer.point_value
         for brewery in breweries:
             Contest_Checkin.objects.create_brewery_checkin(cp,
                                                            brewery,
-                                                           datetime.datetime.now(),
+                                                           timezone.make_aware(datetime.datetime.now()),
                                                            'https://checkin.com/brewery')
             brewery_points = brewery_points + brewery.point_value
         cp.compute_points()
