@@ -48,5 +48,4 @@ class Command(BaseCommand):
             cp = Contest_Player.objects.get(contest_id=opts['contest_id'][0], player_id=player.id)
         except Contest_Player.DoesNotExist:
             raise CommandError("Player '{0}' is not affiliated with contest '{1}'".format(opts['player'], opts['contest_id']))
-        c = Contest_Checkin.objects.create(contest_player=cp, checkin_time=checkin_time,
-                    untappd_checkin=untappd_url, contest_beer=cb)
+        cp.drink_beer(beer, data={'untappd_checkin': untappd_url, 'checkin_time': checkin_time})
