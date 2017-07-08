@@ -109,25 +109,94 @@ class ContestTestCase(TestCase):
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(len(checkins['checkins']), 0)
 
-    def __test_beer_and_brewery_sum(self, cp, beers, breweries):
-        beer_points = 0
-        brewery_points = 0
+    def __test_beer_and_brewery_calculations(self, cp, beers, breweries):
+        """
+        Helper function to iterate through a set of beers for a user to
+        drink. It checks the point values for the passed in player and any
+        challenger
+        """
+        beer_points = cp.beer_points
+        brewery_points = cp.brewery_points
+        challengers = {
+            cp.id: {
+                'gain': cp.challenge_point_gain,
+                'loss': cp.challenge_point_loss,
+            }
+        }
         for beer in beers:
-            Contest_Checkin.objects.create_checkin(cp,
-                                                   beer,
-                                                   timezone.make_aware(datetime.datetime.now()),
-                                                   'https://checkin.com/beer')
-            beer_points = beer_points + beer.point_value
+            # We should only be accumulating points if the beer hasn't already
+            # been drunk
+            had_prior = Contest_Checkin.objects.filter(contest_player=cp,
+                                                       contest_beer=beer).count() > 0
+            if beer.challenger and beer.challenger.id not in challengers:
+                challengers[beer.challenger.id] = {
+                    'gain': beer.challenger.challenge_point_gain,
+                    'loss': beer.challenger.challenge_point_loss,
+                }
+            cp.drink_beer(beer,
+                          data={
+                              'untapped_checkin': 'https://untappd.com/checkin/beer',
+                              'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                          })
+            if not had_prior:
+                if beer.challenger:
+                    if beer.challenger.id == cp.id:
+                        challengers[beer.challenger.id]['gain'] = challengers[beer.challenger.id]['gain'] + beer.challenge_point_value
+                    else:
+                        beer_points = beer_points + beer.point_value
+                        challengers[beer.challenger.id]['loss'] = challengers[beer.challenger.id]['loss'] + beer.challenge_point_loss
+                        if challengers[beer.challenger.id]['loss'] > beer.max_point_loss:
+                            challengers[beer.challenger.id]['loss'] = beer.max_point_loss
+                else:
+                    beer_points = beer_points + beer.point_value
         for brewery in breweries:
-            Contest_Checkin.objects.create_brewery_checkin(cp,
-                                                           brewery,
-                                                           timezone.make_aware(datetime.datetime.now()),
-                                                           'https://checkin.com/brewery')
-            brewery_points = brewery_points + brewery.point_value
+            had_prior = Contest_Checkin.objects.filter(contest_player=cp,
+                                                       contest_brewery=brewery).count() > 0
+            cp.drink_at_brewery(brewery,
+                                data={
+                                     'untapped_checkin': 'https://untappd.com/checkin/brewery',
+                                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                                 })
+            if not had_prior:
+                brewery_points = brewery_points + brewery.point_value
+        # Test all of these and then run compute_points and rerun the tests
+        # compute_points should not change the values`
+        self.assertEqual(cp.brewery_points, brewery_points,
+                         msg='Cumulative sum of brewery points for {}'.format(cp))
+        self.assertEqual(cp.beer_points, beer_points,
+                         msg='Cumulative sum of beer points for {}'.format(cp))
+        self.assertEqual(cp.challenge_point_gain, challengers[cp.id]['gain'],
+                         msg='Cumulative challenge point gain for {}'.format(cp))
+        self.assertEqual(cp.challenge_point_loss, challengers[cp.id]['loss'],
+                         msg='Cumulative challenge point loss for {}'.format(cp))
+        self.assertEqual(cp.total_points,
+                         beer_points + brewery_points + challengers[cp.id]['gain'] - challengers[cp.id]['loss'],
+                         msg='Cumulative sum of total points for {}'.format(cp))
+        for ch_id in challengers.keys():
+            challenger = Contest_Player.objects.get(id=ch_id)
+            self.assertEqual(challengers[ch_id]['gain'], challenger.challenge_point_gain,
+                             msg='Cumulative challenger {} gain against player {}'.format(challenger, cp))
+            self.assertEqual(challengers[ch_id]['loss'], challenger.challenge_point_loss,
+                             msg='Cumulative challenger {} loss against player {}'.format(challenger, cp))
         cp.compute_points()
-        self.assertEqual(cp.brewery_points, brewery_points)
-        self.assertEqual(cp.beer_points, beer_points)
-        self.assertEqual(cp.total_points, beer_points + brewery_points)
+        # Testing the compute points computation
+        self.assertEqual(cp.brewery_points, brewery_points,
+                         msg='Computed sum of brewery points for {}'.format(cp))
+        self.assertEqual(cp.beer_points, beer_points,
+                         msg='Computed sum of beer points for {}'.format(cp))
+        self.assertEqual(cp.challenge_point_gain, challengers[cp.id]['gain'],
+                         msg='Computed challenge point gain for {}'.format(cp))
+        self.assertEqual(cp.challenge_point_loss, challengers[cp.id]['loss'],
+                         msg='Computed challenge point loss for {}'.format(cp))
+        self.assertEqual(cp.total_points,
+                         beer_points + brewery_points + challengers[cp.id]['gain'] - challengers[cp.id]['loss'],
+                         msg='Computed sum of total points for {}'.format(cp))
+        for ch_id in challengers.keys():
+            challenger = Contest_Player.objects.get(id=ch_id)
+            self.assertEqual(challengers[ch_id]['gain'], challenger.challenge_point_gain,
+                             msg='Computed challenger {} gain against player {}'.format(challenger, cp))
+            self.assertEqual(challengers[ch_id]['loss'], challenger.challenge_point_loss,
+                             msg='Computed challenger {} loss against player {}'.format(challenger, cp))
 
     def test_beers_and_brewery_point_computation(self):
         """
@@ -140,7 +209,7 @@ class ContestTestCase(TestCase):
                 ]
         breweries = [Contest_Brewery.objects.get(id=1),
                      Contest_Brewery.objects.get(id=2),]
-        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+        self.__test_beer_and_brewery_calculations(cp, beers, breweries)
 
     def test_beers_and_no_brewery_point_computation(self):
         """
@@ -151,7 +220,7 @@ class ContestTestCase(TestCase):
                  Contest_Beer.objects.get(id=2),
                  Contest_Beer.objects.get(id=3),]
         breweries = []
-        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+        self.__test_beer_and_brewery_calculations(cp, beers, breweries)
 
     def test_no_beers_and_brewery_point_computation(self):
         """
@@ -161,7 +230,7 @@ class ContestTestCase(TestCase):
         beers = []
         breweries = [Contest_Brewery.objects.get(id=1),
                      Contest_Brewery.objects.get(id=2),]
-        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+        self.__test_beer_and_brewery_calculations(cp, beers, breweries)
 
     def test_one_beer_and_brewery_point_computation(self):
         """
@@ -170,4 +239,50 @@ class ContestTestCase(TestCase):
         cp = Contest_Player.objects.get(id=1)
         beers = [Contest_Beer.objects.get(id=1),]
         breweries = [Contest_Brewery.objects.get(id=1),]
-        self.__test_beer_and_brewery_sum(cp, beers, breweries)
+        self.__test_beer_and_brewery_calculations(cp, beers, breweries)
+
+    def _unvalidated_checkin_from_beer(self, contest_player, beer,
+                                       checkin_time=None):
+        """
+        Creates a new unvalidaated checkin which matches the beer.
+        """
+        if checkin_time is None:
+            checkin_time = timezone.make_aware(datetime.datetime.now())
+        uv = Unvalidated_Checkin.objects.create_checkin(contest_player,
+                                                        '{}'.format(beer),
+                                                        beer.name,
+                                                        beer.brewery,
+                                                        'https://untappd.com',
+                                                        checkin_time
+                                                        )
+        return uv
+
+    def test_challenge_points_for_challenger(self):
+        """
+        This tests that a challenger gets the usual point value for drinking
+        their own beer.
+        """
+        challenge = Contest_Beer.objects.get(id=6)
+        challenger = challenge.challenger
+        self.__test_beer_and_brewery_calculations(challenger, [challenge], [])
+
+    def test_challenge_points_for_player(self):
+        """
+        This tests that player gets the usual point value for drinking
+        a challenger's beers and that the challenger gets a loss
+        """
+        challenge = Contest_Beer.objects.get(id=6)
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [challenge], [])
+
+    def test_challenge_points_for_multiple_players(self):
+        """
+        This tests that a challenger loses the right amount of points for
+        multiple people drinking their beer
+        """
+        challenge = Contest_Beer.objects.get(id=6)
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [challenge], [])
+        player = Contest_Player.objects.get(id=2)
+        self.__test_beer_and_brewery_calculations(player, [challenge], [])
+        self.__test_beer_and_brewery_calculations(challenge.challenger, [challenge], [])
