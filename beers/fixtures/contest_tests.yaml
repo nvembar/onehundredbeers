@@ -243,3 +243,27 @@
     last_checkin_beer: null
     last_checkin_load: '2016-01-01 00:00:00.00+00:00'
     rank: -1
+- model: beers.contest_beer
+  pk: 6
+  fields:
+    contest: 1
+    challenger: 3
+    beer: 1
+    beer_name: Challenge Beer 6
+    point_value: 3
+    challenge_point_loss: 3
+    challenge_point_value: 12
+    max_point_loss: 12
+    total_drank: 0
+- model: beers.contest_beer
+  pk: 7
+  fields:
+    contest: 1
+    challenger: 4
+    beer: 1
+    beer_name: Challenge Beer 7
+    point_value: 3
+    challenge_point_loss: 6
+    challenge_point_value: 10
+    max_point_loss: 13
+    total_drank: 0
