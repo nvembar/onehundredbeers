@@ -117,6 +117,20 @@ class Contest(models.Model):
         beer.save()
         return beer
 
+    def add_challenge_beer(self, beer, challenger,
+                           point_data={'point_value': 3,
+                                       'challenge_point_value': 12,
+                                       'point_loss': 3,
+                                       'max_point_loss': 12, }):
+        """
+        Adds a new beer as a challenge with default values for the points.
+        Challenge beers are associated with a player in the contest. By default,
+        they will get 12 points for drinking the beer, but any other player
+        will get 3 for drinking it and also have the challenger lose 3 points
+        up to a maximum of 12 points lost
+        """
+        return None
+
     def add_brewery(self, brewery, point_value=1):
         """Adds a brewery to the contest"""
         brewery = Contest_Brewery(contest=self, brewery=brewery,
@@ -152,17 +166,6 @@ class Contest(models.Model):
     def __str__(self):
         return self.name
 
-class Contest_Beer(models.Model):
-    "Represents a many-to-many connection between a beer and a contest"
-
-    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
-    beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
-    beer_name = models.CharField(max_length=250)
-    point_value = models.IntegerField(default=1)
-    total_drank = models.IntegerField("number of players who drank this beer")
-
-    def __str__(self):
-        return "{0}/{1}".format(self.beer.name, self.beer.brewery)
 
 class Brewery_Manager(models.Manager):
 
@@ -209,6 +212,8 @@ class Contest_Player(models.Model):
     beer_count = models.IntegerField(default=0)
     beer_points = models.IntegerField(default=0)
     brewery_points = models.IntegerField(default=0)
+    challenge_point_gain = models.IntegerField(default=0)
+    challenge_point_loss = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)
     last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
     last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
@@ -216,24 +221,173 @@ class Contest_Player(models.Model):
     last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
 
+    def drink_beer(self, beer, checkin=None, data=None):
+        """
+        Has the user check in to a beer, using the data from a checkin or
+        from a dictionary. This does all the calculations for points,
+        challenges, and updates history. It does not delete the checkin and
+        gives preference to the data from the data object.
+
+        beer: A Contest_Beer object to check into
+        checkin: An Unvalidated_Checkin object
+
+        returns Contest_Checkin
+        """
+        if beer.contest.id != self.contest.id:
+            raise ValueError('Cannot check into a beer not in the contest')
+        checkin_time = None
+        untappd_checkin = None
+        if checkin:
+            if checkin.contest.id != self.contest.id:
+                raise ValueError('Cannot use checkin not in the contest')
+            checkin_time = checkin.untappd_checkin_date
+            untappd_checkin = checkin.untappd_checkin
+        if 'checkin_time' in data:
+            checkin_time = data['checkin_time']
+        if 'untappd_checkin' in data:
+            untappd_checkin = data['untappd_checkin']
+        self.last_checkin_date = checkin_time
+        self.last_checkin_beer = beer.beer_name
+        self.last_checkin_brewery = None
+        if Contest_Checkin.objects.filter(contest_player=self, contest_beer=beer).count() > 0:
+            return None
+        checkin = None
+        # Check if this is a challenge beer
+        if beer.challenger is not None:
+            # This is our own challenge beer, so
+            if beer.challenger.id == self.id:
+                checkin = Contest_Checkin(contest_player=self,
+                                          contest_beer=beer,
+                                          checkin_points=beer.challenge_point_value,
+                                          untappd_checkin=untappd_checkin,
+                                          checkin_time=checkin_time,
+                                         )
+                self.challenge_point_gain = self.challenge_point_gain + beer.challenge_point_value
+            else:
+                checkin = Contest_Checkin(contest_player=self,
+                                          contest_beer=beer,
+                                          checkin_points=beer.point_value,
+                                          untappd_checkin=untappd_checkin,
+                                          checkin_time=checkin_time,
+                                         )
+                self.beer_points = self.beer_points + beer.point_value
+                # The challenger is penalized if someone else drinks their
+                # challenge beer
+                challenger = beer.challenger
+                challenger.challenge_point_loss = challenger.challenge_point_loss + beer.challenge_point_loss
+                if challenger.challenge_point_loss > beer.max_point_loss:
+                   challenger.challenge_point_loss = beer.max_point_loss
+                challenger.total_points = challenger.beer_points + challenger.brewery_points + challenger.challenge_point_gain - challenger.challenge_point_loss
+                challenger.save()
+        else:
+            checkin = Contest_Checkin(contest_player=self,
+                                      contest_beer=beer,
+                                      checkin_points=beer.point_value,
+                                      untappd_checkin=untappd_checkin,
+                                      checkin_time=checkin_time,
+                                     )
+            self.beer_points = self.beer_points + beer.point_value
+        checkin.save()
+        self.total_points = self.brewery_points + self.beer_points + self.challenge_point_gain - self.challenge_point_loss
+        self.save()
+        return checkin
+
+    def drink_at_brewery(self, brewery, checkin=None, data=None):
+        """
+        Has the user check in to a brewery, using the data from a checkin or
+        from a dictionary. It does not delete the checkin and gives preference
+        to the data from the data object.
+
+        brewery: a Contest_Brewery object to check into
+        checkin: an Unvalidated_Checkin object
+
+        returns Contest_Checkin
+        """
+        if brewery.contest.id != self.contest.id:
+            raise ValueError('Cannot check into a brewery not in the contest')
+        checkin_time = None
+        untappd_checkin = None
+        if checkin:
+            if checkin.contest.id != self.contest.id:
+                raise ValueError('Cannot use checkin not in the contest')
+            checkin_time = checkin.untappd_checkin_date
+            untappd_checkin = checkin.untappd_checkin
+        if 'checkin_time' in data:
+            checkin_time = data['checkin_time']
+        if 'untappd_checkin' in data:
+            untappd_checkin = data['untappd_checkin']
+        self.last_checkin_date = checkin_time
+        self.last_checkin_beer = None
+        self.last_checkin_brewery = brewery.brewery_name
+        if Contest_Checkin.objects.filter(contest_player=self, contest_brewery=brewery).count() > 0:
+            return None
+        checkin = Contest_Checkin(contest_player=self,
+                                  contest_brewery=brewery,
+                                  checkin_points=brewery.point_value,
+                                  untappd_checkin=untappd_checkin,
+                                  checkin_time=checkin_time,
+                                 )
+        checkin.save()
+        self.brewery_points = self.brewery_points + brewery.point_value
+        self.total_points = self.total_points + brewery.point_value
+        self.save()
+        return checkin
+
     def compute_points(self):
-        """Computes the brewery and beer points for this user"""
+        """Computes the brewery and beer points for this user."""
         checkins = Contest_Checkin.objects.filter(contest_player=self)
         beer_filter = checkins.filter(contest_beer__isnull=False)
-        beer_points = beer_filter.aggregate(models.Sum('checkin_points'))['checkin_points__sum']
-        brewery_points = checkins.filter(contest_brewery__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+        nonchallenge_filter = beer_filter.exclude(contest_beer__challenger=self)
+        beer_points = nonchallenge_filter.aggregate(models.Sum('checkin_points'))['checkin_points__sum']
         if beer_points is None:
             beer_points = 0
+
+        challenge_filter = beer_filter.filter(contest_beer__challenger=self)
+        challenge_point_gain = challenge_filter.aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+        if challenge_point_gain is None:
+            challenge_point_gain = 0
+
+        challenger_drinks = Contest_Checkin.objects.filter(contest_beer__challenger=self)
+        challenger_drinks = challenger_drinks.exclude(contest_player=self)
+        losses = challenger_drinks.values('contest_beer').annotate(loss=models.Sum('contest_beer__challenge_point_loss'))
+        self.challenge_point_loss = 0
+        for loss in losses:
+            beer = Contest_Beer.objects.get(id=loss['contest_beer'])
+            self.challenge_point_loss = self.challenge_point_loss + min(loss['loss'], beer.max_point_loss)
+
+        brewery_points = checkins.filter(contest_brewery__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
         if brewery_points is None:
             brewery_points = 0
         self.beer_points = beer_points
         self.beer_count = beer_filter.count()
         self.brewery_points = brewery_points
-        self.total_points = self.beer_points + self.brewery_points
+        self.challenge_point_gain = challenge_point_gain
+        self.total_points = self.beer_points + self.brewery_points + self.challenge_point_gain - self.challenge_point_loss
         self.save()
 
     def __str__(self):
         return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
+
+class Contest_Beer(models.Model):
+    "Represents a many-to-many connection between a beer and a contest"
+
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+    challenger = models.ForeignKey(Contest_Player,
+                                   on_delete=models.CASCADE,
+                                   default=None,
+                                   null=True,
+                                  )
+    beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
+    beer_name = models.CharField(max_length=250)
+    point_value = models.IntegerField(default=1)
+    challenge_point_loss = models.IntegerField(default=0)
+    max_point_loss = models.IntegerField(default=0)
+    challenge_point_value = models.IntegerField(default=0,
+                                                help_text='The number of points a challenger gets for drinking this beer')
+    total_drank = models.IntegerField("number of players who drank this beer")
+
+    def __str__(self):
+        return "{0}/{1}".format(self.beer.name, self.beer.brewery)
 
 class Unvalidated_CheckinManager(models.Manager):
     def create_checkin(self, contest_player, untappd_title, brewery, beer,
