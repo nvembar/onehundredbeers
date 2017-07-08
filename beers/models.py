@@ -221,6 +221,22 @@ class Contest_Player(models.Model):
     last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
 
+    def __compute_losses(self):
+        """
+        Computes the point value of the losses due to challenges. We do need
+        to query against the set of data (at the moment) because calculating
+        against the maximum point loss requires querying against all the
+        checkouts of all the challenge beers.
+        """
+        challenger_drinks = Contest_Checkin.objects.filter(contest_beer__challenger=self)
+        challenger_drinks = challenger_drinks.exclude(contest_player=self)
+        losses = challenger_drinks.values('contest_beer').annotate(loss=models.Sum('contest_beer__challenge_point_loss'))
+        self.challenge_point_loss = 0
+        for loss in losses:
+            beer = Contest_Beer.objects.get(id=loss['contest_beer'])
+            self.challenge_point_loss = self.challenge_point_loss + min(loss['loss'], beer.max_point_loss)
+        self.save()
+
     def drink_beer(self, beer, checkin=None, data=None):
         """
         Has the user check in to a beer, using the data from a checkin or
@@ -262,6 +278,7 @@ class Contest_Player(models.Model):
                                           untappd_checkin=untappd_checkin,
                                           checkin_time=checkin_time,
                                          )
+                checkin.save()
                 self.challenge_point_gain = self.challenge_point_gain + beer.challenge_point_value
             else:
                 checkin = Contest_Checkin(contest_player=self,
@@ -270,13 +287,13 @@ class Contest_Player(models.Model):
                                           untappd_checkin=untappd_checkin,
                                           checkin_time=checkin_time,
                                          )
+                checkin.save()
                 self.beer_points = self.beer_points + beer.point_value
                 # The challenger is penalized if someone else drinks their
                 # challenge beer
+
                 challenger = beer.challenger
-                challenger.challenge_point_loss = challenger.challenge_point_loss + beer.challenge_point_loss
-                if challenger.challenge_point_loss > beer.max_point_loss:
-                   challenger.challenge_point_loss = beer.max_point_loss
+                challenger.__compute_losses()
                 challenger.total_points = challenger.beer_points + challenger.brewery_points + challenger.challenge_point_gain - challenger.challenge_point_loss
                 challenger.save()
         else:
@@ -286,8 +303,8 @@ class Contest_Player(models.Model):
                                       untappd_checkin=untappd_checkin,
                                       checkin_time=checkin_time,
                                      )
+            checkin.save()
             self.beer_points = self.beer_points + beer.point_value
-        checkin.save()
         self.total_points = self.brewery_points + self.beer_points + self.challenge_point_gain - self.challenge_point_loss
         self.save()
         return checkin
@@ -347,13 +364,7 @@ class Contest_Player(models.Model):
         if challenge_point_gain is None:
             challenge_point_gain = 0
 
-        challenger_drinks = Contest_Checkin.objects.filter(contest_beer__challenger=self)
-        challenger_drinks = challenger_drinks.exclude(contest_player=self)
-        losses = challenger_drinks.values('contest_beer').annotate(loss=models.Sum('contest_beer__challenge_point_loss'))
-        self.challenge_point_loss = 0
-        for loss in losses:
-            beer = Contest_Beer.objects.get(id=loss['contest_beer'])
-            self.challenge_point_loss = self.challenge_point_loss + min(loss['loss'], beer.max_point_loss)
+        self.__compute_losses()
 
         brewery_points = checkins.filter(contest_brewery__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
         if brewery_points is None:
