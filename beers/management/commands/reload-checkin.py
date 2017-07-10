@@ -24,10 +24,14 @@ class Command(BaseCommand):
         cp = None
         cb = None
         untappd_url = opts['untappd_url'][0]
-        checkin_time = parse(opts['checkin_time'][0],
+        checkin_time = None
+        try:
+            checkin_time = parse(opts['checkin_time'][0],
                 default=datetime.datetime(year=1970, month=1, day=1))
-        if checkin_time.year == 1970:
-            raise CommandError("Date in invalid format: {0}".format(opts['checkin_time']))
+            if checkin_time.year == 1970:
+                raise CommandError("Date in invalid format: {0}".format(opts['checkin_time']))
+        except ValueError as e:
+            raise CommandError("Date in invalid format: {0}: {1}".format(e, opts['checkin_time']))
         try:
             beer = Beer.objects.filter(name__icontains=opts['beer'][0],
                                     brewery__icontains=opts['brewery'][0])[0]
