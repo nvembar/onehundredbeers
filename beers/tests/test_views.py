@@ -84,6 +84,98 @@ class BeersViewsTestCase(TestCase):
                           data={'action': 'join'})
         self.assertTrue(Contest_Player.objects.filter(contest=contest, user_name='user5').count(), 1)
 
+    def test_view_contest_unauthenticated(self):
+        """
+        Tests whether an unauthenticated user can view a contest.
+        """
+        c = Client()
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest.html')
+        self.assertEqual(response.context['contest'].id, 1)
+
+    def test_view_contest_authenticated(self):
+        """
+        Tests whether an authenticated user can view a contest.
+        """
+        c = Client()
+        player = Player.objects.get(id=1)
+        self.assertTrue(c.login(username=player.user.username, password='password1%'))
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest.html')
+        self.assertEqual(response.context['contest'].id, 1)
+        self.assertEqual(response.context['player'].id, player.id)
+        self.assertFalse(response.context['is_creator'])
+
+    def test_view_contest_by_creator(self):
+        """
+        Tests whether an authenticated user can view a contest.
+        """
+        c = Client()
+        player = Player.objects.get(id=4)
+        self.assertTrue(c.login(username=player.user.username, password='password1%'))
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest.html')
+        self.assertEqual(response.context['contest'].id, 1)
+        self.assertEqual(response.context['player'].id, player.id)
+        self.assertTrue(response.context['is_creator'])
+        vlink = reverse('unvalidated-checkins', kwargs={'contest_id': 1})
+        self.assertIn(vlink, response.content.decode('utf-8'))
+
+    def test_view_beers_unauthenticated(self):
+        """
+        Tests whether an unauthenticated user can view a contest.
+        """
+        c = Client()
+        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertEqual(response.context['contest'].id, 1)
+        self.assertEqual(len(response.context['contest_beers']),
+                         Contest_Beer.objects.filter(contest__id=1).count())
+
+    def test_view_beers_authenticated(self):
+        """
+        Tests whether an authenticated user can view a contest.
+        """
+        c = Client()
+        player = Player.objects.get(id=1)
+        cp = Contest_Player.objects.get(player=player, contest__id=1)
+        cp.drink_beer(Contest_Beer.objects.get(id=1),
+                      data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                            'untappd_url': 'https://untappd.com/1',})
+        self.assertTrue(c.login(username=player.user.username, password='password1%'))
+        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertEqual(response.context['contest'].id, 1)
+        self.assertEqual(len(response.context['contest_beers']),
+                         Contest_Beer.objects.filter(contest__id=1).count())
+        for b in response.context['contest_beers']:
+            self.assertEqual(b.checked_into, b.id == 1)
+
+    def test_view_beers_by_creator(self):
+        """
+        Tests whether an authenticated user can view a contest.
+        """
+        c = Client()
+        player = Player.objects.get(id=4)
+        cp = Contest_Player.objects.get(player=player, contest__id=1)
+        cp.drink_beer(Contest_Beer.objects.get(id=1),
+                      data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                            'untappd_url': 'https://untappd.com/1',})
+        self.assertTrue(c.login(username=player.user.username, password='password1%'))
+        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        self.assertTrue(response.status_code, 200)
+        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertEqual(response.context['contest'].id, 1)
+        self.assertEqual(len(response.context['contest_beers']),
+                         Contest_Beer.objects.filter(contest__id=1).count())
+        for b in response.context['contest_beers']:
+            self.assertEqual(b.checked_into, b.id == 1)
+
     def test_basic_leaderboard(self):
         """
         Tests that a simple sequential ranking works as expected
