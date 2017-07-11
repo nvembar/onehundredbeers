@@ -51,8 +51,7 @@ def contest(request, contest_id):
         try:
             player = Player.objects.get(user_id=request.user.id)
             context['player'] = player
-            if this_contest.creator.id == player.id:
-                context['is_creator'] = True
+            context['is_creator'] = this_contest.creator.id == player.id
         except Player.DoesNotExist:
             pass
     return render(request, 'beers/contest.html', context)
