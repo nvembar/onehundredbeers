@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings
 from django.test import Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from beers.models import Contest, Player, Contest_Player, Contest_Checkin, Contest_Beer
+from beers.models import Contest, Player, Contest_Player, Contest_Checkin, Contest_Beer, Contest_Brewery
 
 
 @override_settings(ROOTURL_CONF='beers.urls', SECURE_SSL_REDIRECT=False)
@@ -146,6 +146,9 @@ class BeersViewsTestCase(TestCase):
         cp.drink_beer(Contest_Beer.objects.get(id=1),
                       data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
                             'untappd_url': 'https://untappd.com/1',})
+        cp.drink_at_brewery(Contest_Brewery.objects.get(id=1),
+                            data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                                  'untappd_url': 'https://untappd.com/2',})
         self.assertTrue(c.login(username=player.user.username, password='password1%'))
         response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
         self.assertTrue(response.status_code, 200)
@@ -166,6 +169,9 @@ class BeersViewsTestCase(TestCase):
         cp.drink_beer(Contest_Beer.objects.get(id=1),
                       data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
                             'untappd_url': 'https://untappd.com/1',})
+        cp.drink_at_brewery(Contest_Brewery.objects.get(id=1),
+                            data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                                  'untappd_url': 'https://untappd.com/2',})
         self.assertTrue(c.login(username=player.user.username, password='password1%'))
         response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
         self.assertTrue(response.status_code, 200)

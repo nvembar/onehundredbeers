@@ -107,7 +107,7 @@ def contest_beers(request, contest_id):
             cp = Contest_Player.objects.get(contest=this_contest,
                                             player__user_id=request.user.id)
             checkins = Contest_Checkin.objects.filter(contest_player=cp)
-            checkin_ids = [c.contest_beer.id for c in checkins]
+            checkin_ids = [c.contest_beer.id for c in checkins.filter(contest_beer__isnull=False)]
             for b in beers:
                 b.checked_into = b.id in checkin_ids
             context['contest_player'] = cp
