@@ -1,6 +1,5 @@
 """Command that will load checkins for a user"""
 
-import logging
 import argparse
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
