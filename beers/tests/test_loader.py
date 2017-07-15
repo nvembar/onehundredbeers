@@ -144,7 +144,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         contest.save()
         cp = contest.add_player(player)
         cp.save()
-        call_command('load-checkins', '--player', player.user.username)
+        call_command('load_checkins', '--player', player.user.username)
         self.assertEqual(Unvalidated_Checkin.objects.filter(contest_player=cp).count(), 25)
 
     def test_successful_checkin_command_for_player_after_date(self):
@@ -159,7 +159,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         contest.save()
         cp = contest.add_player(player)
         cp.save()
-        call_command('load-checkins', '--after-date', '2017-06-01')
+        call_command('load_checkins', '--after-date', '2017-06-01')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 4)
 
     def test_successful_checkin_command_for_all(self):
@@ -178,7 +178,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         cp.save()
         cp = contest.add_player(runner)
         cp.save()
-        call_command('load-checkins')
+        call_command('load_checkins')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 50)
 
     def test_successful_checkin_command_for_all_after_date(self):
@@ -197,23 +197,23 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         cp.save()
         cp = contest.add_player(runner)
         cp.save()
-        call_command('load-checkins', '--after-date', '2017-06-01')
+        call_command('load_checkins', '--after-date', '2017-06-01')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 8)
 
     def test_unsucessful_checkin_command_with_bad_contest(self):
         """Test whether a checkin command with bad contest arguments fails"""
         with self.assertRaises(CommandError):
-            call_command('load-checkins', '--contest', 'bad bad')
+            call_command('load_checkins', '--contest', 'bad bad')
         with self.assertRaises(CommandError):
-            call_command('load-checkins', '--contest', 1000)
+            call_command('load_checkins', '--contest', 1000)
 
 
     def test_unsucessful_checkin_command_with_bad_player(self):
         """Test whether a checkin command with bad player argument fails"""
         with self.assertRaises(CommandError):
-            call_command('load-checkins', '--player', 'no such player')
+            call_command('load_checkins', '--player', 'no such player')
 
     def test_unsucessful_checkin_command_with_bad_after_date(self):
         """Test whether a checkin command with bad date argument fails"""
         with self.assertRaises(CommandError):
-            call_command('load-checkins', '--after-date', 'is not a date')
+            call_command('load_checkins', '--after-date', 'is not a date')
