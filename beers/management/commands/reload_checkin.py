@@ -1,9 +1,10 @@
 """Command to load a specific checkin for a user"""
 
-import datetime
 from dateutil.parser import parse
+from django.utils import timezone
 from django.core.management.base import BaseCommand, CommandError
 from beers.models import Beer, Player, Contest_Beer, Contest, Contest_Player
+
 
 class Command(BaseCommand):
     """Command which loads a specific checkin with the given information"""
@@ -30,27 +31,29 @@ class Command(BaseCommand):
         contest_id = opts['contest_id'][0]
         checkin_time = None
         try:
-            default_date = datetime.datetime(year=1970, month=1, day=1)
-            checkin_time = parse(opts['checkin_time'][0],
-                                 default=default_date)
-            if checkin_time.year == 1970:
-                raise CommandError(('Date in invalid format: '
-                                    + ' {0}').format(opts['checkin_time']))
-        except ValueError as e:
+            checkin_time = parse(opts['checkin_time'][0])
+            checkin_time = timezone.make_aware(checkin_time)
+        except ValueError as exc:
             raise CommandError(('Date in invalid format: '
-                                + '{0}: {1}').format(e, opts['checkin_time']))
+                                + '{0}: {1}').format(exc,
+                                                     opts['checkin_time'][0]))
         try:
             beers = Beer.objects.filter(name__icontains=opts['beer'][0],
                                         brewery__icontains=opts['brewery'][0])
+            if beers.count() > 1:
+                raise CommandError(('Beer and brewery pairing is ambiguous: '
+                                    + '{0}/{1}').format(opts['beer'][0],
+                                                        opts['brewery'][0]))
             contest_beer = Contest_Beer.objects.get(contest_id=contest_id,
                                                     beer=beers[0])
         except IndexError:
             raise CommandError(('Unable to find beer '
-                                + ' "{0}" by "{1}"').format(opts['beer'],
-                                                            opts['brewery']))
+                                + '"{0}" by "{1}"').format(opts['beer'][0],
+                                                           opts['brewery'][0]))
         except Contest_Beer.DoesNotExist:
             raise CommandError(('Unable to find beer/contest pairing: '
-                                + ' {0}/{1}').format(contest_id, beer.id))
+                                + ' {0}/{1}').format(contest_id,
+                                                     opts['beer'][0]))
         try:
             contest = Contest.objects.get(id=contest_id)
         except Contest.DoesNotExist:
