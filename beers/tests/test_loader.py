@@ -1,9 +1,14 @@
+"""
+Tests the loader utilities and commands for the hundred beers app
+"""
+
 import datetime
 import io
 import os
-import botocore.session
+from unittest.mock import patch, MagicMock
 import boto3
-from botocore.stub import Stubber, ANY
+import botocore.session
+from botocore.stub import Stubber
 from django.test import TestCase, override_settings
 from django.utils import timezone
 from django.core.management import call_command
@@ -12,8 +17,7 @@ from beers.models import Contest_Beer, Beer, Contest, Player, \
                          Unvalidated_Checkin
 from beers.utils.loader import create_contest_from_csv
 from beers.utils.checkin import load_player_checkins
-from hundred_beers.settings import BASE_DIR, LOADER_ROLE_ARN
-from unittest.mock import patch, Mock, MagicMock
+from hundred_beers.settings import BASE_DIR
 
 FAKE_ARN = 'this_is_a_long_fake_arn'
 
@@ -23,19 +27,18 @@ def sts_boto_patch(client_type):
     if client_type == 'sts':
         sts = botocore.session.get_session().create_client('sts')
         stub = Stubber(sts)
-        response = {
-                        'Credentials': {
-                            'AccessKeyId': 'access_key_id_string',
-                            'SecretAccessKey': 'secret_access_string',
-                            'SessionToken': 'session_string',
-                            'Expiration': datetime.datetime.now(),
+        response = {'Credentials':
+                        {'AccessKeyId': 'access_key_id_string',
+                         'SecretAccessKey': 'secret_access_string',
+                         'SessionToken': 'session_string',
+                         'Expiration': datetime.datetime.now(),
                         },
-                        'AssumedRoleUser': {
-                            'AssumedRoleId': 'assumed_role_id_string_get_long',
-                            'Arn': 'arn_string_this_needs_to_be_long',
+                    'AssumedRoleUser':
+                        {'AssumedRoleId': 'assumed_role_id_string_get_long',
+                         'Arn': 'arn_string_this_needs_to_be_long',
                         },
-                        'PackedPolicySize': 123
-                    }
+                    'PackedPolicySize': 123,
+                   }
         expected = {'RoleArn': FAKE_ARN,
                     'RoleSessionName': 'LoadContest'}
         stub.add_response('assume_role', response, expected)
@@ -276,14 +279,20 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         """Test the ability to load a single XML feed file for a user"""
         runner = Player.objects.get(id=4)
         player = Player.objects.get(id=1)
-        player.untappd_rss = os.path.join(BASE_DIR, '..', 'test-data', 'test-checkins.xml')
+        player.untappd_rss = os.path.join(BASE_DIR,
+                                          '..',
+                                          'test-data',
+                                          'test-checkins.xml')
         player.save()
-        contest = Contest.objects.create_contest('Contest', runner,
-            timezone.make_aware(datetime.datetime(2017, 1, 1)),
-            timezone.make_aware(datetime.datetime(2017, 12, 31)))
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
         contest.save()
-        cp = contest.add_player(player)
-        cp.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
         call_command('load_checkins', '--after-date', '2017-06-01')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 4)
 
