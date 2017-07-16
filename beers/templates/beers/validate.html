@@ -29,9 +29,14 @@
   (function(exports) {
 
 
-    function sendContent(uvId, content) {
-      var url = "{% url 'update-checkin' contest.id 0 %}";
-      url = url.replace(/\/0((\/.*){0,1})$/, '/' + uvId + '$1');
+    function validateCheckin(uvId, isBeer, bId) {
+      var url = "{% url 'validate-checkin' contest.id %}";
+      content = { 'checkin': uvId };
+      if (isBeer) {
+        content['as_beer'] = bId;
+      } else {
+        content['as_brewery'] = bId;
+      }
       return $.ajax({
         url: url,
         headers: { Accept: 'application/json' },
@@ -43,8 +48,7 @@
     }
 
     function sendAddBrewery(uvId, content) {
-      var url = "{% url 'add-brewery-checkin' contest.id 0 %}";
-      url = url.replace(/\/0((\/.*){0,1})$/, '/' + uvId + '$1');
+      var url = "{% url 'validate-checkin' contest.id %}";
       return $.ajax({
         url: url,
         headers: { Accept: 'application/json' },
@@ -131,28 +135,31 @@
       }
     }
 
-    function dismissUv(uvId) {
+    function sendDeleteUvMessage(uvId) {
       var initialPage = {{ uvs.number }};
       var initialPageEndIndex = {{ uvs.end_index }} - 1;
+      var url = "{% url 'delete-checkin' contest.id 0 %}";
+      url = url.replace(/\/0((\/.*){0,1})$/, '/' + uvId + '$1');
       console.log('Dismissing ' + uvId);
-      sendContent(uvId, {'remove-beer': 'Remove'})
-        .then(removeRow(uvId))
+      return $.ajax({
+        url: url,
+        headers: { Accept: 'application/json' },
+        dataType: 'json',
+        method: 'DELETE'
+      }).then(removeRow(uvId))
         .then(getNextUnvalidatedCheckin(initialPageEndIndex))
         .then(refreshList());
     }
 
-    function validateUv(uvId, beerId) {
+    function sendValidateUvMessage(uvId, beerId) {
       var initialPage = {{ uvs.number }};
       var initialPageEndIndex = {{ uvs.end_index }} - 1;
       console.log('Setting ' + uvId + ' to beer ' + beerId);
       var promise = null;
       if (beerId.startsWith('beer:')) {
-        promise = sendContent(uvId,
-            { 'validate-beer': 'Validate',
-              'contest-beer': beerId.substring(5),
-            })
+        promise = validateCheckin(uvId, true, beerId.substring(5))
       } else if (beerId.startsWith('brewery:')) {
-        promise = sendAddBrewery(uvId, { 'as_brewery': beerId.substring(8), })
+        promise = validateCheckin(uvId, false, beerId.substring(8))
       } else {
         return;
       }
@@ -184,14 +191,14 @@
       var uvId = $(row).data("validationId");
       var selected = $(row).find(".beer-list option:selected").val();
       if (selected) {
-        validateUv(uvId, selected);
+        sendValidateUvMessage(uvId, selected);
       }
     }
 
     exports.dismissalClick = function() {
         // The parent validation-row contains the validation ID in its data
         var uvId = $(this).parents(".validation-row").data("validationId");
-        dismissUv(uvId);
+        sendDeleteUvMessage(uvId);
     }
 
     exports.beerListOnSelect = function(e) {
