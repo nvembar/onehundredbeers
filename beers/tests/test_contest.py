@@ -21,11 +21,14 @@ class ContestTestCase(TestCase):
         """Logs in as the correct user and validates a beer"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        uv = Unvalidated_Checkin.objects.get(untappd_title='Unvalidated Checkin 2')
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
         response = c.post(reverse('update-checkin',
-                                  kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
+                                  kwargs={'contest_id': 1,
+                                          'uv_checkin': uv.id}),
                           content_type='application/json',
-                          data=json.dumps({'validate-beer': 'Validate', 'contest-beer': 1,}),
+                          data=json.dumps({'validate-beer': 'Validate',
+                                           'contest-beer': 1}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
         q = Contest_Checkin.objects.filter(contest_beer__id=1,
@@ -47,9 +50,10 @@ class ContestTestCase(TestCase):
         uv = Unvalidated_Checkin.objects.get(
             untappd_title='Unvalidated Checkin 2')
         response = c.post(reverse('update-checkin',
-                                  kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
+                                  kwargs={'contest_id': 1,
+                                          'uv_checkin': uv.id}),
                           content_type='application/json',
-                          data=json.dumps({'remove-beer': 'Remove',}),
+                          data=json.dumps({'remove-beer': 'Remove'}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
         contest_player = Contest_Player.objects.get(id=1)
@@ -134,18 +138,20 @@ class ContestTestCase(TestCase):
         for beer in beers:
             # We should only be accumulating points if the beer hasn't already
             # been drunk
-            had_prior = Contest_Checkin.objects.filter(contest_player=cp,
-                                                       contest_beer=beer).count() > 0
+            had_prior = Contest_Checkin.objects.filter(
+                contest_player=cp,
+                contest_beer=beer).count() > 0
             if beer.challenger and beer.challenger.id not in challengers:
                 challengers[beer.challenger.id] = {
                     'gain': beer.challenger.challenge_point_gain,
                     'loss': beer.challenger.challenge_point_loss,
                 }
-            cp.drink_beer(beer,
-                          data={
-                              'untapped_checkin': 'https://untappd.com/checkin/beer',
-                              'checkin_time': timezone.make_aware(datetime.datetime.now()),
-                          })
+            cp.drink_beer(
+                beer,
+                data={
+                    'untapped_checkin': 'https://untappd.com/checkin/beer',
+                    'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                })
             if not had_prior:
                 if beer.challenger:
                     if beer.challenger.id == cp.id:
@@ -167,8 +173,8 @@ class ContestTestCase(TestCase):
             cp.drink_at_brewery(
                 brewery,
                 data={
-                     'untapped_checkin': 'https://untappd.com/checkin/brewery',
-                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                    'untapped_checkin': 'https://untappd.com/checkin/brewery',
+                    'checkin_time': timezone.make_aware(datetime.datetime.now()),
                 })
             if not had_prior:
                 brewery_points = brewery_points + brewery.point_value
@@ -302,7 +308,7 @@ class ContestTestCase(TestCase):
                                                         beer.brewery,
                                                         'https://untappd.com',
                                                         checkin_time
-                                                        )
+                                                       )
         return uv
 
     def test_challenge_points_for_challenger(self):
