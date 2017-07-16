@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from beers.models import Contest_Beer, Beer, Contest, Player, \
-                         Unvalidated_Checkin
+                         Contest_Checkin, Unvalidated_Checkin
 from beers.utils.loader import create_contest_from_csv
 from beers.utils.checkin import load_player_checkins
 from hundred_beers.settings import BASE_DIR
@@ -368,3 +368,213 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         """Test whether a checkin command with bad date argument fails"""
         with self.assertRaises(CommandError):
             call_command('load_checkins', '--after-date', 'is not a date')
+
+    def test_successful_reload_checkin(self):
+        """Test whether the reload_checkin command works"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        call_command('reload_checkin',
+                     str(contest.id),
+                     'https://example.com/checkin/1',
+                     '6-1-2017',
+                     contest_player.user_name,
+                     'Reloaded Beer',
+                     'Reloaded Brewery',)
+        checkin = Contest_Checkin.objects.get(contest_player=contest_player,
+                                              contest_beer=contest_beer)
+        self.assertIsNotNone(checkin)
+        self.assertEqual(checkin.checkin_time,
+                         timezone.make_aware(datetime.datetime(2017, 6, 1)))
+        contest_player.refresh_from_db()
+        self.assertEqual(contest_player.beer_points, 1)
+        self.assertEqual(contest_player.total_points, 1)
+
+    def test_bad_date_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad date input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         'not a date',
+                         contest_player.user_name,
+                         'Reloaded Beer',
+                         'Reloaded Brewery',)
+
+    def test_bad_contest_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad contest
+        input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id + 100),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         contest_player.user_name,
+                         'Reloaded Beer',
+                         'Reloaded Brewery',)
+
+    def test_bad_player_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad player input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         'not a player',
+                         'Reloaded Beer',
+                         'Reloaded Brewery',)
+
+    def test_bad_beer_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         contest_player.user_name,
+                         'not a beer',
+                         'Reloaded Brewery',)
+
+    def test_bad_brewery_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         contest_player.user_name,
+                         'Reloaded Beer',
+                         'not a brewery',)
+
+    def test_bad_brewery_reload_checkin(self):
+        """Test whether the reload_checkin command fails on bad input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         contest_player.user_name,
+                         'Reloaded Beer',
+                         'not a brewery',)
+
+    def test_ambiguous_reload_checkin(self):
+        """Test whether the reload_checkin command fails on ambiguous input"""
+        runner = Player.objects.get(id=4)
+        player = Player.objects.get(id=1)
+        player.save()
+        start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        contest = Contest.objects.create_contest('Contest',
+                                                 runner,
+                                                 start_date,
+                                                 end_date)
+        contest.save()
+        contest_player = contest.add_player(player)
+        contest_player.save()
+        beer = Beer.objects.create_beer('Reloaded Beer 1', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        beer = Beer.objects.create_beer('Reloaded Beer 2', 'Reloaded Brewery')
+        contest_beer = contest.add_beer(beer)
+        with self.assertRaises(CommandError):
+            call_command('reload_checkin',
+                         str(contest.id),
+                         'https://example.com/checkin/1',
+                         '6-1-2017',
+                         contest_player.user_name,
+                         'Reloaded Beer',
+                         'Reloaded Brewery',)
