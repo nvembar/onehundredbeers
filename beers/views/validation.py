@@ -53,38 +53,76 @@ def align_contest_and_checkin(request, contest_id, uv_checkin):
 @login_required
 @require_http_methods(['POST'])
 @transaction.atomic
-def add_brewery_checkin(request, contest_id, uv_checkin):
+def validate_checkin(request, contest_id):
     """
-    Adds a checkin to a brewery via a POST (like it should do)
+    Adds a checkin to a brewery via a POST (as it should do)
 
-    Expects data in the form { 'as_brewery': id, 'preserve': true/false }
+    POST expects a brewery to come in the form:
+        { 'as_brewery': id, 'checkin': id, 'preserve': true/false }
 
     as_brewery: The contest brewery ID
+    checkin: Unvalidated checkin ID
     preserve: Whether to save the unvalidated checkin or not
+
+
+    POST expects beer to come in the form:
+        { 'as_beer': id, 'checkin': id, 'preserve': true/false }
+
+    as_beer: The contest beer ID
+    checkin: Unvalidated checkin ID
+    preserve: Whether to save the unvalidated checkin or not
+
     """
     values = None
+    data = None
+    uv_checkin = None
+    try:
+        data = json.loads(request.body)
+        uv_checkin = int(data['checkin'])
+    except KeyError:
+        return HttpResponseBadRequest('Invalid request, expected checkin ID')
+    except ValueError:
+        return HttpResponseBadRequest('Invalid request, checkin ID should be '
+                                      + 'an integer')
+    except json.JSONDecodeError as exc:
+        return HttpResponseBadRequest('Invalid request, not JSON: {}'
+                                      .format(exc))
     try:
         values = align_contest_and_checkin(request, contest_id, uv_checkin)
     except BadValidationResponse as exc:
         return HttpResponseBadRequest(exc.value)
     uv = values['uv']
     contest = values['contest']
-    data = None
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError as exc:
         return HttpResponseBadRequest('Invalid request, not JSON: {}'
                                       .format(exc))
-    contest_brewery = None
-    try:
-        contest_brewery = Contest_Brewery.objects.get(id=data['as_brewery'])
-    except Contest_Brewery.DoesNotExist:
-        return HttpResponseBadRequest(
-            'No such brewery with id {}'.format(data['as_brewery']))
-    if contest_brewery.contest.id != contest.id:
-        return HttpResponseBadRequest('Brewery is not associated with contest')
+    checkin = None
     contest_player = uv.contest_player
-    checkin = contest_player.drink_at_brewery(contest_brewery, uv)
+    if 'as_brewery' in data:
+        contest_brewery = None
+        try:
+            contest_brewery = Contest_Brewery.objects.get(
+                id=data['as_brewery'])
+        except Contest_Brewery.DoesNotExist:
+            return HttpResponseBadRequest(
+                'No such brewery with id {}'.format(data['as_brewery']))
+        if contest_brewery.contest.id != contest.id:
+            return HttpResponseBadRequest(
+                'Brewery is not associated with contest')
+        checkin = contest_player.drink_at_brewery(contest_brewery, uv)
+    elif 'as_beer' in data:
+        contest_beer = None
+        try:
+            contest_beer = Contest_Beer.objects.get(id=data['as_beer'])
+        except Contest_Beer.DoesNotExist:
+            return HttpResponseBadRequest(
+                'No such beer with id {}'.format(data['as_beer']))
+        if contest_beer.contest.id != contest.id:
+            return HttpResponseBadRequest(
+                'Beer is not associated with contest')
+        checkin = contest_player.drink_beer(contest_beer, uv)
     if not data.get('preserve'):
         uv.delete()
     if request.META.get('HTTP_ACCEPT') == 'application/json':
