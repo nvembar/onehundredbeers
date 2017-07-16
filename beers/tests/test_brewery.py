@@ -1,6 +1,7 @@
 """Tests brewery checkins"""
 
 
+import json
 from django.test import Client, TestCase, override_settings
 from django.core.urlresolvers import reverse
 from beers.models import Contest, Contest_Player, Unvalidated_Checkin, \
