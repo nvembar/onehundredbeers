@@ -215,10 +215,20 @@ class Contest_Player(models.Model):
     challenge_point_gain = models.IntegerField(default=0)
     challenge_point_loss = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)
-    last_checkin_date = models.DateTimeField("Denormalized date from last checkin", null=True, blank=True)
-    last_checkin_beer = models.CharField("Denormalized beer name from last checkin", null=True, max_length=250, blank=True)
-    last_checkin_brewery  = models.CharField("Denormalized brewery name from last checkin", null=True, max_length=250, blank=True)
-    last_checkin_load = models.DateTimeField("Latest date in the last load for this player")
+    last_checkin_date = models.DateTimeField(
+        "Denormalized date from last checkin", null=True, blank=True)
+    last_checkin_beer = models.CharField(
+        "Denormalized beer name from last checkin",
+        null=True,
+        max_length=250,
+        blank=True)
+    last_checkin_brewery = models.CharField(
+        "Denormalized brewery name from last checkin",
+        null=True,
+        max_length=250,
+        blank=True)
+    last_checkin_load = models.DateTimeField(
+        "Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
 
     def __compute_losses(self):
@@ -230,11 +240,14 @@ class Contest_Player(models.Model):
         """
         challenger_drinks = Contest_Checkin.objects.filter(contest_beer__challenger=self)
         challenger_drinks = challenger_drinks.exclude(contest_player=self)
-        losses = challenger_drinks.values('contest_beer').annotate(loss=models.Sum('contest_beer__challenge_point_loss'))
+        losses = challenger_drinks.values('contest_beer').annotate(
+            loss=models.Sum('contest_beer__challenge_point_loss'))
         self.challenge_point_loss = 0
         for loss in losses:
             beer = Contest_Beer.objects.get(id=loss['contest_beer'])
-            self.challenge_point_loss = self.challenge_point_loss + min(loss['loss'], beer.max_point_loss)
+            self.challenge_point_loss = (self.challenge_point_loss
+                                         + min(loss['loss'],
+                                               beer.max_point_loss))
         self.save()
 
     def drink_beer(self, beer, checkin=None, data=None):
@@ -254,18 +267,20 @@ class Contest_Player(models.Model):
         checkin_time = None
         untappd_checkin = None
         if checkin:
-            if checkin.contest.id != self.contest.id:
-                raise ValueError('Cannot use checkin not in the contest')
+            if checkin.contest_player.id != self.id:
+                raise ValueError('Player and checkin not matched')
             checkin_time = checkin.untappd_checkin_date
             untappd_checkin = checkin.untappd_checkin
-        if 'checkin_time' in data:
-            checkin_time = data['checkin_time']
-        if 'untappd_checkin' in data:
-            untappd_checkin = data['untappd_checkin']
+        if data is not None:
+            if 'checkin_time' in data:
+                checkin_time = data['checkin_time']
+            if 'untappd_checkin' in data:
+                untappd_checkin = data['untappd_checkin']
         self.last_checkin_date = checkin_time
         self.last_checkin_beer = beer.beer_name
         self.last_checkin_brewery = None
-        if Contest_Checkin.objects.filter(contest_player=self, contest_beer=beer).count() > 0:
+        if Contest_Checkin.objects.filter(contest_player=self,
+                                          contest_beer=beer).count() > 0:
             return None
         checkin = None
         # Check if this is a challenge beer
@@ -279,7 +294,8 @@ class Contest_Player(models.Model):
                                           checkin_time=checkin_time,
                                          )
                 checkin.save()
-                self.challenge_point_gain = self.challenge_point_gain + beer.challenge_point_value
+                self.challenge_point_gain = (self.challenge_point_gain
+                                             + beer.challenge_point_value)
             else:
                 checkin = Contest_Checkin(contest_player=self,
                                           contest_beer=beer,
@@ -294,7 +310,10 @@ class Contest_Player(models.Model):
 
                 challenger = beer.challenger
                 challenger.__compute_losses()
-                challenger.total_points = challenger.beer_points + challenger.brewery_points + challenger.challenge_point_gain - challenger.challenge_point_loss
+                challenger.total_points = (challenger.beer_points
+                                           + challenger.brewery_points
+                                           + challenger.challenge_point_gain
+                                           - challenger.challenge_point_loss)
                 challenger.save()
         else:
             checkin = Contest_Checkin(contest_player=self,
@@ -305,7 +324,11 @@ class Contest_Player(models.Model):
                                      )
             checkin.save()
             self.beer_points = self.beer_points + beer.point_value
-        self.total_points = self.brewery_points + self.beer_points + self.challenge_point_gain - self.challenge_point_loss
+        self.total_points = (self.brewery_points
+                             + self.beer_points
+                             + self.challenge_point_gain
+                             - self.challenge_point_loss)
+        self.beer_count = self.beer_count + 1
         self.save()
         return checkin
 
@@ -325,18 +348,20 @@ class Contest_Player(models.Model):
         checkin_time = None
         untappd_checkin = None
         if checkin:
-            if checkin.contest.id != self.contest.id:
+            if checkin.contest_player.id != self.id:
                 raise ValueError('Cannot use checkin not in the contest')
             checkin_time = checkin.untappd_checkin_date
             untappd_checkin = checkin.untappd_checkin
-        if 'checkin_time' in data:
-            checkin_time = data['checkin_time']
-        if 'untappd_checkin' in data:
-            untappd_checkin = data['untappd_checkin']
+        if data is not None:
+            if 'checkin_time' in data:
+                checkin_time = data['checkin_time']
+            if 'untappd_checkin' in data:
+                untappd_checkin = data['untappd_checkin']
         self.last_checkin_date = checkin_time
         self.last_checkin_beer = None
         self.last_checkin_brewery = brewery.brewery_name
-        if Contest_Checkin.objects.filter(contest_player=self, contest_brewery=brewery).count() > 0:
+        if Contest_Checkin.objects.filter(contest_player=self,
+                                          contest_brewery=brewery).count() > 0:
             return None
         checkin = Contest_Checkin(contest_player=self,
                                   contest_brewery=brewery,
@@ -354,26 +379,34 @@ class Contest_Player(models.Model):
         """Computes the brewery and beer points for this user."""
         checkins = Contest_Checkin.objects.filter(contest_player=self)
         beer_filter = checkins.filter(contest_beer__isnull=False)
-        nonchallenge_filter = beer_filter.exclude(contest_beer__challenger=self)
-        beer_points = nonchallenge_filter.aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+        nonchallenge_filter = beer_filter.exclude(
+            contest_beer__challenger=self)
+        beer_points = nonchallenge_filter.aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum']
         if beer_points is None:
             beer_points = 0
 
         challenge_filter = beer_filter.filter(contest_beer__challenger=self)
-        challenge_point_gain = challenge_filter.aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+        challenge_point_gain = challenge_filter.aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum']
         if challenge_point_gain is None:
             challenge_point_gain = 0
 
         self.__compute_losses()
 
-        brewery_points = checkins.filter(contest_brewery__isnull=False).aggregate(models.Sum('checkin_points'))['checkin_points__sum']
+        brewery_points = checkins.filter(
+            contest_brewery__isnull=False).aggregate(
+                models.Sum('checkin_points'))['checkin_points__sum']
         if brewery_points is None:
             brewery_points = 0
         self.beer_points = beer_points
         self.beer_count = beer_filter.count()
         self.brewery_points = brewery_points
         self.challenge_point_gain = challenge_point_gain
-        self.total_points = self.beer_points + self.brewery_points + self.challenge_point_gain - self.challenge_point_loss
+        self.total_points = (self.beer_points
+                             + self.brewery_points
+                             + self.challenge_point_gain
+                             - self.challenge_point_loss)
         self.save()
 
     def __str__(self):
@@ -393,8 +426,10 @@ class Contest_Beer(models.Model):
     point_value = models.IntegerField(default=1)
     challenge_point_loss = models.IntegerField(default=0)
     max_point_loss = models.IntegerField(default=0)
-    challenge_point_value = models.IntegerField(default=0,
-                                                help_text='The number of points a challenger gets for drinking this beer')
+    challenge_point_value = models.IntegerField(
+        default=0,
+        help_text='The number of points the challenger gets ' +
+            'for drinking this beer')
     total_drank = models.IntegerField("number of players who drank this beer")
 
     def __str__(self):
