@@ -1,10 +1,7 @@
 """Command to load a specific checkin for a user"""
 
-import argparse
-import sys
 import datetime
 from dateutil.parser import parse
-import django
 from django.core.management.base import BaseCommand, CommandError
 from beers.models import Beer, Player, Contest_Beer, Contest, Contest_Player
 
@@ -64,12 +61,12 @@ class Command(BaseCommand):
             raise CommandError(('Unable to find user '
                                 + '"{0}"').format(opts['player'][0]))
         try:
-            contest_player = Contest_Player.objects.get(contest_id=contest_id,
+            contest_player = Contest_Player.objects.get(contest=contest,
                                                         player_id=player.id)
         except Contest_Player.DoesNotExist:
             raise CommandError(('Player "{0}" is not affiliated with '
                                 + 'contest "{1}"').format(opts['player'][0],
-                                                          contest_id))
+                                                          contest))
         contest_player.drink_beer(contest_beer,
                                   data={'untappd_checkin': untappd_url,
                                         'checkin_time': checkin_time})
