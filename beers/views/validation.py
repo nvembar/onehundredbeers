@@ -3,20 +3,17 @@
 import math
 import logging
 import json
-import datetime
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse, HttpResponseBadRequest, \
-                        HttpResponseServerError
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, \
-                                   MultipleObjectsReturned
+from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from beers.models import Contest, Contest_Checkin, Contest_Beer, \
                          Contest_Player, Contest_Brewery, Unvalidated_Checkin
 from .helper import is_authenticated_user_contest_runner, \
-                    is_authenticated_user_player, HttpNotImplementedResponse
+                    HttpNotImplementedResponse
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +36,7 @@ def align_contest_and_checkin(request, contest_id, uv_checkin):
         raise BadValidationResponse('Checkin not associated with contest')
     if not is_authenticated_user_contest_runner(request):
         logger.warning('User %s attempted to validate checkins for contest %s',
-                       request.user.name, contest_id)
+                       request.user.username, contest_id)
         raise PermissionDenied("User is not allowed to validate checkins")
     if contest.creator.user.id is not request.user.id:
         logger.warning('User %s attempted to validate checkins ' +
@@ -132,51 +129,16 @@ def validate_checkin(request, contest_id):
 
 
 @login_required
-@require_http_methods(['POST'])
+@require_http_methods(['DELETE'])
 @transaction.atomic
-def update_checkin(request, contest_id, uv_checkin):
-    """An update API to for a checkin. Needs to be refactored for the sake
-    of sanity"""
-    # XXX: Refactor this into something more like add_brwery_checkin()
+def delete_checkin(request, contest_id, uv_checkin):
+    """Deletes an unvalidated checkin"""
     values = None
     try:
         values = align_contest_and_checkin(request, contest_id, uv_checkin)
     except BadValidationResponse as exc:
         return HttpResponseBadRequest(exc.value)
     uv = values['uv']
-    contest = values['contest']
-    data = None
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError as exc:
-        return HttpResponseBadRequest('Invalid request, not JSON: {}'
-                                      .format(exc))
-    if data.get('remove-beer') == 'Remove':
-        uv.delete()
-        if request.META.get('HTTP_ACCEPT') == 'application/json':
-            return HttpResponse('{ "success": true }',
-                                content_type='application/json')
-        return redirect('unvalidated-checkins', contest_id)
-    # This should be a validation, so it needs the validate beer value
-    # and contest beer identifier
-    contest_beer = None
-    if not ('contest-beer' in data
-            and data.get('validate-beer') == 'Validate'):
-        return HttpResponseBadRequest('Invalid JSON: {}'.format(request.body))
-    logger.info('Attempting to set UV %s to beer # %s', uv.id,
-                data['contest-beer'])
-    try:
-        contest_beer = Contest_Beer.objects.get(id=int(data['contest-beer']))
-    except ValueError:
-        return HttpResponseBadRequest('Invalid beer ID: {}'
-                                      .format(data['contest-beer']))
-    except Contest_Beer.DoesNotExist:
-        return HttpResponseBadRequest('No such beer with id {}'
-                                      .format(data['contest-beer']))
-    if contest_beer.contest.id != contest.id:
-        return HttpResponseBadRequest('Beer is not associated with contest')
-    contest_player = uv.contest_player
-    contest_player.drink_beer(contest_beer, uv)
     uv.delete()
     if request.META.get('HTTP_ACCEPT') == 'application/json':
         return HttpResponse('{ "success": true }',
