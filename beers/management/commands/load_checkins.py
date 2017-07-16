@@ -27,12 +27,20 @@ class Command(BaseCommand):
     help = 'Loads checkins across contests'
 
     def add_arguments(self, parser):
+        """There are three optional arguments for the command:
+           --player: the user name of the player
+           --contest: the Contest ID
+           --after-date: The date after which to filter the results
+        """
         parser.add_argument('--player', nargs=1, help='Player')
         parser.add_argument('--contest', nargs=1, help='Contest ID', type=int)
         parser.add_argument('--after-date', nargs=1, help='After date',
                             type=convert_to_date)
 
     def handle(self, *args, **opts):
+        """
+        Primarily calls load_player_checkins with the right arguments
+        """
         players = Player.objects.all()
         contest_id = None
         after_date = None
