@@ -15,7 +15,6 @@ from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from beers.models import Contest, Contest_Checkin, Contest_Beer, \
                          Contest_Player, Contest_Brewery, Unvalidated_Checkin
-from beers.utils.checkin import checkin_brewery
 from .helper import is_authenticated_user_contest_runner, \
                     is_authenticated_user_player, HttpNotImplementedResponse
 
