@@ -17,32 +17,6 @@ class ContestTestCase(TestCase):
     def tearDown(self):
         pass
 
-    def test_successful_checkin_validate(self):
-        """Logs in as the correct user and validates a beer"""
-        c = Client()
-        self.assertTrue(c.login(username='runner1', password='password1%'))
-        uv = Unvalidated_Checkin.objects.get(
-            untappd_title='Unvalidated Checkin 2')
-        response = c.post(reverse('update-checkin',
-                                  kwargs={'contest_id': 1,
-                                          'uv_checkin': uv.id}),
-                          content_type='application/json',
-                          data=json.dumps({'validate-beer': 'Validate',
-                                           'contest-beer': 1}),
-                          HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 200)
-        q = Contest_Checkin.objects.filter(contest_beer__id=1,
-                                           contest_player__id=1)
-        self.assertEqual(q.count(), 1)
-        checkin = q.get()
-        self.assertEqual(checkin.checkin_points, 1)
-        self.assertEqual(checkin.untappd_checkin,
-                         'https://example.com/unvalidated_2')
-        self.assertEqual(checkin.contest_player.beer_count, 1)
-        self.assertEqual(checkin.contest_player.beer_points, 1)
-        self.assertEqual(Unvalidated_Checkin.objects.filter(
-            untappd_title='Unvalidated Checkin 2').count(), 0)
-
     def test_successful_modify_checkin_beer(self):
         """Tests that the API call to modify a checkin works for a beer"""
         c = Client()
@@ -123,24 +97,30 @@ class ContestTestCase(TestCase):
             untappd_title='Unvalidated Checkin 2').count(), 0)
         self.assertEqual(response.status_code, 200)
 
-    def test_invalid_checkin_validate(self):
-        """Tests what happens when an unvalidated checkin is removed"""
+    def test_dismiss_unvalidated_checkin(self):
+        """Tests whether a delete of a checkin works"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        uv = Unvalidated_Checkin.objects.get(
-            untappd_title='Unvalidated Checkin 2')
-        response = c.post(reverse('update-checkin',
-                                  kwargs={'contest_id': 1,
-                                          'uv_checkin': uv.id}),
-                          content_type='application/json',
-                          data=json.dumps({'remove-beer': 'Remove'}),
-                          HTTP_ACCEPT='application/json')
+        response = c.delete(reverse('delete-checkin',
+                                    kwargs={'contest_id': 1,
+                                            'uv_checkin': 1}),
+                            HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
-        contest_player = Contest_Player.objects.get(id=1)
-        self.assertEqual(contest_player.beer_count, 0)
-        self.assertEqual(contest_player.beer_points, 0)
-        self.assertEqual(Unvalidated_Checkin.objects.filter(
-            untappd_title='Unvalidated Checkin 2').count(), 0)
+        with self.assertRaises(Unvalidated_Checkin.DoesNotExist):
+            Unvalidated_Checkin.objects.get(id=1)
+
+    def test_unauthenticated_dismiss_unvalidated_checkin(self):
+        """Tests whether an attempt of delete of a checkin
+        by a player who is not the contest runner fails"""
+        c = Client()
+        self.assertTrue(c.login(username='user1', password='password1%'))
+        response = c.delete(reverse('delete-checkin',
+                                    kwargs={'contest_id': 1,
+                                            'uv_checkin': 1}),
+                            HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 403)
+        uv = Unvalidated_Checkin.objects.get(id=1)
+        self.assertIsNotNone(uv)
 
     def test_unvalidated_api_single(self):
         """Tests if the JSON API gets the right values for a single request"""
