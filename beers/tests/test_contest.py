@@ -28,20 +28,24 @@ class ContestTestCase(TestCase):
                           data=json.dumps({'validate-beer': 'Validate', 'contest-beer': 1,}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
-        q = Contest_Checkin.objects.filter(contest_beer__id=1, contest_player__id=1)
+        q = Contest_Checkin.objects.filter(contest_beer__id=1,
+                                           contest_player__id=1)
         self.assertEqual(q.count(), 1)
         checkin = q.get()
         self.assertEqual(checkin.checkin_points, 1)
-        self.assertEqual(checkin.untappd_checkin, 'https://example.com/unvalidated_2')
+        self.assertEqual(checkin.untappd_checkin,
+                         'https://example.com/unvalidated_2')
         self.assertEqual(checkin.contest_player.beer_count, 1)
         self.assertEqual(checkin.contest_player.beer_points, 1)
-        self.assertEqual(Unvalidated_Checkin.objects.filter(untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
 
     def test_invalid_checkin_validate(self):
         """Tests what happens when an unvalidated checkin is removed"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        uv = Unvalidated_Checkin.objects.get(untappd_title='Unvalidated Checkin 2')
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
         response = c.post(reverse('update-checkin',
                                   kwargs={'contest_id': 1, 'uv_checkin': uv.id,}),
                           content_type='application/json',
@@ -51,7 +55,8 @@ class ContestTestCase(TestCase):
         contest_player = Contest_Player.objects.get(id=1)
         self.assertEqual(contest_player.beer_count, 0)
         self.assertEqual(contest_player.beer_points, 0)
-        self.assertEqual(Unvalidated_Checkin.objects.filter(untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
 
     def test_unvalidated_api_single(self):
         """Tests if the JSON API gets the right values for a single request"""
@@ -98,7 +103,10 @@ class ContestTestCase(TestCase):
             cindex = cindex + 1
 
     def test_unvalidated_api_past_end(self):
-        """Tests if the JSON API returns nothing when the slice goes beyond the end of the page"""
+        """
+        Tests if the JSON API returns nothing when the slice goes beyond
+        the end of the page
+        """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
         response = c.get(reverse('unvalidated-checkins-json',
@@ -141,10 +149,14 @@ class ContestTestCase(TestCase):
             if not had_prior:
                 if beer.challenger:
                     if beer.challenger.id == cp.id:
-                        challengers[beer.challenger.id]['gain'] = challengers[beer.challenger.id]['gain'] + beer.challenge_point_value
+                        challengers[beer.challenger.id]['gain'] = (
+                            challengers[beer.challenger.id]['gain']
+                            + beer.challenge_point_value)
                     else:
                         beer_points = beer_points + beer.point_value
-                        challengers[beer.challenger.id]['loss'] = challengers[beer.challenger.id]['loss'] + beer.challenge_point_loss
+                        challengers[beer.challenger.id]['loss'] = (
+                            challengers[beer.challenger.id]['loss']
+                            + beer.challenge_point_loss)
                         if challengers[beer.challenger.id]['loss'] > beer.max_point_loss:
                             challengers[beer.challenger.id]['loss'] = beer.max_point_loss
                 else:
@@ -152,51 +164,87 @@ class ContestTestCase(TestCase):
         for brewery in breweries:
             had_prior = Contest_Checkin.objects.filter(contest_player=cp,
                                                        contest_brewery=brewery).count() > 0
-            cp.drink_at_brewery(brewery,
-                                data={
-                                     'untapped_checkin': 'https://untappd.com/checkin/brewery',
-                                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
-                                 })
+            cp.drink_at_brewery(
+                brewery,
+                data={
+                     'untapped_checkin': 'https://untappd.com/checkin/brewery',
+                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                })
             if not had_prior:
                 brewery_points = brewery_points + brewery.point_value
         # Test all of these and then run compute_points and rerun the tests
         # compute_points should not change the values`
-        self.assertEqual(cp.brewery_points, brewery_points,
-                         msg='Cumulative sum of brewery points for {}'.format(cp))
-        self.assertEqual(cp.beer_points, beer_points,
-                         msg='Cumulative sum of beer points for {}'.format(cp))
-        self.assertEqual(cp.challenge_point_gain, challengers[cp.id]['gain'],
-                         msg='Cumulative challenge point gain for {}'.format(cp))
-        self.assertEqual(cp.challenge_point_loss, challengers[cp.id]['loss'],
-                         msg='Cumulative challenge point loss for {}'.format(cp))
-        self.assertEqual(cp.total_points,
-                         beer_points + brewery_points + challengers[cp.id]['gain'] - challengers[cp.id]['loss'],
-                         msg='Cumulative sum of total points for {}'.format(cp))
+        self.assertEqual(
+            cp.brewery_points,
+            brewery_points,
+            msg='Cumulative sum of brewery points for {}'.format(cp))
+        self.assertEqual(
+            cp.beer_points, beer_points,
+            msg='Cumulative sum of beer points for {}'.format(cp))
+        self.assertEqual(
+            cp.challenge_point_gain,
+            challengers[cp.id]['gain'],
+            msg='Cumulative challenge point gain for {}'.format(cp))
+        self.assertEqual(
+            cp.challenge_point_loss,
+            challengers[cp.id]['loss'],
+            msg='Cumulative challenge point loss for {}'.format(cp))
+        self.assertEqual(
+            cp.total_points,
+            (beer_points
+             + brewery_points
+             + challengers[cp.id]['gain']
+             - challengers[cp.id]['loss']),
+            msg='Cumulative sum of total points for {}'.format(cp))
         for ch_id in challengers.keys():
             challenger = Contest_Player.objects.get(id=ch_id)
-            self.assertEqual(challengers[ch_id]['gain'], challenger.challenge_point_gain,
-                             msg='Cumulative challenger {} gain against player {}'.format(challenger, cp))
-            self.assertEqual(challengers[ch_id]['loss'], challenger.challenge_point_loss,
-                             msg='Cumulative challenger {} loss against player {}'.format(challenger, cp))
+            self.assertEqual(
+                challengers[ch_id]['gain'],
+                challenger.challenge_point_gain,
+                msg='Cumulative challenger {} gain against player {}'
+                    .format(challenger, cp))
+            self.assertEqual(
+                challengers[ch_id]['loss'],
+                challenger.challenge_point_loss,
+                msg='Cumulative challenger {} loss against player {}'
+                    .format(challenger, cp))
         cp.compute_points()
         # Testing the compute points computation
-        self.assertEqual(cp.brewery_points, brewery_points,
-                         msg='Computed sum of brewery points for {}'.format(cp))
-        self.assertEqual(cp.beer_points, beer_points,
-                         msg='Computed sum of beer points for {}'.format(cp))
-        self.assertEqual(cp.challenge_point_gain, challengers[cp.id]['gain'],
-                         msg='Computed challenge point gain for {}'.format(cp))
-        self.assertEqual(cp.challenge_point_loss, challengers[cp.id]['loss'],
-                         msg='Computed challenge point loss for {}'.format(cp))
-        self.assertEqual(cp.total_points,
-                         beer_points + brewery_points + challengers[cp.id]['gain'] - challengers[cp.id]['loss'],
-                         msg='Computed sum of total points for {}'.format(cp))
+        self.assertEqual(
+            cp.brewery_points,
+            brewery_points,
+            msg='Computed sum of brewery points for {}'.format(cp))
+        self.assertEqual(
+            cp.beer_points,
+            beer_points,
+            msg='Computed sum of beer points for {}'.format(cp))
+        self.assertEqual(
+            cp.challenge_point_gain,
+            challengers[cp.id]['gain'],
+            msg='Computed challenge point gain for {}'.format(cp))
+        self.assertEqual(
+            cp.challenge_point_loss,
+            challengers[cp.id]['loss'],
+            msg='Computed challenge point loss for {}'.format(cp))
+        self.assertEqual(
+            cp.total_points,
+            (beer_points
+             + brewery_points
+             + challengers[cp.id]['gain']
+             - challengers[cp.id]['loss']),
+            msg='Computed sum of total points for {}'.format(cp))
         for ch_id in challengers.keys():
             challenger = Contest_Player.objects.get(id=ch_id)
-            self.assertEqual(challengers[ch_id]['gain'], challenger.challenge_point_gain,
-                             msg='Computed challenger {} gain against player {}'.format(challenger, cp))
-            self.assertEqual(challengers[ch_id]['loss'], challenger.challenge_point_loss,
-                             msg='Computed challenger {} loss against player {}'.format(challenger, cp))
+            self.assertEqual(
+                challengers[ch_id]['gain'],
+                challenger.challenge_point_gain,
+                msg='Computed challenger {} gain against player {}'
+                    .format(challenger, cp))
+            self.assertEqual(
+                challengers[ch_id]['loss'],
+                challenger.challenge_point_loss,
+                msg='Computed challenger {} loss against player {}'
+                    .format(challenger, cp))
 
     def test_beers_and_brewery_point_computation(self):
         """
