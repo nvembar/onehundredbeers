@@ -68,6 +68,34 @@
     brewery_lon: null
     untappd_id: null
     last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.beer
+  pk: 6
+  fields:
+    name: Beer 6
+    brewery: Brewery 6
+    style: Style 6
+    description: ''
+    brewery_city: City 6
+    brewery_state: DC
+    brewery_country: ''
+    brewery_lat: null
+    brewery_lon: null
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
+- model: beers.beer
+  pk: 7
+  fields:
+    name: Beer 7
+    brewery: Brewery 7
+    style: Style 7
+    description: ''
+    brewery_city: City 7
+    brewery_state: DC
+    brewery_country: ''
+    brewery_lat: null
+    brewery_lon: null
+    untappd_id: null
+    last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 1
   fields:
@@ -248,7 +276,7 @@
   fields:
     contest: 1
     challenger: 3
-    beer: 1
+    beer: 6
     beer_name: Challenge Beer 6
     point_value: 3
     challenge_point_loss: 3
@@ -260,7 +288,7 @@
   fields:
     contest: 1
     challenger: 4
-    beer: 1
+    beer: 7
     beer_name: Challenge Beer 7
     point_value: 3
     challenge_point_loss: 6
