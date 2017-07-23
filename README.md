@@ -1,13 +1,15 @@
 ### Build instructions
 
-This uses Python 3.5, so make sure that's installed. To set up your own virtual environment, follow the directions below.
+This uses Python 3.6, so make sure that's installed. To set up your own virtual environment, follow the directions below.
 
 If you don't have it, get bower:
 ```
-$ npm install -g bower 
+$ npm install -g bower
 ```
 
-Create a Postgres database and point to it using `DATABASE_URL`
+Create a Postgres database and point to it using the environment variable `DATABASE_URL`. Create a Django secret key and store it in `SECRET_KEY`.
+
+Generally, if you're running this in test, set `SSL_REDIRECT=0` so that Django doesn't redirect on your local machine.
 
 ```
 $ virtualenv hundred_beers
@@ -21,4 +23,4 @@ $ python manage.py migrate
 $ python manage.py runserver
 ```
 
-
+The project is set to be deployed in Heroku.
