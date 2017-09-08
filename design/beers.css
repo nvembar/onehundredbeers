@@ -1,0 +1,61 @@
+.summary {
+    /* height: 100%; */
+}
+
+.summary-table  {
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.summary-table tr {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.summary-rank {
+    width: 10%;
+}
+
+.summary-player  {
+    width: 80%;
+}
+
+.summary-score  {
+    width: 10%;
+    float: right;
+}
+
+.login-entry {
+    padding-bottom: 3px;
+    padding-top: 3px;
+    width: 80%;
+}
+
+.login-buttons {
+    float: right;
+}
+
+.whats-this {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.leaderboard {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 10px;
+}
+
+.leaderboard-row {
+    padding: 3px;
+}
+
+.leaderboard-odd {
+    background-color: beige;
+}
+
+.leaderboard-even {
+    background-color: aliceblue;
+}
+
+

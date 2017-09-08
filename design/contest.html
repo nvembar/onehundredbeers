@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+        
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+        
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        
+
+        
+        <link rel="stylesheet" href="beers.css">
+        <title>One Hundred Beers - Contest</title>
+        
+    </head>
+    <body>
+        <h2>Contest Name</h2>
+        
+        <div class="container">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
+            <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers &amp; Breweries</a></li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="leaderboard">
+                <div class="leaderboard">
+                    <div class="row leaderboard-row leaderboard-odd">
+                        <div class="col-md-1 col-xs-1">1</div>
+                        <div class="col-md-4 col-xs-10">Player 1</div>
+                        <div class="col-md-2 col-md-push-5 col-xs-1">43</div>
+                        <div class="col-md-5 col-md-pull-2 col-xs-offset-1 col-xs-10">Last Beer</div>
+                    </div>
+                    <div class="row leaderboard-row leaderboard-even">
+                        <div class="col-md-1 col-xs-1">2</div>
+                        <div class="col-md-4 col-xs-10">Player 2</div>
+                        <div class="col-md-2 col-md-push-5 col-xs-1">40</div>
+                        <div class="col-md-5 col-md-pull-2 col-xs-offset-1 col-xs-10">Last Beer 2</div>
+                    </div>
+                    <div class="row leaderboard-row leaderboard-odd">
+                        <div class="col-md-1 col-xs-1">2</div>
+                        <div class="col-md-4 col-xs-10">Player 3</div>
+                        <div class="col-md-2 col-md-push-5 col-xs-1">40</div>
+                        <div class="col-md-5 col-md-pull-2 col-xs-offset-1 col-xs-10">Last Beer 3</div>
+                    </div>
+                    <div class="row leaderboard-row leaderboard-even">
+                        <div class="col-md-1 col-xs-1">4</div>
+                        <div class="col-md-4 col-xs-10">Player 4</div>
+                        <div class="col-md-2 col-md-push-5 col-xs-1">37</div>
+                        <div class="col-md-5 col-md-pull-2 col-xs-offset-1 col-xs-10">Last Beer 4</div>
+                    </div>
+
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="beers">
+                <div class="beer-list">
+                    <div class="row form-group">
+                        <div class="col-md-3 coll-md-offset-9">
+                            <label for="beerSearch" class="sr-only">Search for Beers</label>
+                            <input id="beerSearch" type="search" class="form-group" placeholder="Search for beers"/>
+                        </div>
+                    </div>
+                    <h3>Beers</h3>
+                    <div class="row">
+                    </div>
+                    <h3>Breweries</h3>
+                </div>
+            </div>
+          </div>
+
+        </div>
+    </body>
+</html>
