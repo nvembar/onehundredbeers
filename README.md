@@ -24,3 +24,8 @@ $ python manage.py runserver
 ```
 
 The project is set to be deployed in Heroku.
+
+#### Run with Docker
+
+Alternatively, you can run this in Docker with `docker-compose up`. You will need to set `SECRET_KEY` as an environment variable before running the command. If it's the first time setting it up,
+`docker-compose run web python3 manage.py migrate` will create an empty database.

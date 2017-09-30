@@ -1,0 +1,14 @@
+.git/*
+.gitignore
+dev-data/*
+*/__pycache__
+*/.sass-cache
+bin/
+lib/
+include/
+pip-selfcheck.json
+.Python
+.coverage
+dev-data
+staticfiles/
+design/

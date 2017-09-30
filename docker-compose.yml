@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    ports:
+      - "6543:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+  web:
+    build: .
+    command: python3 manage.py runserver 0.0.0.0:8000
+    environment:
+      - DATABASE_URL=postgres://postgres@db:5432/hbeers
+      - SSL_REDIRECT
+      - SECRET_KEY
+      - DEBUG
+    volumes:
+      - .:/code
+    ports:
+      - "8080:8000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
