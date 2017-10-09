@@ -5,6 +5,89 @@
 {% endblock %}
 
 {% block content %}
+  <div class="container">
+		<div class="page-header">
+			<h1>Thirsty for beer?</h1>
+		</div>
+      <div class="row">
+          <div class="col-xs-12 col-md-6 summary">
+              <div class="panel panel-default">
+                  <div class="panel-body">
+                      <h3>{{ active.name }}</h3>
+                      <table class="summary-table">
+                          <colgroup>
+                              <col class="summary-rank"/>
+                              <col class="summary-player"/>
+                              <col class="summary-score"/>
+                          </colgroup>
+													{% for leader in active.summary_leaderboard %}
+                          <tr>
+                              <td>{{ leader.rank }}</td>
+                              <td>{{ leader.user_name }}</td>
+                              <td>{{ leader.total_points }}</td>
+													</tr>
+													{% endfor %}
+                      </table>
+                      <p class="text-right">
+                      <a href="{% url 'contest' contest_id=active.id %}">More&gt;</a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+
+          <div class="col-xs-12 col-md-6 summary">
+              <div class="panel panel-default">
+                  <div class="panel-body">
+											{% if not user.is_authenticated %}
+                      <h3>Login</h3>
+                      <form method="post" action="{% url 'login' %}">
+													{% csrf_token %}
+                          <div class="form-group">
+                              <label for="username">User name</label>
+
+                              <input type="text" class="form-control" name="username" placeholder="Username"/>
+                          </div>
+                          <div class="form-group">
+                              <label for="password">Password</label>
+                              <input type="password" class="form-control" name="password" placeholder="Password"/>
+                          </div>
+                          <div class="form-group">
+                              <div class="login-buttons">
+                                  <button name="submit-login" type="submit" class="btn btn-primary">Login</button>
+                              </div>
+                          </div>
+													<input type="hidden" name="next" value="{% url 'index' %}">
+                      </form>
+											<div>
+												<p>
+												You'll need to create a profile - and have an
+												<a href="https://untappd.com">Untappd</a> account - to play. So get going!
+												(Note: we have no affiliation with Untappd.)
+												</p>
+											</div>
+											{% else %}
+											<p>Logged in as {{ user.username }}</p>
+											{% endif %}
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="row whats-this">
+          <h3>What Is This?</h3>
+
+          <p>
+						Join the hunt for the best beer and race your fellow beer-lovers to drink
+						these 100 brews. It’s fun, promise.
+          </p>
+					<p>
+						1 Year<br/>
+						&nbsp;&nbsp;&nbsp;100 Beers<br/>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8734; Possibilities<br/>
+					</p>
+      </div>
+  </div>
+
+	<!--
 	<h1>Thirsty for life? Thirsty for love? Thirsty for beer?</h1>
 
 	<p style="font-size: 1.25em;">
@@ -74,4 +157,5 @@
 	<div style="margin-top: 1em; text-align: center">
 	See the <a href="{% url 'instructions' %}">instructions</a> for more details!
 	</div>
+	-->
 {% endblock %}
