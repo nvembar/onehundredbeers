@@ -4,6 +4,68 @@
 
 {% block content %}
 	<h1>{{ contest.name }}</h1>
+  <div class="container">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
+      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers &amp; Breweries</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" id="leaderboard">
+          <div class="leaderboard">
+            <div class="row leaderboard-row leaderboard-header">
+              <div class="col-md-1 col-xs-1">Rank</div>
+              <div class="col-md-4 col-xs-10">User</div>
+              <div class="col-md-2 col-md-push-5 col-xs-1">Points</div>
+              <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">Last Checkin</div>
+            </div>
+						{% for p in players %}
+            <div class="row leaderboard-row leaderboard-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %}">
+              <div class="col-md-1 col-xs-1">{{ p.rank }}</div>
+              <div class="col-md-4 col-xs-10">{{ p.user_name }}</div>
+              <div class="col-md-2 col-md-push-5 col-xs-1">{{ p.total_points }}</div>
+              <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">{{ p.last_checkin_beer }}</div>
+            </div>
+						{% endfor %}
+          </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="beers">
+          <div class="beer-list">
+            <div class="row form-group">
+                <div class="col-md-3 coll-md-offset-9">
+                    <label for="beer-search" class="sr-only">Search for Beers</label>
+                    <input id="beer-search" type="search" class="form-group" placeholder="Search for beers"/>
+                </div>
+            </div>
+            <div class="row beer-row beer-header">
+              <div class="col-xs-4">Beer</div>
+              <div class="col-xs-4">Brewery</div>
+              <div class="col-xs-1">State</div>
+              <div class="col-xs-1">Points</div>
+              {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
+            </div>
+						{% for b in contest_beers %}
+            <div class="row beer-row beer-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}beer-checkedin{% endif %}">
+              <div class="col-xs-4">{{ b.beer.name }}</div>
+              <div class="col-xs-4">{{ b.beer.brewery }}</div>
+              <div class="col-xs-1">{{ b.beer.brewery_state }}</div>
+              <div class="col-xs-1">{{ b.point_value }}</div>
+              {% if contest_player %}
+							<div class="col-xs-1">
+								{% if b.checked_into %}
+								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+								{% endif %}
+							</div>
+							{% endif %}
+            </div>
+						{% endfor %}
+          </div>
+      </div>
+    </div>
+
+  </div>
 
 	<div class="three-column-box" style="height: 10em;">
 		<div class="outset-column-box">
