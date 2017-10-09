@@ -13,16 +13,24 @@ from .helper import is_authenticated_user_player, is_authenticated_user_contest_
 
 logger = logging.getLogger(__name__)
 
+
 def index(request):
     """Renders the index page with all the contest info"""
-    all_contests = Contest.objects.order_by('created_on')[:5]
+    all_contests = Contest.objects.order_by('-created_on')[:5]
+    active = None
     if is_authenticated_user_contest_runner(request):
         player = Player.objects.get(user=request.user)
         for c in all_contests:
             if c.creator.id == player.id:
                 c.is_creator = True
     context = {'contests': all_contests}
+    if all_contests:
+        active = all_contests[0]
+        leaderboard = active.ranked_players()
+        active.summary_leaderboard = leaderboard[0:5]
+        context['active'] = active
     return render(request, 'beers/index.html', context)
+
 
 def contests(request):
     """Returns all the contests"""
@@ -43,18 +51,35 @@ def contests(request):
                'player': player}
     return render(request, 'beers/contests.html', context)
 
+
 def contest(request, contest_id):
     """Gets the details of a specific contest and presents them to the user"""
     this_contest = get_object_or_404(Contest, id=contest_id)
-    context = {'contest': this_contest}
+    ranked_players = this_contest.ranked_players()
+    beers = Contest_Beer.objects.filter(
+        contest=this_contest).order_by('beer_name')
+    context = {'contest': this_contest,
+               'players': ranked_players,
+               'contest_beers': beers, }
     if request.user.is_authenticated:
         try:
             player = Player.objects.get(user_id=request.user.id)
-            context['player'] = player
             context['is_creator'] = this_contest.creator.id == player.id
+            cp = Contest_Player.objects.get(contest=this_contest,
+                                            player=player)
+            checkins = Contest_Checkin.objects.filter(contest_player=cp)
+            checkin_ids = [c.contest_beer.id
+                           for c in checkins.filter(contest_beer__isnull=False)]
+            for b in beers:
+                b.checked_into = b.id in checkin_ids
+            context['contest_player'] = cp
         except Player.DoesNotExist:
             pass
+        except Contest_Player.DoesNotExist:
+            logger.error('Request for user %s for contest %s is not valid',
+                         request.user.username, contest)
     return render(request, 'beers/contest.html', context)
+
 
 def contest_leaderboard(request, contest_id):
     """Renders the leaderboard for a particular contest"""
@@ -62,6 +87,7 @@ def contest_leaderboard(request, contest_id):
     ranked_players = this_contest.ranked_players()
     context = {'contest': this_contest, 'players': ranked_players}
     return render(request, 'beers/contest-leaderboard.html', context)
+
 
 def contest_add(request):
     """Add a contest with a unique name to the list"""
@@ -84,6 +110,7 @@ def contest_add(request):
         f = ContestForm()
     return render(request, 'beers/contest-add.html', {'form': f})
 
+
 def contest_player(request, contest_id, username):
     """Shows the validated checkins for a player for a given contest"""
     cp = get_object_or_404(Contest_Player.objects.select_related(),
@@ -94,9 +121,10 @@ def contest_player(request, contest_id, username):
     context = {'player': cp, 'checkins': player_checkins}
     return render(request, 'beers/contest-player.html', context)
 
+
 def contest_beers(request, contest_id):
     """
-    Gets the beers associated with a contest and flags those that have beer
+    Gets the beers associated with a contest and flags those that have been
     had by the user
     """
     this_contest = get_object_or_404(Contest, id=contest_id)
@@ -116,8 +144,10 @@ def contest_beers(request, contest_id):
                          request.user.username, contest)
     return render(request, 'beers/contest-beers.html', context)
 
+
 def contest_beer(request, contest_id, beer_id):
     return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+
 
 @login_required
 @require_http_methods(['POST'])
@@ -129,11 +159,14 @@ def contest_join(request, contest_id):
             'User {0} cannot join contests'.format(request.user.username))
     player = Player.objects.get(user_id=request.user.id)
     if Contest_Player.objects.filter(contest=this_contest, player=player).count() != 0:
-        context = {'contest': this_contest, 'player': player, 'created_new': False}
+        context = {'contest': this_contest,
+                   'player': player,
+                   'created_new': False}
     else:
         this_contest.add_player(player)
         context = {'contest': contest, 'player': player, 'created_new': True}
     return render(request, 'beers/contest-join.html', context)
+
 
 def instructions(request):
     """Returns the static instructions page"""
