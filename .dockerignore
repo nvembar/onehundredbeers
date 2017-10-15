@@ -9,6 +9,9 @@ include/
 pip-selfcheck.json
 .Python
 .coverage
-dev-data
-staticfiles/
+components/
+dev-data/
 design/
+styles/
+terraform/
+wireframes/
