@@ -16,7 +16,7 @@ services:
       - SECRET_KEY
       - DEBUG
     volumes:
-      - .:/code
+      - ./staticfiles:/code/staticfiles
     ports:
       - "8080:8000"
     depends_on:
