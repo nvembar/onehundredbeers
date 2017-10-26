@@ -1,15 +1,23 @@
+"""Tests the core contest features and their models"""
+
 import datetime
 import json
 from django.test import TestCase, override_settings, Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-from beers.models import Contest_Player, Unvalidated_Checkin
-from beers.models import Contest_Checkin, Contest_Beer, Contest_Brewery
+from beers.models import Beer, Brewery, Contest, Contest_Player, \
+                         Unvalidated_Checkin, Contest_Checkin, Contest_Beer, \
+                         Contest_Brewery, Player
 
 @override_settings(SECURE_SSL_REDIRECT=False, ROOTURL_CONF='beers.urls')
 class ContestTestCase(TestCase):
+    """The tests on the contest features"""
 
-    fixtures = ['permissions', 'users', 'contest_tests', 'unvalidated_checkins']
+    fixtures = ['permissions',
+                'users',
+                'contest_tests',
+                'unvalidated_checkins',
+                ]
 
     def setUp(self):
         pass
@@ -320,7 +328,7 @@ class ContestTestCase(TestCase):
         beers = [Contest_Beer.objects.get(id=1),
                  Contest_Beer.objects.get(id=2),
                  Contest_Beer.objects.get(id=3),
-                ]
+                 ]
         breweries = [Contest_Brewery.objects.get(id=1),
                      Contest_Brewery.objects.get(id=2),]
         self.__test_beer_and_brewery_calculations(cp, beers, breweries)
@@ -400,3 +408,149 @@ class ContestTestCase(TestCase):
         player = Contest_Player.objects.get(id=2)
         self.__test_beer_and_brewery_calculations(player, [challenge], [])
         self.__test_beer_and_brewery_calculations(challenge.challenger, [challenge], [])
+
+    def test_unvalidated_beer_list(self):
+        """
+        This tests that a call to Contest.beers() works with an unvalidated
+        call. It should return the beers associated with a contest in
+        alphabetical order. We add a couple beers into the list that are
+        out of alpha order to test this explicitly.
+
+        The beer list should include challenge beers.
+        """
+        beer_a = Beer.objects.create_beer('Aaaa', 'AA Brewery')
+        beer_z = Beer.objects.create_beer('Zzzz', 'ZZ Brewery')
+        contest = Contest.objects.get(id=1)
+        contest.add_beer(beer_z)
+        contest.add_beer(beer_a)
+        beers = contest.beers()
+        self.assertEqual(beers.count(), 9)
+        self.assertEqual(beers[0].beer_name, 'Aaaa')
+        self.assertEqual(beers[1].beer_name, 'Beer 1')
+        self.assertEqual(beers[2].beer_name, 'Beer 2')
+        self.assertEqual(beers[3].beer_name, 'Beer 3')
+        self.assertEqual(beers[4].beer_name, 'Beer 4')
+        self.assertEqual(beers[5].beer_name, 'Beer 5')
+        self.assertEqual(beers[6].beer_name, 'Challenge Beer 6')
+        self.assertEqual(beers[7].beer_name, 'Challenge Beer 7')
+        self.assertEqual(beers[8].beer_name, 'Zzzz')
+
+    def test_validated_beer_list(self):
+        """
+        This tests that a call to Contest.beers() works with an validated
+        call. It should return the beers associated with a contest in
+        alphabetical order with a checked_into value for those beers
+        that the play has drunk. We add a couple beers into the list that
+        are out of alpha order to test this explicitly.
+
+        The beer list should include challenge beers.
+        """
+        beer_a = Beer.objects.create_beer('Aaaa', 'AA Brewery')
+        beer_z = Beer.objects.create_beer('Zzzz', 'ZZ Brewery')
+        contest = Contest.objects.get(id=1)
+        contest.add_beer(beer_z)
+        contest.add_beer(beer_a)
+        player = Player.objects.get(id=1)
+        contest_player = Contest_Player.objects.get(player=player)
+        beer3 = Contest_Beer.objects.get(beer_name='Beer 3')
+        challenge_beer6 = Contest_Beer.objects.get(beer_name='Challenge Beer 6')
+        contest_player.drink_beer(beer3,
+            data={
+                'untapped_checkin': 'https://untappd.com/checkin/beer',
+                'checkin_time': timezone.make_aware(datetime.datetime.now()),
+            })
+        contest_player.drink_beer(challenge_beer6,
+            data={
+                'untapped_checkin': 'https://untappd.com/checkin/beer',
+                'checkin_time': timezone.make_aware(datetime.datetime.now()),
+            })
+        contest_player.drink_beer(challenge_beer6)
+        beers = contest.beers(player)
+        self.assertEqual(beers.count(), 9)
+        self.assertEqual(beers[0].beer_name, 'Aaaa')
+        self.assertFalse(beers[0].checked_into)
+        self.assertEqual(beers[1].beer_name, 'Beer 1')
+        self.assertFalse(beers[1].checked_into)
+        self.assertEqual(beers[2].beer_name, 'Beer 2')
+        self.assertFalse(beers[2].checked_into)
+        self.assertEqual(beers[3].beer_name, 'Beer 3')
+        self.assertTrue(beers[3].checked_into)
+        self.assertEqual(beers[4].beer_name, 'Beer 4')
+        self.assertFalse(beers[4].checked_into)
+        self.assertEqual(beers[5].beer_name, 'Beer 5')
+        self.assertFalse(beers[5].checked_into)
+        self.assertEqual(beers[6].beer_name, 'Challenge Beer 6')
+        self.assertTrue(beers[6].checked_into)
+        self.assertEqual(beers[7].beer_name, 'Challenge Beer 7')
+        self.assertFalse(beers[7].checked_into)
+        self.assertEqual(beers[8].beer_name, 'Zzzz')
+        self.assertFalse(beers[8].checked_into)
+
+    def test_unvalidated_brewery_list(self):
+        """
+        This tests that a call to Contest.breweries() works with an unvalidated
+        call. It should return the breweries associated with a contest in
+        alphabetical order. We add a couple breweries into the list that are
+        out of alpha order to test this explicitly.
+        """
+        brewery_a = Brewery.objects.create_brewery('Aaaa Brewery', '1234')
+        brewery_z = Brewery.objects.create_brewery('Zzzz Brewery', '5678')
+        contest = Contest.objects.get(id=1)
+        contest.add_brewery(brewery_z)
+        contest.add_brewery(brewery_a)
+        breweries = contest.breweries()
+        self.assertEqual(breweries.count(), 7)
+        self.assertEqual(breweries[0].brewery_name, 'Aaaa Brewery')
+        self.assertEqual(breweries[1].brewery_name, 'Brewery 1')
+        self.assertEqual(breweries[2].brewery_name, 'Brewery 2')
+        self.assertEqual(breweries[3].brewery_name, 'Brewery 3')
+        self.assertEqual(breweries[4].brewery_name, 'Brewery 4')
+        self.assertEqual(breweries[5].brewery_name, 'Brewery 5')
+        self.assertEqual(breweries[6].brewery_name, 'Zzzz Brewery')
+
+    def test_validated_brewery_list(self):
+        """
+        This tests that a call to Contest.beers() works with an validated
+        call. It should return the beers associated with a contest in
+        alphabetical order with a checked_into value for those beers
+        that the play has drunk. We add a couple beers into the list that
+        are out of alpha order to test this explicitly.
+
+        The beer list should include challenge beers.
+        """
+        brewery_a = Brewery.objects.create_brewery('Aaaa Brewery', '1234')
+        brewery_z = Brewery.objects.create_brewery('Zzzz Brewery', '5678')
+        contest = Contest.objects.get(id=1)
+        contest.add_brewery(brewery_z)
+        contest.add_brewery(brewery_a)
+        player = Player.objects.get(id=1)
+        contest_player = Contest_Player.objects.get(player=player)
+        brewery3 = Contest_Brewery.objects.get(brewery_name='Brewery 3')
+        brewery5 = Contest_Brewery.objects.get(brewery_name='Brewery 5')
+        contest_player.drink_at_brewery(brewery3,
+            data={
+                'untapped_checkin': 'https://untappd.com/checkin/beer',
+                'checkin_time': timezone.make_aware(datetime.datetime.now()),
+            })
+        contest_player.drink_at_brewery(brewery5,
+            data={
+                'untapped_checkin': 'https://untappd.com/checkin/beer',
+                'checkin_time': timezone.make_aware(datetime.datetime.now()),
+            })
+
+        breweries = contest.breweries(player)
+        self.assertEqual(breweries.count(), 7)
+        self.assertEqual(breweries[0].brewery_name, 'Aaaa Brewery')
+        self.assertFalse(breweries[0].checked_into)
+        self.assertEqual(breweries[1].brewery_name, 'Brewery 1')
+        self.assertFalse(breweries[1].checked_into)
+        self.assertEqual(breweries[2].brewery_name, 'Brewery 2')
+        self.assertFalse(breweries[2].checked_into)
+        self.assertEqual(breweries[3].brewery_name, 'Brewery 3')
+        self.assertTrue(breweries[3].checked_into)
+        self.assertEqual(breweries[4].brewery_name, 'Brewery 4')
+        self.assertFalse(breweries[4].checked_into)
+        self.assertEqual(breweries[5].brewery_name, 'Brewery 5')
+        self.assertTrue(breweries[5].checked_into)
+        self.assertEqual(breweries[6].brewery_name, 'Zzzz Brewery')
+        self.assertFalse(breweries[6].checked_into)
