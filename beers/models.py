@@ -163,6 +163,36 @@ class Contest(models.Model):
             last_total_points = p.total_points
         return contest_players
 
+    def beers(self, player=None):
+        """
+        Gets the list of beers in beer, brewery order. If the player is passed
+        in, it adds a checked_into=True to the entry
+        """
+        if player is None:
+            return Contest_Beer.objects.filter(
+                contest=self).order_by('beer_name')
+        checkins = Contest_Checkin.objects.filter(contest_player__contest=self,
+            contest_player__player=player,
+            contest_beer=models.OuterRef('pk'))
+        beers = Contest_Beer.objects.filter(contest=self).annotate(
+            checked_into=models.Exists(checkins)).order_by('beer_name')
+        return beers
+
+    def breweries(self, player=None):
+        """
+        Gets the list of breweries in name order. If the player is passed
+        in, it adds a checked_into=True to the entry
+        """
+        if player is None:
+            return Contest_Brewery.objects.filter(
+                contest=self).order_by('brewery_name')
+        checkins = Contest_Checkin.objects.filter(contest_player__contest=self,
+            contest_player__player=player,
+            contest_brewery=models.OuterRef('pk'))
+        breweries = Contest_Brewery.objects.filter(contest=self).annotate(
+            checked_into=models.Exists(checkins)).order_by('brewery_name')
+        return breweries
+
     def __str__(self):
         return self.name
 
