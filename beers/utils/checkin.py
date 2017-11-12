@@ -19,13 +19,17 @@ def load_player_checkins(p, contest_id=None, from_date=None):
 
     logger.debug('Parsing "{}" for player {}'.format(p.untappd_rss, p.user.username))
     if p.untappd_rss:
-        feed = feedparser.parse(p.untappd_rss)
-        logger.debug('Got {} entries'.format(len(feed.entries)))
+        # Only load the RSS feed if there is at least one contest the player is taking
+        # part in.
+        feed = None
         cps = None
         if contest_id is None:
             cps = Contest_Player.objects.filter(player=p)
         else:
             cps = Contest_Player.objects.filter(contest_id=contest_id, player=p)
+        if cps.count() > 0:
+            feed = feedparser.parse(p.untappd_rss)
+            logger.debug('Got {} entries'.format(len(feed.entries)))
         for cp in cps:
             contest = cp.contest
             # after_date is set from from_date so that in case after_date changes
