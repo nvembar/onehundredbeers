@@ -530,6 +530,25 @@ $validation-button-color: #599bb3;
     padding-right: 15px;
 }
 
+.data-header {
+  background-color: darkgrey;
+  font-weight: bold;
+}
+
+.data-row-odd {
+    background-color: beige;
+}
+
+.data-row-even {
+    background-color: aliceblue;
+}
+
+.data-row-checkedin {
+  color: black;
+  background-color: lightgreen;
+  font-style: italic;
+}
+
 .leaderboard {
     padding-left: 15px;
     padding-right: 15px;
@@ -541,16 +560,15 @@ $validation-button-color: #599bb3;
 }
 
 .leaderboard-header {
-  background-color: darkgrey;
-  font-weight: bold;
+  @extend .data-header;
 }
 
 .leaderboard-odd {
-    background-color: beige;
+  @extend .data-row-odd;
 }
 
 .leaderboard-even {
-    background-color: aliceblue;
+  @extend .data-row-even;
 }
 
 .beer-list {
@@ -561,20 +579,49 @@ $validation-button-color: #599bb3;
 }
 
 .beer-header {
-  background-color: darkgrey;
-  font-weight: bold;
+  @extend .data-header;
 }
 
 .beer-odd {
-    background-color: beige;
+  @extend .data-row-odd;
 }
 
 .beer-even {
-    background-color: aliceblue;
+  @extend .data-row-even;
 }
 
 .beer-checkedin {
-  color: black;
-  background-color: lightgreen;
-  font-style: italic;
+  @extend .data-row-checkedin;
+}
+
+.brewery-header {
+  @extend .data-header;
+}
+
+.brewery-odd {
+  @extend .data-row-odd;
+}
+
+.brewery-even {
+  @extend .data-row-even;
+}
+
+.brewery-checkedin {
+  @extend .data-row-checkedin;
+}
+
+.challenge-header {
+  @extend .data-header;
+}
+
+.challenge-odd {
+  @extend .data-row-odd;
+}
+
+.challenge-even {
+  @extend .data-row-even;
+}
+
+.challenge-checkedin {
+  @extend .data-row-checkedin;
 }
