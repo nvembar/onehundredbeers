@@ -98,40 +98,4 @@
 
   </div>
 
-	<div class="three-column-box" style="height: 10em;">
-		<div class="outset-column-box">
-			<div class="column-box-content">
-				<h3>Leaderboards</h3>
-
-				Check out how the competition is doing!
-			</div>
-			<div class="column-box-link">
-				<a href="{% url 'leaderboard' contest.id %}">Leaderboard&gt;</a>
-			</div>
-		</div>
-		<div class="outset-column-box">
-			<div class="column-box-content">
-				<h3>Beers</h3>
-
-				The whole point of this is to drink some beer - check out which ones!
-			</div>
-			<div class="column-box-link">
-				<a href="{% url 'beer-list' contest.id %}">See the list&gt;</a>
-			</div>
-		</div>
-
-		{% if is_creator %}
-		<div class="outset-column-box">
-			<div class="column-box-content">
-				<h3>Validate Checkins</h3>
-
-				You're running this show! So see which of your players checkins count!
-			</div>
-			<div class="column-box-link">
-				<a href="{% url 'unvalidated-checkins' contest.id %}">Validate&gt;</a>
-			</div>
-		</div>
-		{% endif %}
-	</div>
-
 {% endblock %}
