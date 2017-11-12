@@ -3,7 +3,10 @@
 {% block title %}{{ contest.name }}{% endblock %}
 
 {% block content %}
-	<h1>{{ contest.name }}</h1>
+	<div class="page-header">
+		<h1>{{ contest.name }} 
+			{% if is_creator %}<small><a href="{% url 'unvalidated-checkins' contest.id %}">Validate</a></small>{% endif %}</h1>
+	</div>
   <div class="container">
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
