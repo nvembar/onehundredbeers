@@ -78,15 +78,6 @@ def contest(request, contest_id):
                }
     return render(request, 'beers/contest.html', context)
 
-
-def contest_leaderboard(request, contest_id):
-    """Renders the leaderboard for a particular contest"""
-    this_contest = get_object_or_404(Contest, id=contest_id)
-    ranked_players = this_contest.ranked_players()
-    context = {'contest': this_contest, 'players': ranked_players}
-    return render(request, 'beers/contest-leaderboard.html', context)
-
-
 def contest_add(request):
     """Add a contest with a unique name to the list"""
     f = None
