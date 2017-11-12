@@ -515,57 +515,41 @@ img.column-icon {
 }
 
 /* line 533, ../../../styles/sass/beers.scss */
+.data-header, .leaderboard-header, .beer-header, .brewery-header, .challenge-header {
+  background-color: darkgrey;
+  font-weight: bold;
+}
+
+/* line 538, ../../../styles/sass/beers.scss */
+.data-row-odd, .leaderboard-odd, .beer-odd, .brewery-odd, .challenge-odd {
+  background-color: beige;
+}
+
+/* line 542, ../../../styles/sass/beers.scss */
+.data-row-even, .leaderboard-even, .beer-even, .brewery-even, .challenge-even {
+  background-color: aliceblue;
+}
+
+/* line 546, ../../../styles/sass/beers.scss */
+.data-row-checkedin, .beer-checkedin, .brewery-checkedin, .challenge-checkedin {
+  color: black;
+  background-color: lightgreen;
+  font-style: italic;
+}
+
+/* line 552, ../../../styles/sass/beers.scss */
 .leaderboard {
   padding-left: 15px;
   padding-right: 15px;
   margin-top: 10px;
 }
 
-/* line 539, ../../../styles/sass/beers.scss */
+/* line 558, ../../../styles/sass/beers.scss */
 .leaderboard-row {
   padding: 3px;
 }
 
-/* line 543, ../../../styles/sass/beers.scss */
-.leaderboard-header {
-  background-color: darkgrey;
-  font-weight: bold;
-}
-
-/* line 548, ../../../styles/sass/beers.scss */
-.leaderboard-odd {
-  background-color: beige;
-}
-
-/* line 552, ../../../styles/sass/beers.scss */
-.leaderboard-even {
-  background-color: aliceblue;
-}
-
-/* line 559, ../../../styles/sass/beers.scss */
+/* line 577, ../../../styles/sass/beers.scss */
 .beer-row {
   padding: 3px;
-}
-
-/* line 563, ../../../styles/sass/beers.scss */
-.beer-header {
-  background-color: darkgrey;
-  font-weight: bold;
-}
-
-/* line 568, ../../../styles/sass/beers.scss */
-.beer-odd {
-  background-color: beige;
-}
-
-/* line 572, ../../../styles/sass/beers.scss */
-.beer-even {
-  background-color: aliceblue;
-}
-
-/* line 576, ../../../styles/sass/beers.scss */
-.beer-checkedin {
-  color: black;
-  background-color: lightgreen;
-  font-style: italic;
 }
