@@ -232,7 +232,7 @@ class BeersViewsTestCase(TestCase):
                         Contest_Beer.objects.get(contest=contest, beer_name='Beer 1'),
                         checkin_date, 'https://example.com/checkin/user4/beer1')
         c = Client()
-        response = c.get(reverse('leaderboard', args=[contest.id]))
+        response = c.get(reverse('contest', args=[contest.id]))
         players = response.context['players']
         self.assertEqual(players[0].id, user1.id)
         self.assertEqual(players[0].rank, 1)
@@ -296,7 +296,7 @@ class BeersViewsTestCase(TestCase):
                         Contest_Beer.objects.get(contest=contest, beer_name='Beer 1'),
                         checkin_date, 'https://example.com/checkin/user4/beer1')
         c = Client()
-        response = c.get(reverse('leaderboard', args=[contest.id]))
+        response = c.get(reverse('contest', args=[contest.id]))
         players = response.context['players']
         self.assertEqual(players[0].id, user1.id)
         self.assertEqual(players[0].rank, 1)
@@ -357,7 +357,7 @@ class BeersViewsTestCase(TestCase):
                         Contest_Beer.objects.get(contest=contest, beer_name='Beer 1'),
                         checkin_date, 'https://example.com/checkin/user4/beer1')
         c = Client()
-        response = c.get(reverse('leaderboard', args=[contest.id]))
+        response = c.get(reverse('contest', args=[contest.id]))
         players = response.context['players']
         self.assertEqual(players[0].id, user1.id)
         self.assertEqual(players[0].rank, 1)
