@@ -8,7 +8,8 @@
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
       <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
-      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers &amp; Breweries</a></li>
+      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers</a></li>
+      <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab">Breweries</a></li>
     </ul>
 
     <!-- Tab panes -->
@@ -51,6 +52,36 @@
               <div class="col-xs-4">{{ b.beer.name }}</div>
               <div class="col-xs-4">{{ b.beer.brewery }}</div>
               <div class="col-xs-1">{{ b.beer.brewery_state }}</div>
+              <div class="col-xs-1">{{ b.point_value }}</div>
+              {% if contest_player %}
+							<div class="col-xs-1">
+								{% if b.checked_into %}
+								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+								{% endif %}
+							</div>
+							{% endif %}
+            </div>
+						{% endfor %}
+          </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="breweries">
+          <div class="brewery-list">
+            <div class="row form-group">
+                <div class="col-md-3 coll-md-offset-9">
+                    <label for="brewery-search" class="sr-only">Search for Breweries</label>
+                    <input id="brewery-search" type="search" class="form-group" placeholder="Search for breweries"/>
+                </div>
+            </div>
+            <div class="row brewery-row brewery-header">
+              <div class="col-xs-8">Brewery</div>
+              <div class="col-xs-1">State</div>
+              <div class="col-xs-1">Points</div>
+              {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
+            </div>
+						{% for b in contest_breweries %}
+            <div class="row brewery-row brewery-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}brewery-checkedin{% endif %}">
+              <div class="col-xs-4">{{ b.brewery.name }}</div>
+              <div class="col-xs-1">{{ b.brewery.state }}</div>
               <div class="col-xs-1">{{ b.point_value }}</div>
               {% if contest_player %}
 							<div class="col-xs-1">
