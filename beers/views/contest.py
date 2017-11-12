@@ -111,29 +111,6 @@ def contest_player(request, contest_id, username):
     return render(request, 'beers/contest-player.html', context)
 
 
-def contest_beers(request, contest_id):
-    """
-    Gets the beers associated with a contest and flags those that have been
-    had by the user
-    """
-    this_contest = get_object_or_404(Contest, id=contest_id)
-    beers = Contest_Beer.objects.filter(contest=this_contest)
-    context = {'contest': this_contest, 'contest_beers': beers}
-    if request.user.is_authenticated:
-        try:
-            cp = Contest_Player.objects.get(contest=this_contest,
-                                            player__user_id=request.user.id)
-            checkins = Contest_Checkin.objects.filter(contest_player=cp)
-            checkin_ids = [c.contest_beer.id for c in checkins.filter(contest_beer__isnull=False)]
-            for b in beers:
-                b.checked_into = b.id in checkin_ids
-            context['contest_player'] = cp
-        except Contest_Player.DoesNotExist:
-            logger.error('Request for user %s for contest %s is not valid',
-                         request.user.username, contest)
-    return render(request, 'beers/contest-beers.html', context)
-
-
 def contest_beer(request, contest_id, beer_id):
     return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
 
