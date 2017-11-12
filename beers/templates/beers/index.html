@@ -1,14 +1,14 @@
 {% extends "base/base-large-banner.html" %}
 
 {% block title %}
-	One Hundred Beers - Homepage
+    One Hundred Beers - Homepage
 {% endblock %}
 
 {% block content %}
   <div class="container">
-		<div class="page-header">
-			<h1>Thirsty for beer?</h1>
-		</div>
+     <div class="page-header">
+        <h1>Thirsty for beer?</h1>
+     </div>
       <div class="row">
           <div class="col-xs-12 col-md-6 summary">
               <div class="panel panel-default">
@@ -20,13 +20,13 @@
                               <col class="summary-player"/>
                               <col class="summary-score"/>
                           </colgroup>
-													{% for leader in active.summary_leaderboard %}
+                                                    {% for leader in active.summary_leaderboard %}
                           <tr>
                               <td>{{ leader.rank }}</td>
                               <td>{{ leader.user_name }}</td>
                               <td>{{ leader.total_points }}</td>
-													</tr>
-													{% endfor %}
+                                                    </tr>
+                                                    {% endfor %}
                       </table>
                       <p class="text-right">
                       <a href="{% url 'contest' contest_id=active.id %}">More&gt;</a>
@@ -38,10 +38,10 @@
           <div class="col-xs-12 col-md-6 summary">
               <div class="panel panel-default">
                   <div class="panel-body">
-											{% if not user.is_authenticated %}
+                                            {% if not user.is_authenticated %}
                       <h3>Login</h3>
                       <form method="post" action="{% url 'login' %}">
-													{% csrf_token %}
+                          {% csrf_token %}
                           <div class="form-group">
                               <label for="username">User name</label>
 
@@ -56,18 +56,18 @@
                                   <button name="submit-login" type="submit" class="btn btn-primary">Login</button>
                               </div>
                           </div>
-													<input type="hidden" name="next" value="{% url 'index' %}">
+                          <input type="hidden" name="next" value="{% url 'index' %}">
                       </form>
-											<div>
-												<p>
-												You'll need to create a profile - and have an
-												<a href="https://untappd.com">Untappd</a> account - to play. So get going!
-												(Note: we have no affiliation with Untappd.)
-												</p>
-											</div>
-											{% else %}
-											<p>Logged in as {{ user.username }}</p>
-											{% endif %}
+                                            <div>
+                                                <p>
+                                                You'll need to create a profile - and have an
+                                                <a href="https://untappd.com">Untappd</a> account - to play. So get going!
+                                                (Note: we have no affiliation with Untappd.)
+                                                </p>
+                                            </div>
+                                            {% else %}
+                                            <p>Logged in as {{ user.username }}</p>
+                                            {% endif %}
                   </div>
               </div>
           </div>
@@ -76,14 +76,14 @@
           <h3>What Is This?</h3>
 
           <p>
-						Join the hunt for the best beer and race your fellow beer-lovers to drink
-						these 100 brews. It’s fun, promise.
+                        Join the hunt for the best beer and race your fellow beer-lovers to drink
+                        these 100 brews. It’s fun, promise.
           </p>
-					<p>
-						1 Year<br/>
-						&nbsp;&nbsp;&nbsp;100 Beers<br/>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8734; Possibilities<br/>
-					</p>
+                    <p>
+                        1 Year<br/>
+                        &nbsp;&nbsp;&nbsp;100 Beers<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8734; Possibilities<br/>
+                    </p>
       </div>
   </div>
 
