@@ -5,10 +5,12 @@ from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
-from beers.models import Contest, Player, Contest_Checkin, Contest_Beer, Contest_Player
+from beers.models import Contest, Player, Contest_Checkin, Contest_Beer, \
+                         Contest_Brewery, Contest_Player
 from beers.forms.contests import ContestForm
 from .helper import HttpNotImplementedResponse
-from .helper import is_authenticated_user_player, is_authenticated_user_contest_runner
+from .helper import is_authenticated_user_player, \
+                    is_authenticated_user_contest_runner
 
 
 logger = logging.getLogger(__name__)
@@ -56,28 +58,24 @@ def contest(request, contest_id):
     """Gets the details of a specific contest and presents them to the user"""
     this_contest = get_object_or_404(Contest, id=contest_id)
     ranked_players = this_contest.ranked_players()
-    beers = Contest_Beer.objects.filter(
-        contest=this_contest).order_by('beer_name')
-    context = {'contest': this_contest,
-               'players': ranked_players,
-               'contest_beers': beers, }
+    player = None
+    this_contest_player = None
+    is_creator = False
     if request.user.is_authenticated:
         try:
             player = Player.objects.get(user_id=request.user.id)
-            context['is_creator'] = this_contest.creator.id == player.id
-            cp = Contest_Player.objects.get(contest=this_contest,
-                                            player=player)
-            checkins = Contest_Checkin.objects.filter(contest_player=cp)
-            checkin_ids = [c.contest_beer.id
-                           for c in checkins.filter(contest_beer__isnull=False)]
-            for b in beers:
-                b.checked_into = b.id in checkin_ids
-            context['contest_player'] = cp
+            this_contest_player = Contest_Player.objects.get(player=player,
+                contest=this_contest)
+            is_creator = this_contest.creator.id == player.id
         except Player.DoesNotExist:
             pass
-        except Contest_Player.DoesNotExist:
-            logger.error('Request for user %s for contest %s is not valid',
-                         request.user.username, contest)
+    context = {'contest': this_contest,
+               'contest_player': this_contest_player,
+               'players': ranked_players,
+               'contest_beers': this_contest.beers(player),
+               'contest_breweries': this_contest.breweries(player),
+               'is_creator': is_creator,
+               }
     return render(request, 'beers/contest.html', context)
 
 
