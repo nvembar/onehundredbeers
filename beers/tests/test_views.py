@@ -105,7 +105,7 @@ class BeersViewsTestCase(TestCase):
         self.assertTrue(response.status_code, 200)
         self.assertTemplateUsed(response, 'beers/contest.html')
         self.assertEqual(response.context['contest'].id, 1)
-        self.assertEqual(response.context['player'].id, player.id)
+        self.assertEqual(response.context['contest_player'].id, player.id)
         self.assertFalse(response.context['is_creator'])
 
     def test_view_contest_by_creator(self):
@@ -119,7 +119,7 @@ class BeersViewsTestCase(TestCase):
         self.assertTrue(response.status_code, 200)
         self.assertTemplateUsed(response, 'beers/contest.html')
         self.assertEqual(response.context['contest'].id, 1)
-        self.assertEqual(response.context['player'].id, player.id)
+        self.assertEqual(response.context['contest_player'].id, player.id)
         self.assertTrue(response.context['is_creator'])
         vlink = reverse('unvalidated-checkins', kwargs={'contest_id': 1})
         self.assertIn(vlink, response.content.decode('utf-8'))
