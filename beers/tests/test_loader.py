@@ -298,19 +298,17 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 4)
 
     def test_successful_checkin_command_for_all(self):
-        """Test the ability to load a single XML feed file for a user"""
-        runner = Player.objects.get(id=4)
-        runner.untappd_rss = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'test-data', 'test-checkins.xml')
-        runner.save()
-        player = Player.objects.get(id=1)
-        player.untappd_rss = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'test-data', 'test-checkins.xml')
-        player.save()
+        """Test the ability to load all the XML feeds"""
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            'test-data', 'test-checkins.xml')
         start_date = timezone.make_aware(datetime.datetime(2017, 1, 1))
         end_date = timezone.make_aware(datetime.datetime(2017, 12, 31))
+        runner = Player.objects.get(id=4)
+        runner.untappd_rss = path
+        runner.save()
+        player = Player.objects.get(id=1)
+        player.untappd_rss = path
+        player.save()
         contest = Contest.objects.create_contest('Contest',
                                                  runner,
                                                  start_date,
