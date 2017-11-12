@@ -200,7 +200,9 @@ class Contest(models.Model):
 class Brewery_Manager(models.Manager):
 
     def create_brewery(self, name, untappd_id):
-        return self.create(name=name, untappd_id=untappd_id)
+        return self.create(name=name, 
+													 untappd_id=untappd_id,
+													 last_updated=timezone.now())
 
 class Brewery(models.Model):
     name = models.CharField(max_length=250)
@@ -226,7 +228,8 @@ class Contest_Brewery(models.Model):
     brewery = models.ForeignKey(Brewery, on_delete=models.CASCADE)
     brewery_name = models.CharField(max_length=250)
     point_value = models.IntegerField(default=1)
-    total_visited = models.IntegerField("number of players who drank at this brewery")
+    total_visited = models.IntegerField(default=0, 
+			help_text="number of players who drank at this brewery")
 
     objects = Contest_BreweryManager()
 
