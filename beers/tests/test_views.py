@@ -129,9 +129,9 @@ class BeersViewsTestCase(TestCase):
         Tests whether an unauthenticated user can view a contest.
         """
         c = Client()
-        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
         self.assertTrue(response.status_code, 200)
-        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertTemplateUsed(response, 'beers/contest.html')
         self.assertEqual(response.context['contest'].id, 1)
         self.assertEqual(len(response.context['contest_beers']),
                          Contest_Beer.objects.filter(contest__id=1).count())
@@ -150,9 +150,9 @@ class BeersViewsTestCase(TestCase):
                             data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
                                   'untappd_url': 'https://untappd.com/2',})
         self.assertTrue(c.login(username=player.user.username, password='password1%'))
-        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
         self.assertTrue(response.status_code, 200)
-        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertTemplateUsed(response, 'beers/contest.html')
         self.assertEqual(response.context['contest'].id, 1)
         self.assertEqual(len(response.context['contest_beers']),
                          Contest_Beer.objects.filter(contest__id=1).count())
@@ -173,12 +173,13 @@ class BeersViewsTestCase(TestCase):
                             data={'checkin_time': timezone.make_aware(datetime.datetime.now()),
                                   'untappd_url': 'https://untappd.com/2',})
         self.assertTrue(c.login(username=player.user.username, password='password1%'))
-        response = c.get(reverse('beer-list', kwargs={'contest_id': 1}))
+        response = c.get(reverse('contest', kwargs={'contest_id': 1}))
         self.assertTrue(response.status_code, 200)
-        self.assertTemplateUsed(response, 'beers/contest-beers.html')
+        self.assertTemplateUsed(response, 'beers/contest.html')
         self.assertEqual(response.context['contest'].id, 1)
         self.assertEqual(len(response.context['contest_beers']),
                          Contest_Beer.objects.filter(contest__id=1).count())
+        self.assertTrue(response.context['is_creator'])
         for b in response.context['contest_beers']:
             self.assertEqual(b.checked_into, b.id == 1)
 
