@@ -5,77 +5,92 @@
 {% endblock %}
 
 {% block content %}
-
-  {% if form.non_field_errors %}
-    <ul>
-      {% for k, v in form.errors.items %}
-        {% for e in v %}
-          <li>{{ k }}: {{ e }}</li>
-        {% endfor %}
-      {% endfor %}
-    </ul>
-  {% endif %}
-
-  <form action="{% url 'profile' %}" method="post">
-    {% csrf_token %}
-    <div class="login-form">
-      <div class="login-label">User Name</div>
-      <div class="login-field">{{ user.username }}</div>
-      <div class="login-label">{{ form.first_name.label_tag }}</div>
-      <div class="login-field">{{ form.first_name }}</div>
-      {% if form.first_name.errors %}
-      <div class="error-info">
-        {{ form.first_name.label }} Errors:<br/>
-        {{ form.first_name.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.last_name.label_tag }}</div>
-      <div class="login-field">{{ form.last_name }}</div>
-      {% if form.last_name.errors %}
-      <div class="error-info">
-        {{ form.last_name.label }} Errors:<br/>
-        {{ form.last_name.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.email.label_tag }}</div>
-      <div class="login-field">{{ form.email }}</div>
-      {% if form.email.errors %}
-      <div class="error-info">
-        {{ form.email.label }} Errors:<br/>
-        {{ form.email.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.personal_statement.label_tag }}</div>
-      <div class="login-field">{{ form.personal_statement }}</div>
-      {% if form.personal_statement.errors %}
-      <div class="error-info">
-        {{ form.personal_statement.label }} Errors:<br/>
-        {{ form.personal_statement.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.untappd_username.label_tag }}</div>
-      <div class="login-field">{{ form.untappd_username }}</div>
-      {% if form.untappd_username.errors %}
-      <div class="error-info">
-        {{ form.untappd_username.label }} Errors:<br/>
-        {{ form.untappd_username.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.untappd_rss.label_tag }}</div>
-      <div class="field-help">
-        <a href="{% url 'instructions' %}#rss">{{ form.untappd_rss.help_text }}</a>
-      </div>
-      <div class="login-field">{{ form.untappd_rss }}</div>
-      {% if form.untappd_rss.errors %}
-      <div class="error-info">
-        {{ form.untappd_rss.label }} Errors:<br/>
-        {{ form.untappd_rss.errors }}
-      </div>
-      {% endif %}
-
-      <div class="login-button-row">
-        <input type="submit" value="Update Profile"/>
-      </div>
+    <div class="container">
+        <div class="page-header">
+            <h1>Profile</h1>
+        </div>
+        {% if form.non_field_errors %}
+        <ul>
+          {% for k, v in form.errors.items %}
+            {% for e in v %}
+              <li>{{ k }}: {{ e }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2">
+            <form action="{% url 'profile' %}" class="form-horizontal" method="post">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="id_username" class="col-sm-2 control-label">User name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="username" value="{{ user.username }}" id="id_username" disabled/>
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.first_name.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_first_name" class="col-sm-2 control-label">First name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="first_name" id="id_first_name" value="{{ form.first_name.data }}"/>
+                                {% if form.first_name.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.last_name.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_last_name" class="col-sm-2 control-label">Last name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="last_name" id="id_last_name" value="{{ form.last_name.data }}"/>
+                                {% if form.last_name.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.email.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_email" class="col-sm-2 control-label">E-mail</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control" name="email" id="id_email" value="{{ form.email.data }}"/>
+                                {% if form.email.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.personal_statement.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_personal_statement" class="col-sm-2 control-label">Motto</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="10" maxlength="150" name="personal_statement" id="id_personal_statement">{{ form.personal_statement.data }}</textarea>
+                                {% if form.personal_statement.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.untappd_username.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_untappd_username" class="col-sm-2 control-label">Untappd user name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="untappd_username" id="id_untappd_username" value="{{ form.untappd_username.data }}"/>
+                                {% if form.untappd_username.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group {% if form.untappd_rss.errors %}has-error has-feedback{% endif %}">
+                            <label for="id_untappd_rss" class="col-sm-2 control-label">Untappd RSS Feed</label>
+                            <div class="col-sm-10">
+                                <input type="url" class="form-control" name="untappd_rss" id="id_untappd_rss" value="{{ form.untappd_rss.data }}"/>
+                                {% if form.untappd_rss.errors %}
+                                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="login-buttons">
+                                <button name="update-profile" type="submit" class="btn btn-primary">Update Profile</button>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </form>
+        </div>
     </div>
-  </form>
 {% endblock %}
