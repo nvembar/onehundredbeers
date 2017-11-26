@@ -47,18 +47,6 @@
       });
     }
 
-    function sendAddBrewery(uvId, content) {
-      var url = "{% url 'validate-checkin' contest.id %}";
-      return $.ajax({
-        url: url,
-        headers: { Accept: 'application/json' },
-        data: JSON.stringify(content),
-        contentType: 'application/json',
-        dataType: 'json',
-        method: 'POST'
-      });
-    }
-
     function removeRow(uvId) {
       return function (result, status, xhr) {
         console.log("removeRow status " + status);
