@@ -245,6 +245,7 @@ class Contest_Player(models.Model):
     beer_count = models.IntegerField(default=0)
     beer_points = models.IntegerField(default=0)
     brewery_points = models.IntegerField(default=0)
+    bonus_points = models.IntegerField(default=0)
     challenge_point_gain = models.IntegerField(default=0)
     challenge_point_loss = models.IntegerField(default=0)
     total_points = models.IntegerField(default=0)
@@ -421,6 +422,42 @@ class Contest_Player(models.Model):
         self.save()
         return checkin
 
+    def drink_bonus(self, bonus, checkin=None, data=None):
+        """
+        Has the user check in to a bonus, using the data from a checkin or
+        from a dictionary. It does not delete the checkin and gives preference
+        to the data from the data object.
+
+        bonus: a string bonus tag to check into
+        checkin: an Unvalidated_Checkin object
+
+        returns Contest_Checkin
+        """
+        checkin_time = None
+        untappd_checkin = None
+        if checkin:
+            if checkin.contest_player.id != self.id:
+                raise ValueError('Cannot use checkin not in the contest')
+            checkin_time = checkin.untappd_checkin_date
+            untappd_checkin = checkin.untappd_checkin
+        if data is not None:
+            if 'checkin_time' in data:
+                checkin_time = data['checkin_time']
+            if 'untappd_checkin' in data:
+                untappd_checkin = data['untappd_checkin']
+        checkin = Contest_Checkin(contest_player=self,
+                                  bonus_type=bonus,
+                                  checkin_points=1,
+                                  untappd_checkin=untappd_checkin,
+                                  checkin_time=checkin_time,
+                                  tx_type='BO',
+                                 )
+        checkin.save()
+        self.bonus_points = self.bonus_points + 1
+        self.total_points = self.total_points + 1
+        self.save()
+        return checkin
+
     def compute_points(self):
         """Computes the brewery and beer points for this user."""
         checkins = Contest_Checkin.objects.filter(contest_player=self)
@@ -433,8 +470,11 @@ class Contest_Player(models.Model):
             models.Sum('checkin_points'))['checkin_points__sum'] or 0
         self.brewery_points = checkins.filter(tx_type='BR').aggregate(
             models.Sum('checkin_points'))['checkin_points__sum'] or 0
+        self.bonus_points = checkins.filter(tx_type='BO').aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0
         self.total_points = (self.beer_points
                              + self.brewery_points
+                             + self.bonus_points
                              + self.challenge_point_gain
                              - self.challenge_point_loss)
         self.save()

@@ -189,7 +189,7 @@ class ContestTestCase(TestCase):
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(len(checkins['checkins']), 0)
 
-    def __test_beer_and_brewery_calculations(self, cp, beers, breweries):
+    def __test_beer_and_brewery_calculations(self, cp, beers, breweries, bonuses=[]):
         """
         Helper function to iterate through a set of beers for a user to
         drink. It checks the point values for the passed in player and any
@@ -197,6 +197,7 @@ class ContestTestCase(TestCase):
         """
         beer_points = cp.beer_points
         brewery_points = cp.brewery_points
+        bonus_points = cp.bonus_points
         challengers = {
             cp.id: {
                 'gain': cp.challenge_point_gain,
@@ -217,7 +218,7 @@ class ContestTestCase(TestCase):
             cp.drink_beer(
                 beer,
                 data={
-                    'untapped_checkin': 'https://untappd.com/checkin/beer',
+                    'untappd_checkin': 'https://untappd.com/checkin/beer',
                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
                 })
             if not had_prior:
@@ -241,11 +242,20 @@ class ContestTestCase(TestCase):
             cp.drink_at_brewery(
                 brewery,
                 data={
-                    'untapped_checkin': 'https://untappd.com/checkin/brewery',
+                    'untappd_checkin': 'https://untappd.com/checkin/brewery',
                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
                 })
             if not had_prior:
                 brewery_points = brewery_points + brewery.point_value
+        for bonus in bonuses:
+            # No limit on how many times you can accumlate bonus points
+            cp.drink_bonus(
+                bonus,
+                data={
+                    'untappd_checkin': 'https://untappd.com/checkin/bonus',
+                    'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                })
+            bonus_points = bonus_points + 1
         # Test all of these and then run compute_points and rerun the tests
         # compute_points should not change the values`
         self.assertEqual(
@@ -264,9 +274,14 @@ class ContestTestCase(TestCase):
             challengers[cp.id]['loss'],
             msg='Cumulative challenge point loss for {}'.format(cp))
         self.assertEqual(
+            cp.bonus_points,
+            bonus_points,
+            msg='Cumulative bonus points for {}'.format(cp))
+        self.assertEqual(
             cp.total_points,
             (beer_points
              + brewery_points
+             + bonus_points
              + challengers[cp.id]['gain']
              - challengers[cp.id]['loss']),
             msg='Cumulative sum of total points for {}'.format(cp))
@@ -301,9 +316,14 @@ class ContestTestCase(TestCase):
             challengers[cp.id]['loss'],
             msg='Computed challenge point loss for {}'.format(cp))
         self.assertEqual(
+            cp.bonus_points,
+            bonus_points,
+            msg='Computed bonus points for {}'.format(cp))
+        self.assertEqual(
             cp.total_points,
             (beer_points
              + brewery_points
+             + bonus_points
              + challengers[cp.id]['gain']
              - challengers[cp.id]['loss']),
             msg='Computed sum of total points for {}'.format(cp))
@@ -408,6 +428,35 @@ class ContestTestCase(TestCase):
         player = Contest_Player.objects.get(id=2)
         self.__test_beer_and_brewery_calculations(player, [challenge], [])
         self.__test_beer_and_brewery_calculations(challenge.challenger, [challenge], [])
+
+    def test_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun'])
+
+    def test_multiple_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun', 'ballgame'])
+
+    def test_same_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun', 'pun'])
+
+    def test_beer_and_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        beer = Contest_Beer.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [beer], [], ['pun'])
 
     def test_unvalidated_beer_list(self):
         """
