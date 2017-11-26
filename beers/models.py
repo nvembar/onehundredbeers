@@ -271,16 +271,11 @@ class Contest_Player(models.Model):
         against the maximum point loss requires querying against all the
         checkouts of all the challenge beers.
         """
-        challenger_drinks = Contest_Checkin.objects.filter(contest_beer__challenger=self)
-        challenger_drinks = challenger_drinks.exclude(contest_player=self)
-        losses = challenger_drinks.values('contest_beer').annotate(
-            loss=models.Sum('contest_beer__challenge_point_loss'))
-        self.challenge_point_loss = 0
-        for loss in losses:
-            beer = Contest_Beer.objects.get(id=loss['contest_beer'])
-            self.challenge_point_loss = (self.challenge_point_loss
-                                         + min(loss['loss'],
-                                               beer.max_point_loss))
+        challenger_losses = Contest_Checkin.objects.filter(contest_player=self, 
+                                                           tx_type='CL')
+        loss = (challenger_losses.aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0)
+        self.challenge_point_loss = -loss
         self.save()
 
     def drink_beer(self, beer, checkin=None, data=None):
@@ -325,6 +320,7 @@ class Contest_Player(models.Model):
                                           checkin_points=beer.challenge_point_value,
                                           untappd_checkin=untappd_checkin,
                                           checkin_time=checkin_time,
+                                          tx_type='CS',
                                          )
                 checkin.save()
                 self.challenge_point_gain = (self.challenge_point_gain
@@ -335,13 +331,28 @@ class Contest_Player(models.Model):
                                           checkin_points=beer.point_value,
                                           untappd_checkin=untappd_checkin,
                                           checkin_time=checkin_time,
+                                          tx_type='CO',
                                          )
                 checkin.save()
                 self.beer_points = self.beer_points + beer.point_value
                 # The challenger is penalized if someone else drinks their
                 # challenge beer
-
                 challenger = beer.challenger
+                points_lost = (Contest_Checkin.objects.filter(contest_player=challenger,
+                    contest_beer=beer,
+                    tx_type='CL').aggregate(
+                        models.Sum('checkin_points'))['checkin_points__sum'] or 0)
+                if -(points_lost - beer.challenge_point_loss) <= beer.max_point_loss:
+                    loss_checkin = Contest_Checkin(
+                        contest_player=challenger,
+                        contest_beer=beer,
+                        checkin_points=-beer.challenge_point_loss,
+                        checkin_time=checkin_time,
+                        untappd_checkin=untappd_checkin,
+                        tx_type='CL',
+                        )
+                    loss_checkin.save()
+
                 challenger.__compute_losses()
                 challenger.total_points = (challenger.beer_points
                                            + challenger.brewery_points
@@ -354,6 +365,7 @@ class Contest_Player(models.Model):
                                       checkin_points=beer.point_value,
                                       untappd_checkin=untappd_checkin,
                                       checkin_time=checkin_time,
+                                      tx_type='BE',
                                      )
             checkin.save()
             self.beer_points = self.beer_points + beer.point_value
@@ -401,6 +413,7 @@ class Contest_Player(models.Model):
                                   checkin_points=brewery.point_value,
                                   untappd_checkin=untappd_checkin,
                                   checkin_time=checkin_time,
+                                  tx_type='BR',
                                  )
         checkin.save()
         self.brewery_points = self.brewery_points + brewery.point_value
@@ -411,31 +424,15 @@ class Contest_Player(models.Model):
     def compute_points(self):
         """Computes the brewery and beer points for this user."""
         checkins = Contest_Checkin.objects.filter(contest_player=self)
-        beer_filter = checkins.filter(contest_beer__isnull=False)
-        nonchallenge_filter = beer_filter.exclude(
-            contest_beer__challenger=self)
-        beer_points = nonchallenge_filter.aggregate(
-            models.Sum('checkin_points'))['checkin_points__sum']
-        if beer_points is None:
-            beer_points = 0
-
-        challenge_filter = beer_filter.filter(contest_beer__challenger=self)
-        challenge_point_gain = challenge_filter.aggregate(
-            models.Sum('checkin_points'))['checkin_points__sum']
-        if challenge_point_gain is None:
-            challenge_point_gain = 0
-
-        self.__compute_losses()
-
-        brewery_points = checkins.filter(
-            contest_brewery__isnull=False).aggregate(
-                models.Sum('checkin_points'))['checkin_points__sum']
-        if brewery_points is None:
-            brewery_points = 0
-        self.beer_points = beer_points
-        self.beer_count = beer_filter.count()
-        self.brewery_points = brewery_points
-        self.challenge_point_gain = challenge_point_gain
+        self.challenge_point_gain = checkins.filter(tx_type='CS').aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0
+        self.challenge_point_loss = -(checkins.filter(tx_type='CL').aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0)
+        self.beer_points = checkins.filter(models.Q(tx_type='CO') | 
+                                             models.Q(tx_type='BE')).aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0
+        self.brewery_points = checkins.filter(tx_type='BR').aggregate(
+            models.Sum('checkin_points'))['checkin_points__sum'] or 0
         self.total_points = (self.beer_points
                              + self.brewery_points
                              + self.challenge_point_gain
