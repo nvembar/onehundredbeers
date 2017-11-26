@@ -519,9 +519,27 @@ class Contest_CheckinManager(models.Manager):
                            untappd_checkin=untappd_checkin)
 
 class Contest_Checkin(models.Model):
+    TRANSACTION_TYPES = (
+        ('BE', 'Beer'),
+        ('BR', 'Brewery'),
+        ('CO', 'Challenge Beer - Other'),
+        ('CS', 'Challenge Beer - Self'),
+        ('CL', 'Challenge Beer - Loss'),
+        ('BO', 'Bonus'),
+    )
+    tx_type = models.CharField(max_length=2, default='BE', choices=TRANSACTION_TYPES)
     contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
-    contest_beer = models.ForeignKey(Contest_Beer, on_delete=models.CASCADE, blank=True, null=True,)
-    contest_brewery = models.ForeignKey(Contest_Brewery, on_delete=models.CASCADE, blank=True, null=True,)
+    contest_beer = models.ForeignKey(Contest_Beer, 
+                                     on_delete=models.CASCADE, 
+                                     blank=True, 
+                                     null=True,
+                                    )
+    contest_brewery = models.ForeignKey(Contest_Brewery,
+                                        on_delete=models.CASCADE,
+                                        blank=True,
+                                        null=True,
+                                       )
+    bonus_type = models.CharField(max_length=10, blank=True, null=True,)
     checkin_points = models.IntegerField(default=1)
     checkin_time = models.DateTimeField()
     untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
