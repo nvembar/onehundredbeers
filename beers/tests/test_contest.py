@@ -105,6 +105,62 @@ class ContestTestCase(TestCase):
             untappd_title='Unvalidated Checkin 2').count(), 0)
         self.assertEqual(response.status_code, 200)
 
+    def test_successful_modify_checkin_bonus_with_beer(self):
+        """Tests that the API call to modify a checkin works for a beer with a bonus"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
+        response = c.post(reverse('validate-checkin',
+                                  kwargs={'contest_id': 1}),
+                          content_type='application/json',
+                          data=json.dumps({'as_beer': 1,
+                                           'bonuses': [ 'pun' ],
+                                           'checkin': uv.id,
+                                           'preserve': False}),
+                          HTTP_ACCEPT='application/json')
+        q = Contest_Checkin.objects.filter(contest_player__id=1)
+        self.assertEqual(q.count(), 2)
+        self.assertEqual(q.filter(tx_type='BO').count(), 1)
+        self.assertEqual(q.filter(tx_type='BE').count(), 1)
+        checkin = q.filter(tx_type='BE').get()
+        self.assertEqual(checkin.checkin_points, 1)
+        self.assertEqual(checkin.untappd_checkin, uv.untappd_checkin)
+        self.assertEqual(checkin.contest_player.beer_count, 1)
+        self.assertEqual(checkin.contest_player.beer_points, 1)
+        self.assertEqual(checkin.contest_player.bonus_points, 1)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(response.status_code, 200)
+
+    def test_successful_modify_checkin_bonus(self):
+        """
+        Tests that the API call to modify a checkin works for bonus with no beer
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
+        response = c.post(reverse('validate-checkin',
+                                  kwargs={'contest_id': 1}),
+                          content_type='application/json',
+                          data=json.dumps({'bonuses': [ 'pun' ],
+                                           'checkin': uv.id,
+                                           'preserve': False}),
+                          HTTP_ACCEPT='application/json')
+        q = Contest_Checkin.objects.filter(contest_player__id=1)
+        self.assertEqual(q.count(), 1)
+        checkin = q.get()
+        self.assertEqual(checkin.checkin_points, 1)
+        self.assertEqual(checkin.tx_type, 'BO')
+        self.assertEqual(checkin.untappd_checkin, uv.untappd_checkin)
+        self.assertEqual(checkin.contest_player.beer_count, 0)
+        self.assertEqual(checkin.contest_player.beer_points, 0)
+        self.assertEqual(checkin.contest_player.bonus_points, 1)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(response.status_code, 200)
+
     def test_dismiss_unvalidated_checkin(self):
         """Tests whether a delete of a checkin works"""
         c = Client()
