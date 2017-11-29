@@ -13,6 +13,8 @@ before_script:
   #- psql -c 'create database hbeers;' -U postgres
   #- python manage.py collectstatic
   - docker-compose build --force-rm web
-  - docker-copmose -f docker-compose.yml run db
+  - docker-compose -f docker-compose.yml up -d
 script: 
   - docker-compose -f docker-compose.yml run web python manage.py test
+after_script:
+  - docker-compose down
