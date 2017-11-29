@@ -1,8 +1,8 @@
+sudo: required
 language: python
 python:
   - 3.6
 services:
-  # - postgresql
   - docker
 env:
   global:
@@ -13,5 +13,6 @@ before_script:
   #- psql -c 'create database hbeers;' -U postgres
   #- python manage.py collectstatic
   - docker-compose build --force-rm web
+  - docker-copmose -f docker-compose.yml run db
 script: 
   - docker-compose -f docker-compose.yml run web python manage.py test
