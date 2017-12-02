@@ -6,10 +6,13 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data/
   web:
-    build: .
+    build: 
+      context: .
+      args:
+        - SECRET_KEY
     command: python3 manage.py runserver 0.0.0.0:8000
     environment:
-      - DATABASE_URL=postgres://postgres@db:5432/hbeers
+      - DATABASE_URL=postgres://postgres@db/hbeers
       - SSL_REDIRECT
       - SECRET_KEY
       - DEBUG
