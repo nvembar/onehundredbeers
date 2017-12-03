@@ -625,3 +625,27 @@ $validation-button-color: #599bb3;
 .challenge-checkedin {
   @extend .data-row-checkedin;
 }
+
+.checkin-list {
+}
+
+.checkin-row {
+  padding: 3px;
+  border: 1px;
+}
+
+.checkin-header {
+  @extend .data-header;
+}
+
+.checkin-odd {
+  @extend .data-row-odd;
+}
+
+.checkin-even {
+  @extend .data-row-even;
+}
+
+.validation-buttons {
+  float: right;
+}
