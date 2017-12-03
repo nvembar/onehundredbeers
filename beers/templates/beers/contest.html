@@ -41,8 +41,7 @@
 
 {% block content %}
 	<div class="page-header">
-		<h1>{{ contest.name }} 
-			{% if is_creator %}<small><a href="{% url 'unvalidated-checkins' contest.id %}">Validate</a></small>{% endif %}</h1>
+		<h1>{{ contest.name }}</h1>
 	</div>
   <div class="container">
     <!-- Nav tabs -->
