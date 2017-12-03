@@ -30,12 +30,12 @@ var Validate = {
         console.log('checkin URL: ' + checkin.checkin_url);
         $(".checkin-list").append(
             '<div class="row checkin-row checkin-' + (even ? 'even' : 'odd') + '" id="id_' + checkin.id + '_row" data-validation-id="' + checkin.id + '">' + "\n" +
-            '<div class="col-xs-4 col-md-2">' + checkin.player + "</div>\n" +
-            '<div class="col-xs-8 col-md-4">' +
-            '<a href="' + checkin.checkin_url + '" target="_blank">'+
-            checkin.beer + ' from ' + checkin.brewery + 
+            '<div class="col-xs-4 col-md-2"><em>' + checkin.player + "</em></div>\n" +
+            '<div class="col-xs-8 col-md-6">' +
+            '<a href="' + checkin.checkin_url + '" target="_blank">' +
+            '<em>' + checkin.beer + ' from ' + checkin.brewery + '</em>' +
             "</a></div>\n" +
-            '<div class="col-xs-12 col-md-6"><select id="id_' + checkin.id + '_select" class="beer-select"></select></div>' + "\n" +
+            '<div class="col-xs-12 col-md-4"><select id="id_' + checkin.id + '_select" class="beer-select" style="width: 100%;"></select></div>' + "\n" +
             '<div class="col-xs-2 col-md-2"><input type="checkbox">Trump</input></div>' +
             '<div class="col-xs-2 col-md-2"><input type="checkbox">Ballpark</input></div>' +
             '<div class="validation-buttons col-xs-offset-4 col-xs-2 col-md-offset-0 col-md-2"><button type="button" id="id_' + checkin.id + '_dbutton" class="btn dismissal-click">Dismiss</button></div>' + "\n" + 
@@ -124,6 +124,25 @@ var Validate = {
                 $(".validation-click").click(that.validationFunction(contest));
                 /* When a dismissal is clicked, submit the dismissal information */
                 $(".dismissal-click").click(that.dismissalFunction(contest));
+                $(".step-links").html(function (i, oldHtml) {
+                    let html = '';
+                    if (data.page_index > 1) {
+                        html = html + 
+                            '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
+                            (data.page_index - 1) + 
+                            ')">previous</a>' + "\n";
+                    }
+                    html = html + '<span id="page-description" closs="current">' +
+                           'Page ' + data.page_index + ' of ' + data.page_count +
+                           "</span>\n";
+                    if (data.page_index < data.page_count) {
+                        html = html + 
+                            '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
+                            (data.page_index + 1) + 
+                            ')">next</a>' + "\n";
+                    }
+                    return html;
+                });
              });
     },
 };
