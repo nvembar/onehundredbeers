@@ -72,7 +72,7 @@ var Validate = {
                 $(row).find('.bonus-checkbox:checked').length > 0));
     },
 
-    removeRow: function(uvId) {
+    removeRow: function(contest, uvId) {
         return function () {
             let row = $('#id_' + uvId + '_row');
             row.slideUp('slow');
@@ -86,9 +86,19 @@ var Validate = {
         return function() {
            let row = $(this).parents('.checkin-row'); 
            let uvId = $(row).data('validationId');
+           let checkins = $('.checkin-list');
+           let currentPage = $(checkins).data('currentPage');
            console.log('Dismissing ' + uvId);
            contest.deleteUnvalidatedCheckin(uvId)
-               .then(that.removeRow(uvId)).done();
+               .then(that.removeRow(uvId)).then(
+                    function () {
+                        if (checkins.data('pageSize') == 1) {
+                            return that.displayCheckins(contest, currentPage - 1);
+                        } else {
+                            return that.displayCheckins(contest, currentPage);
+                        }
+                    }
+                ).done();
         }
     },
 
@@ -118,7 +128,17 @@ var Validate = {
             } else {
                 return;
             }
-            return promise.then(that.removeRow(uvId));
+            let checkins = $('.checkin-list');
+            let currentPage = $(checkins).data('currentPage');
+            return promise.then(that.removeRow(uvId)).then(
+                function () {
+                    if (checkins.data('pageSize') == 1) {
+                        return that.displayCheckins(contest, currentPage - 1);
+                    } else {
+                        return that.displayCheckins(contest, currentPage);
+                    }
+                }
+            );
         }
     },
     
@@ -129,6 +149,10 @@ var Validate = {
         contest.getUnvalidatedCheckins(start, end)
             .then(function(data) {
                 $('.checkin-list').html('');
+                $('.checkin-list').data('currentPage', page);
+                $('.checkin-list').data('startIndex', data['page_index']);
+                $('.checkin-list').data('pageCount', data['page_count']);
+                $('.checkin-list').data('pageSize', data['page_size']);
                 for (let i = 0; i < data.checkins.length; i++) {
                     that.addRow(data.checkins[i], i % 2 == 0);
                 }
