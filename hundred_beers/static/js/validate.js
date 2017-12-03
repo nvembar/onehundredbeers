@@ -27,7 +27,6 @@ var Validate = {
     },
 
     addRow: function(checkin, even=true, updateSelect=true) {
-        console.log('checkin URL: ' + checkin.checkin_url);
         $(".checkin-list").append(
             '<div class="row checkin-row checkin-' + (even ? 'even' : 'odd') + '" id="id_' + checkin.id + '_row" data-validation-id="' + checkin.id + '">' + "\n" +
             '<div class="col-xs-4 col-md-2"><em>' + checkin.player + "</em></div>\n" +
@@ -36,10 +35,10 @@ var Validate = {
             '<em>' + checkin.beer + ' from ' + checkin.brewery + '</em>' +
             "</a></div>\n" +
             '<div class="col-xs-12 col-md-4"><select id="id_' + checkin.id + '_select" class="beer-select" style="width: 100%;"></select></div>' + "\n" +
-            '<div class="col-xs-2 col-md-2"><input type="checkbox">Trump</input></div>' +
-            '<div class="col-xs-2 col-md-2"><input type="checkbox">Ballpark</input></div>' +
-            '<div class="validation-buttons col-xs-offset-4 col-xs-2 col-md-offset-0 col-md-2"><button type="button" id="id_' + checkin.id + '_dbutton" class="btn dismissal-click">Dismiss</button></div>' + "\n" + 
-            '<div class="validation-buttons col-xs-2 col-md-2"><button type="button" id="id_' + checkin.id + '_vbutton" class="btn btn-primary validation-click" disabled>Validate</button></div>' + "\n" + 
+            '<div class="col-xs-2 col-md-2"><input id="id_' + checkin.id + '_trump" data-bonus-type="trump" class="bonus-checkbox" type="checkbox">Trump</input></div>' +
+            '<div class="col-xs-2 col-md-2"><input id="id_' + checkin.id + '_ballpark" data-bonus-type="ballpark" class="bonus-checkbox" type="checkbox">Ballpark</input></div>' +
+            '<div class="validation-buttons col-xs-4 col-md-offset-0 col-md-2"><button type="button" id="id_' + checkin.id + '_dbutton" class="btn dismissal-click">Dismiss</button></div>' + "\n" + 
+            '<div class="validation-buttons col-xs-4 col-md-2"><button type="button" id="id_' + checkin.id + '_vbutton" class="btn btn-primary validation-click" disabled>Validate</button></div>' + "\n" + 
             "</div>\n"
         );
         let select = $('#id_' + checkin.id + '_select');
@@ -63,8 +62,14 @@ var Validate = {
         */
     },
 
-    enableValidate: function(e) {
-        $(this).parents(".checkin-row").find(".validation-click").prop('disabled', false);
+    determineValidateState: function(e) {
+        console.log('Detemrmining Validate State for ' + this);
+        row = $(this).parents('.checkin-row');
+        console.log('Selection: ' + $(row).find('.beer-select option:selected').val());
+        let selected = $(row).find('.beer-select option:selected').val();
+        $(row).find('.validation-click').prop('disabled', 
+            !($(row).find('.beer-select option:selected').val() ||
+                $(row).find('.bonus-checkbox:checked').length > 0));
     },
 
     removeRow: function(uvId) {
@@ -73,10 +78,6 @@ var Validate = {
             row.slideUp('slow');
             return row.promise().then( function() { $(this).remove(); } );
         }
-    },
-
-    disableValidate: function(e) {
-        $(this).parents(".checkin-row").find(".validation-click").prop('disabled', true);
     },
 
     dismissalFunction: function(contest) {
@@ -94,9 +95,30 @@ var Validate = {
     validationFunction: function(contest) {
         let that = this;
         return function() {
-           let row = $(this).parents('.checkin-row'); 
-           let uvId = $(row).data('validationId');
-           console.log('Validating ' + uvId);
+            let row = $(this).parents('.checkin-row'); 
+            let uvId = $(row).data('validationId');
+            console.log('Validating ' + uvId);
+            let selected = $(row).find('.beer-select option:selected').val();
+            let checkboxes = $(row).find('.bonus-checkbox:checked');
+            let bonuses = null;
+            if (checkboxes.length > 0) {
+                bonuses = checkboxes.map(function(c) { return $(c).data('bonusType'); });
+            }
+            let promise = null;
+            if (selected) {
+                if (selected.startsWith('beer:')) {
+                    promise = contest.validateBeer(uvId, selected.substring(5), bonuses);
+                } else if (selected.startsWith('brewery:')) {
+                    promise = contest.validateBrewery(uvId, selected.substring(8), bonuses);
+                } else {
+                    return;
+                }
+            } else if (bonuses) {
+                promise = contest.validateBonuses(uvId, bonuses);
+            } else {
+                return;
+            }
+            return promise.then(that.removeRow(uvId));
         }
     },
     
@@ -116,10 +138,10 @@ var Validate = {
                       allowClear: true, 
                       data: contest.selectData, 
                     });
-                /* When a beer is selected, enable validation */
-                $(".beer-select").on("select2:select", this.enableValidate);
-                /* When a beer is unselected, disable validation */
-                $(".beer-select").on("select2:unselect", this.disableValidate);
+                /* When a beer or brewery is modified or a bonus is clicked, 
+                   check the state of the button */
+                $(".beer-select").on("change", that.determineValidateState);
+                $(".bonus-checkbox").change(that.determineValidateState);
                 /* When a validate button is clicked, submit the validation information */
                 $(".validation-click").click(that.validationFunction(contest));
                 /* When a dismissal is clicked, submit the dismissal information */
