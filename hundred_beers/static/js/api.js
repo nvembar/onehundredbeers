@@ -31,13 +31,13 @@ var Contests = {
                 });
             },
 
-            validateBeer: function(contestId, uvId, beerId, bonuses = null) {
+            validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 
                   'checkin': uvId, 
                   'as_beer': beerId,
               };
-              if (!bonuses) {
+              if (bonuses) {
                   content['bonuses'] = bonuses;
               }
               return $.ajax({
@@ -56,7 +56,7 @@ var Contests = {
                   'checkin': uvId, 
                   'as_brewery': breweryId,
               };
-              if (!bonuses) {
+              if (bonuses) {
                   content['bonuses'] = bonuses;
               }
               return $.ajax({
