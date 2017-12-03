@@ -557,9 +557,10 @@ img.column-icon {
 /* line 632, ../../../styles/sass/beers.scss */
 .checkin-row {
   padding: 3px;
+  border: thin solid;
 }
 
-/* line 648, ../../../styles/sass/beers.scss */
+/* line 649, ../../../styles/sass/beers.scss */
 .validation-buttons {
   float: right;
 }
