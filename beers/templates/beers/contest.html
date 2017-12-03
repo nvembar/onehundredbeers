@@ -34,7 +34,6 @@
       contest = Contests.init('{% url 'index' %}', {{ contest.id }});
       contest.selectData = selectData;
       Validate.displayCheckins(contest, 1);
-      console.log('Displayed checkins');
   });
   </script>
   {% endif %}
@@ -142,6 +141,10 @@
       <div role="tabpanel" class="tab-pane" id="validate">
         <div class="checkin-list">
           <p>Loading...</p>
+        </div>
+        <div class="checkin-pages">
+          <span class="step-links">
+          </span>
         </div>
       </div>
       {% endif %}
