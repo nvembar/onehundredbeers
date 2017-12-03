@@ -140,8 +140,7 @@ def validate_checkin(request, contest_id):
     if not data.get('preserve'):
         uv.delete()
     if request.META.get('HTTP_ACCEPT') == 'application/json':
-        return HttpResponse(json.dumps({'success': True,
-                                        'checkin_id': checkin.id}),
+        return HttpResponse(json.dumps({'success': True }),
                             content_type='application/json')
     return redirect('unvalidated-checkins', contest_id)
 
