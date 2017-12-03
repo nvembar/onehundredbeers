@@ -2,6 +2,44 @@
 {% load staticfiles %}
 {% block title %}{{ contest.name }}{% endblock %}
 
+{% block scripts %}
+  <link rel="stylesheet" href="{% static 'select2/dist/css/select2.min.css' %}"/>
+  <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
+  <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
+  {{ form.media }}
+  {% if is_creator %}
+  <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+  <script type="text/javascript">
+  $(function() {
+      console.log('Getting a new contest');
+      // TODO: will move this to an API call later
+      var selectData = [
+          {
+            text: 'Beers',
+            children: [
+              {% for b in contest_beers %}{ id: 'beer:{{ b.id }}', text: '{{ b.beer_name }}'},
+              {% endfor %}
+            ]
+          },
+          {
+            text: 'Breweries',
+            children: [
+              {% for b in contest_breweries %}{ id: 'brewery:{{ b.id }}', text: '{{ b.brewery_name }}'},
+              {% endfor %}
+            ]
+          }
+      ];
+      contest = Contests.init('{% url 'index' %}', {{ contest.id }});
+      contest.selectData = selectData;
+      Validate.displayCheckins(contest, 1);
+      console.log('Displayed checkins');
+  });
+  </script>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 	<div class="page-header">
 		<h1>{{ contest.name }} 
@@ -13,6 +51,9 @@
       <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
       <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers</a></li>
       <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab">Breweries</a></li>
+      {% if is_creator %}
+      <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab">Validate</a></li>
+      {% endif %}
     </ul>
 
     <!-- Tab panes -->
@@ -25,14 +66,14 @@
               <div class="col-md-2 col-md-push-5 col-xs-1">Points</div>
               <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">Last Checkin</div>
             </div>
-						{% for p in players %}
+            {% for p in players %}
             <div class="row leaderboard-row leaderboard-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %}">
               <div class="col-md-1 col-xs-1">{{ p.rank }}</div>
               <div class="col-md-4 col-xs-10">{{ p.user_name }}</div>
               <div class="col-md-2 col-md-push-5 col-xs-1">{{ p.total_points }}</div>
               <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">{{ p.last_checkin_beer }}</div>
             </div>
-						{% endfor %}
+            {% endfor %}
           </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="beers">
@@ -50,21 +91,21 @@
               <div class="col-xs-1">Points</div>
               {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
             </div>
-						{% for b in contest_beers %}
+			{% for b in contest_beers %}
             <div class="row beer-row beer-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}beer-checkedin{% endif %}">
               <div class="col-xs-4">{{ b.beer.name }}</div>
               <div class="col-xs-4">{{ b.beer.brewery }}</div>
               <div class="col-xs-1">{{ b.beer.brewery_state }}</div>
               <div class="col-xs-1">{{ b.point_value }}</div>
               {% if contest_player %}
-							<div class="col-xs-1">
-								{% if b.checked_into %}
-								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-								{% endif %}
-							</div>
-							{% endif %}
+              <div class="col-xs-1">
+                {% if b.checked_into %}
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                {% endif %}
+              </div>
+              {% endif %}
             </div>
-						{% endfor %}
+            {% endfor %}
           </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="breweries">
@@ -81,24 +122,32 @@
               <div class="col-xs-1">Points</div>
               {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
             </div>
-						{% for b in contest_breweries %}
+		    {% for b in contest_breweries %}
             <div class="row brewery-row brewery-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}brewery-checkedin{% endif %}">
               <div class="col-xs-4">{{ b.brewery.name }}</div>
               <div class="col-xs-1">{{ b.brewery.state }}</div>
               <div class="col-xs-1">{{ b.point_value }}</div>
               {% if contest_player %}
-							<div class="col-xs-1">
-								{% if b.checked_into %}
-								<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-								{% endif %}
-							</div>
-							{% endif %}
+              <div class="col-xs-1">
+                {% if b.checked_into %}
+				<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+				{% endif %}
+              </div>
+			  {% endif %}
             </div>
-						{% endfor %}
+		    {% endfor %}
           </div>
       </div>
+      {% if is_creator %}
+      <div role="tabpanel" class="tab-pane" id="validate">
+        <div class="checkin-list">
+          <p>Loading...</p>
+        </div>
+      </div>
+      {% endif %}
     </div>
 
   </div>
+
 
 {% endblock %}
