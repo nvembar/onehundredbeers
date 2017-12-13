@@ -16,7 +16,7 @@ deploy:
   provider: heroku
   app:
     staging: onehundredbeers-test
-    run:
-    - "python manage.py migrate"
+  run:
+  - "python manage.py migrate"
   api_key:
     secure: G3QBHsIaHXcUNLXt1rdrJodmIavzSFPrjalRb/qk87aIGIF4xtPLPPL7UsHSH060f8uyPQiqb2NxjQKby9oCfh5C93JKyB0HwU11/DJUW3lt/ujOOkhxwEZk5JUxbKrlT6PoZjfs6xh5Sk7MnaXeOrlaWVjjFhcyAx8S0B4mo+Th7B9TRDn9ff1gqvSPRdYMhY5AleSr5txhpgOzEM3r5U2QnoNeTUBeT+244cPq7mVev3F1jxKY9Uctd+gE8j2hlRajaHzCkHaG2z886FXXwJ+C+Tzy4C5Icbi7x7oQL/QDjIukayem5K57m+pcdRI+A8agMkLNQJtyDzmljf6wPgYrlx7zaFhJYog286LwhgJ9vYDrVNJkftFVlZLrdcS3Umoa3JooSZbz/Xc3RZAyDqf/W7j/xcpNjKKJ0xpGqvaCp+mVC+ZYXIAhCtmOi2+8/3aYZakoPuCn5Ma6NXkbOq7HuxyM+H6i0FAEgCLBmsmEMZu34Kf3U8rejWbL7UntsWQhFNQpPuhfWbgrQMogz0Po5ii46ujxeN8TuuB6Us1gkfaCTTMC878orsfpW5RQS3TTmYSssaFl627yIhp0KOm7lq63Em0KDU45TK/N75MiH3r9JlANLU38CczAS3w4TpPbqjP2gs29BqsTqcFRAoatMP5WftwbTpU8GdItsPM=
