@@ -1,14 +1,22 @@
 sudo: required
 language: python
 python:
-  - 3.6
+- 3.6
 services:
-  - docker
+- docker
 env:
   global:
   - SSL_REDIRECT=0
   - secure: aIt3vS/XxeW0Ymv+Sq1GxFB8SrvtXSAk/JidJ+95nRdNAsdIZNX403nG2Q9cG+hDF+o3zq2FA0RBoIhvOQrN1NrUdOaDbenc5KpNy67qz7hFwWMbwDTJf+0maJH2vbNRn7WYVaEIeU1gj7dx/hKTreNkCyRdw3AGcau0zrzFcTWD4L/4V4Oqwirv5xFlB8xbt6XNAXuVPKHiQJvUQw6l6k0X0WVXmSh0SMXdPgt9DtvfNZvSVNznrd2Fkzep0VpnjWZhYweLmjrqqQInmskXpJF0Hn5ngmn0lQlsfxEa+7TyK2psZsQfrwnj7MEq0kxqh417iY1bNRevBv3exiKzW6mWkUlIop10Nmq1bzLgpZnJQb3tq56KixCXfSaEQKwDlP2cm70UBaJXnIlY2crTBjlJ4KpGDmGf5IDOiMNUcn6sAgK1JQLGJEcfhXRjGh5tcyHFR/Ft1bezmfbR6yenmOkxMZsrzDyuJdgB7dLwbqfgNeWnhU+D3OeDseqkwHqiCnELomqm4kesPck6LKQpGPJnyIKlO5HF4BKVhD6fUn/7OvfLEL5sYzT1JD8PLqeMvxiCRpbUlILHSJt5WDNpglb8IULg8bI0Me1lOe1krt7KWAMoY5Bc5cTYJIPaqoap1FT8qagbKNeAEnsq+ITI24YzqJA/oK5cXKiT4oGvA48=
-before_script: 
-  - docker-compose build --force-rm web
-script: 
-  - docker-compose -f docker-compose.yml run web sh ./run-tests.sh
+before_script:
+- docker-compose build --force-rm web
+script:
+- docker-compose -f docker-compose.yml run web sh ./run-tests.sh
+deploy:
+  provider: heroku
+  app:
+    staging: onehundredbeers-test
+    run:
+    - "python manage.py migrate"
+  api_key:
+    secure: G3QBHsIaHXcUNLXt1rdrJodmIavzSFPrjalRb/qk87aIGIF4xtPLPPL7UsHSH060f8uyPQiqb2NxjQKby9oCfh5C93JKyB0HwU11/DJUW3lt/ujOOkhxwEZk5JUxbKrlT6PoZjfs6xh5Sk7MnaXeOrlaWVjjFhcyAx8S0B4mo+Th7B9TRDn9ff1gqvSPRdYMhY5AleSr5txhpgOzEM3r5U2QnoNeTUBeT+244cPq7mVev3F1jxKY9Uctd+gE8j2hlRajaHzCkHaG2z886FXXwJ+C+Tzy4C5Icbi7x7oQL/QDjIukayem5K57m+pcdRI+A8agMkLNQJtyDzmljf6wPgYrlx7zaFhJYog286LwhgJ9vYDrVNJkftFVlZLrdcS3Umoa3JooSZbz/Xc3RZAyDqf/W7j/xcpNjKKJ0xpGqvaCp+mVC+ZYXIAhCtmOi2+8/3aYZakoPuCn5Ma6NXkbOq7HuxyM+H6i0FAEgCLBmsmEMZu34Kf3U8rejWbL7UntsWQhFNQpPuhfWbgrQMogz0Po5ii46ujxeN8TuuB6Us1gkfaCTTMC878orsfpW5RQS3TTmYSssaFl627yIhp0KOm7lq63Em0KDU45TK/N75MiH3r9JlANLU38CczAS3w4TpPbqjP2gs29BqsTqcFRAoatMP5WftwbTpU8GdItsPM=
