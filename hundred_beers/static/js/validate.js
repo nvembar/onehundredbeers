@@ -174,18 +174,29 @@ var Validate = {
                     let html = '';
                     if (data.page_index > 1) {
                         html = html + 
-                            '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
-                            (data.page_index - 1) + 
-                            ')">previous</a>' + "\n";
+                            '<a href="#" onclick="Validate.displayCheckins(contest, ' +
+                            '1)">first</a>' + "\n";
+                        if (data.page_index > 2) {
+                            html = html + 
+                                '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
+                                (data.page_index - 1) + 
+                                ')">previous</a>' + "\n";
+                        }
                     }
                     html = html + '<span id="page-description" closs="current">' +
                            'Page ' + data.page_index + ' of ' + data.page_count +
                            "</span>\n";
                     if (data.page_index < data.page_count) {
+                        if (data.page_index < data.page_count - 1) {
+                            html = html + 
+                                '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
+                                (data.page_index + 1) + 
+                                ')">next</a>' + "\n";
+                        }
                         html = html + 
-                            '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
-                            (data.page_index + 1) + 
-                            ')">next</a>' + "\n";
+                            '<a href="#" onclick="Validate.displayCheckins(contest, ' +
+                            (data.page_count) +
+                            ')">last</a>' + "\n";
                     }
                     return html;
                 });
