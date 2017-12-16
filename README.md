@@ -1,7 +1,7 @@
 
 ## One Hundred Beers
 
-[![Travis badge](https://travis-ci.org/nvembar/onehundredbeers.svg?branch=master)][travis-ci.org]
+[![Travis badge](https://travis-ci.org/nvembar/onehundredbeers.svg?branch=master)](travis-ci.org)
 
 ### Build instructions
 
