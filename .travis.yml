@@ -16,6 +16,7 @@ deploy:
   provider: heroku
   app:
     staging: onehundredbeers-test
+    master: onehundredbeers
   run:
   - "python manage.py migrate"
   api_key:
