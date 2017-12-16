@@ -121,8 +121,6 @@ class BeersViewsTestCase(TestCase):
         self.assertEqual(response.context['contest'].id, 1)
         self.assertEqual(response.context['contest_player'].id, player.id)
         self.assertTrue(response.context['is_creator'])
-        vlink = reverse('unvalidated-checkins', kwargs={'contest_id': 1})
-        self.assertIn(vlink, response.content.decode('utf-8'))
 
     def test_view_beers_unauthenticated(self):
         """

@@ -1,3 +1,8 @@
+
+## One Hundred Beers
+
+[![Travis badge](https://travis-ci.org/nvembar/onehundredbeers.svg?branch=master)](travis-ci.org)
+
 ### Build instructions
 
 This uses Python 3.6, so make sure that's installed. To set up your own virtual environment, follow the directions below.

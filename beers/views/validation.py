@@ -54,19 +54,30 @@ def validate_checkin(request, contest_id):
     Adds a checkin to a brewery via a POST (as it should do)
 
     POST expects a brewery to come in the form:
-        { 'as_brewery': id, 'checkin': id, 'preserve': true/false }
+        { 'as_brewery': id, 
+          'checkin': id, 
+          'bonuses': [ <list of bonuses> ],
+          'preserve': true/false }
 
     as_brewery: The contest brewery ID
     checkin: Unvalidated checkin ID
+    bonuses: Optional tag with a list of bonus tags this checkin gets
     preserve: Whether to save the unvalidated checkin or not
 
 
     POST expects beer to come in the form:
-        { 'as_beer': id, 'checkin': id, 'preserve': true/false }
+        { 'as_beer': id, 
+          'checkin': id, 
+          'bonuses': [ <list of bonuses> ],
+          'preserve': true/false }
 
     as_beer: The contest beer ID
     checkin: Unvalidated checkin ID
+    bonuses: Optional tag with a list of bonus tags this checkin gets
     preserve: Whether to save the unvalidated checkin or not
+
+    Additionally, if this is just a bonus checkin, both 'as_beer' and 'as_brewery'
+    can be omitted.
 
     """
     values = None
@@ -119,11 +130,17 @@ def validate_checkin(request, contest_id):
             return HttpResponseBadRequest(
                 'Beer is not associated with contest')
         checkin = contest_player.drink_beer(contest_beer, uv)
+    if 'bonuses' in data:
+        # for the moment, prefer the checkin for beers or breweries over
+        # bonus checkins. Will need to fix this so it returns all relevant checkins
+        for bonus in data['bonuses']:
+            bonus_checkin = contest_player.drink_bonus(bonus, checkin=uv)
+        if checkin is None:
+            checkin = bonus_checkin
     if not data.get('preserve'):
         uv.delete()
     if request.META.get('HTTP_ACCEPT') == 'application/json':
-        return HttpResponse(json.dumps({'success': True,
-                                        'checkin_id': checkin.id}),
+        return HttpResponse(json.dumps({'success': True }),
                             content_type='application/json')
     return redirect('unvalidated-checkins', contest_id)
 

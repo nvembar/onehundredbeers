@@ -105,6 +105,62 @@ class ContestTestCase(TestCase):
             untappd_title='Unvalidated Checkin 2').count(), 0)
         self.assertEqual(response.status_code, 200)
 
+    def test_successful_modify_checkin_bonus_with_beer(self):
+        """Tests that the API call to modify a checkin works for a beer with a bonus"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
+        response = c.post(reverse('validate-checkin',
+                                  kwargs={'contest_id': 1}),
+                          content_type='application/json',
+                          data=json.dumps({'as_beer': 1,
+                                           'bonuses': [ 'pun' ],
+                                           'checkin': uv.id,
+                                           'preserve': False}),
+                          HTTP_ACCEPT='application/json')
+        q = Contest_Checkin.objects.filter(contest_player__id=1)
+        self.assertEqual(q.count(), 2)
+        self.assertEqual(q.filter(tx_type='BO').count(), 1)
+        self.assertEqual(q.filter(tx_type='BE').count(), 1)
+        checkin = q.filter(tx_type='BE').get()
+        self.assertEqual(checkin.checkin_points, 1)
+        self.assertEqual(checkin.untappd_checkin, uv.untappd_checkin)
+        self.assertEqual(checkin.contest_player.beer_count, 1)
+        self.assertEqual(checkin.contest_player.beer_points, 1)
+        self.assertEqual(checkin.contest_player.bonus_points, 1)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(response.status_code, 200)
+
+    def test_successful_modify_checkin_bonus(self):
+        """
+        Tests that the API call to modify a checkin works for bonus with no beer
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        uv = Unvalidated_Checkin.objects.get(
+            untappd_title='Unvalidated Checkin 2')
+        response = c.post(reverse('validate-checkin',
+                                  kwargs={'contest_id': 1}),
+                          content_type='application/json',
+                          data=json.dumps({'bonuses': [ 'pun' ],
+                                           'checkin': uv.id,
+                                           'preserve': False}),
+                          HTTP_ACCEPT='application/json')
+        q = Contest_Checkin.objects.filter(contest_player__id=1)
+        self.assertEqual(q.count(), 1)
+        checkin = q.get()
+        self.assertEqual(checkin.checkin_points, 1)
+        self.assertEqual(checkin.tx_type, 'BO')
+        self.assertEqual(checkin.untappd_checkin, uv.untappd_checkin)
+        self.assertEqual(checkin.contest_player.beer_count, 0)
+        self.assertEqual(checkin.contest_player.beer_points, 0)
+        self.assertEqual(checkin.contest_player.bonus_points, 1)
+        self.assertEqual(Unvalidated_Checkin.objects.filter(
+            untappd_title='Unvalidated Checkin 2').count(), 0)
+        self.assertEqual(response.status_code, 200)
+
     def test_dismiss_unvalidated_checkin(self):
         """Tests whether a delete of a checkin works"""
         c = Client()
@@ -189,7 +245,7 @@ class ContestTestCase(TestCase):
         self.assertEqual(checkins['page_count'], 1)
         self.assertEqual(len(checkins['checkins']), 0)
 
-    def __test_beer_and_brewery_calculations(self, cp, beers, breweries):
+    def __test_beer_and_brewery_calculations(self, cp, beers, breweries, bonuses=[]):
         """
         Helper function to iterate through a set of beers for a user to
         drink. It checks the point values for the passed in player and any
@@ -197,6 +253,7 @@ class ContestTestCase(TestCase):
         """
         beer_points = cp.beer_points
         brewery_points = cp.brewery_points
+        bonus_points = cp.bonus_points
         challengers = {
             cp.id: {
                 'gain': cp.challenge_point_gain,
@@ -217,7 +274,7 @@ class ContestTestCase(TestCase):
             cp.drink_beer(
                 beer,
                 data={
-                    'untapped_checkin': 'https://untappd.com/checkin/beer',
+                    'untappd_checkin': 'https://untappd.com/checkin/beer',
                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
                 })
             if not had_prior:
@@ -241,11 +298,20 @@ class ContestTestCase(TestCase):
             cp.drink_at_brewery(
                 brewery,
                 data={
-                    'untapped_checkin': 'https://untappd.com/checkin/brewery',
+                    'untappd_checkin': 'https://untappd.com/checkin/brewery',
                     'checkin_time': timezone.make_aware(datetime.datetime.now()),
                 })
             if not had_prior:
                 brewery_points = brewery_points + brewery.point_value
+        for bonus in bonuses:
+            # No limit on how many times you can accumlate bonus points
+            cp.drink_bonus(
+                bonus,
+                data={
+                    'untappd_checkin': 'https://untappd.com/checkin/bonus',
+                    'checkin_time': timezone.make_aware(datetime.datetime.now()),
+                })
+            bonus_points = bonus_points + 1
         # Test all of these and then run compute_points and rerun the tests
         # compute_points should not change the values`
         self.assertEqual(
@@ -264,9 +330,14 @@ class ContestTestCase(TestCase):
             challengers[cp.id]['loss'],
             msg='Cumulative challenge point loss for {}'.format(cp))
         self.assertEqual(
+            cp.bonus_points,
+            bonus_points,
+            msg='Cumulative bonus points for {}'.format(cp))
+        self.assertEqual(
             cp.total_points,
             (beer_points
              + brewery_points
+             + bonus_points
              + challengers[cp.id]['gain']
              - challengers[cp.id]['loss']),
             msg='Cumulative sum of total points for {}'.format(cp))
@@ -301,9 +372,14 @@ class ContestTestCase(TestCase):
             challengers[cp.id]['loss'],
             msg='Computed challenge point loss for {}'.format(cp))
         self.assertEqual(
+            cp.bonus_points,
+            bonus_points,
+            msg='Computed bonus points for {}'.format(cp))
+        self.assertEqual(
             cp.total_points,
             (beer_points
              + brewery_points
+             + bonus_points
              + challengers[cp.id]['gain']
              - challengers[cp.id]['loss']),
             msg='Computed sum of total points for {}'.format(cp))
@@ -408,6 +484,35 @@ class ContestTestCase(TestCase):
         player = Contest_Player.objects.get(id=2)
         self.__test_beer_and_brewery_calculations(player, [challenge], [])
         self.__test_beer_and_brewery_calculations(challenge.challenger, [challenge], [])
+
+    def test_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun'])
+
+    def test_multiple_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun', 'ballgame'])
+
+    def test_same_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [], [], ['pun', 'pun'])
+
+    def test_beer_and_bonus_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        beer = Contest_Beer.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, [beer], [], ['pun'])
 
     def test_unvalidated_beer_list(self):
         """

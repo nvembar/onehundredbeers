@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^contests/(?P<contest_id>[0-9]+)/validate$',
         validation.unvalidated_checkins,
         name='unvalidated-checkins'),
-    url(r'^contests/(?P<contest_id>[0-9]+)/validate_api$',
+    url(r'^contests/(?P<contest_id>[0-9]+)/unvalidated_checkins$',
         validation.unvalidated_checkins_json,
         name='unvalidated-checkins-json'),
     url(r'^contests/(?P<contest_id>[0-9]+)/unvalidated_checkins/(?P<uv_checkin>[0-9]+)$',
