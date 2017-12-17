@@ -582,3 +582,25 @@ class Contest_Checkin(models.Model):
     untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
 
     objects = Contest_CheckinManager()
+
+    def description(self):
+        """Returns a string that describes what got or lost the user points"""
+        if self.tx_type == 'BE':
+            return "Drank {} by {}".format(self.contest_beer.beer.name, 
+                                           self.contest_beer.beer.brewery)
+        elif self.tx_type == 'BR':
+            return "Drank at {}".format(self.contest_brewery.brewery.name)
+        elif self.tx_type == 'CO':
+            return "Drank {}'s challenge - {} by {}".format(
+                self.contest_beer.challenger.user_name,
+                self.contest_beer.beer.name,
+                self.contest_beer.beer.brewery)
+        elif self.tx_type == 'CS':
+            return "Drank own challenge beer - {} by {}".format(
+                self.contest_beer.beer.name,
+                self.contest_beer.beer.brewery)
+        elif self.tx_type == 'CL':
+            return "Lost points to competitor drinking challenge beer"
+        elif self.tx_type == 'BO':
+            return "Got bonus '{}' points".format(self.bonus_type)
+
