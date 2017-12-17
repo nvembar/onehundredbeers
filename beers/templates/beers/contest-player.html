@@ -2,52 +2,47 @@
 {% load staticfiles %}
 
 {% block content %}
+  <div class="page-header">
+    <h1>{{ player.player.user.first_name }} {{ player.player.user.last_name}}
+        - {{ player.player.user.username }}
+        {% if player.player.personal_statement %}
+        <small>
+            {{ player.player.personal_statement }}
+        </small>
+        {% endif %}
+    </h1>
+  </div>
 
-		<h1>{{ player.player.user.first_name }} {{ player.player.user.last_name}}
-			- {{ player.player.user.username }}</h1>
-
-		{% if player.player.personal_statement %}
-		<p id="pstmt">
-			{{ player.player.personal_statement }}
-		</p>
-		{% endif %}
-
-		<div class="player-beers">
-			<table>
-				<tr>
-					<th>
-						Beer
-					</th>
-					<th>
-						Brewery
-					</th>
-					<th>
-						Last Checkin Date
-					</th>
-				</tr>
-				{% for c in checkins %}
-				<tr>
-					<td>
-						{{ c.contest_beer.beer.name }}
-					</td>
-					<td>
-						{{ c.contest_beer.beer.brewery }}
-					</td>
-					<td>
-						{{ c.checkin_time|date:'SHORT_DATETIME_FORMAT' }}
-					</td>
-				</tr>
-				{% empty %}
-					<td>
-						-
-					</td>
-					<td>
-						-
-					</td>
-					<td>
-						-
-					</td>
-				{% endfor %}
-			</table>
-		</div>
+  <div class="container">
+    <table class="table table-striped">
+        <tr>
+            <th>Event</th>
+            <th>Points</th>
+            <th>Last Checkin Date</th>
+        </tr>
+        {% for c in checkins %}
+        <tr>
+            <td>
+                <a href="{{c.untappd_checkin}}">{{ c.description }}</a>
+            </td>
+            <td>
+                {{ c.checkin_points }}
+            </td>
+            <td>
+                {{ c.checkin_time|date:'SHORT_DATETIME_FORMAT' }}
+            </td>
+        </tr>
+        {% empty %}
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+            <td>
+                -
+            </td>
+        {% endfor %}
+    </table>
+   </div>
 {% endblock %}
