@@ -45,7 +45,7 @@ var Validate = {
         if ('possible_id'  in checkin) {
             $('#id_' + checkin.id + '_vbutton').prop('disabled', false);
             select.append(
-                '<option value="' + checkin.possible_id + '">' + 
+                '<option value="beer:' + checkin.possible_id + '">' + 
                 checkin.possible_name + 
                 '</option>'
             );
@@ -107,8 +107,8 @@ var Validate = {
         return function() {
             let row = $(this).parents('.checkin-row'); 
             let uvId = $(row).data('validationId');
-            console.log('Validating ' + uvId);
             let selected = $(row).find('.beer-select option:selected').val();
+            console.log('Validating ' + uvId + ' as ' + selected);
             let checkboxes = $(row).find('.bonus-checkbox:checked');
             let bonuses = null;
             if (checkboxes.length > 0) {
