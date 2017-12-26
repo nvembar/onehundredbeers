@@ -56,7 +56,7 @@ urlpatterns = [
         name='contest-challenges'),
     url(r'^contests/(?P<contest_id>[0-9]+)/bonuses/$',
         contest.contest_bonuses,
-        name='contest-bonus'),
+        name='contest-bonuses'),
     url(r'^contests/(?P<contest_id>[0-9]+)/bonuses/(?P<bonus_tag>[A-Za-z0-9]+)$',
         contest.contest_bonus,
         name='contest-bonus'),
