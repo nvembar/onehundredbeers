@@ -171,6 +171,20 @@ def contest_player(request, contest_id, username):
     return render(request, 'beers/contest-player.html', context)
 
 
+def contest_beers(request, contest_id):
+    """
+    Gets the list of a beers for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new beer to a contest.
+
+    URL: /contests/:id/beers/
+
+    GET: Gets the list of beers in a contest.
+
+    POST: Adds a new beer to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Beers not yet implemented')
+
+
 def contest_beer(request, contest_id, beer_id):
     """
     Gets the details of a beer for a contest, including its name, Untappd URL
@@ -188,6 +202,21 @@ def contest_beer(request, contest_id, beer_id):
     return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
 
 
+def contest_breweries(request, contest_id):
+    """
+    Gets the list of a breweries for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new brewery to a 
+    contest.
+
+    URL: /contests/:id/breweries/
+
+    GET: Gets the list of breweries in a contest.
+
+    POST: Adds a new brewery to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Beers not yet implemented')
+
+
 def contest_brewery(request, contest_id, brewery_id):
     """
     Gets the details of a brewery for a contest, including its name, Untappd URL
@@ -202,8 +231,23 @@ def contest_brewery(request, contest_id, brewery_id):
 
     DELETE: Removes the brewery from a contest if the contest is not active
     """
-    return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+    return HttpNotImplementedResponse('Contest-Brewery Detail not yet implemented')
     
+
+def contest_challenges(request, contest_id):
+    """
+    Gets the list of a challenges for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new challenge to a 
+    contest.
+
+    URL: /contests/:id/challenges/
+
+    GET: Gets the list of challenges in a contest.
+
+    POST: Adds a new challenge to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Challenges not yet implemented')
+
 
 def contest_challenge(request, contest_id, beer_id):
     """
@@ -220,6 +264,37 @@ def contest_challenge(request, contest_id, beer_id):
     DELETE: Removes the challenge from a contest if the contest is not active
     """
     return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+
+
+def contest_bonuses(request, contest_id):
+    """
+    Gets the list of a bonuses tags for a contest including the the players who 
+    got them, or allows for the addition of a new bonus to a contest.
+
+    URL: /contests/:id/bonuses/
+
+    GET: Gets the list of bonuses in a contest.
+
+    POST: Adds a new bonus to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Bonuses not yet implemented')
+
+
+def contest_bonus(request, contest_id, bonus):
+    """
+    Gets the details of a bonus for a contest, including its tag, 
+    and the players who got it, or allows for the editing of a bonus in a 
+    contest, including deletion.
+
+    URL: /contests/:id/bonus/:bonus_tag
+
+    GET: Gets the details in HTML or JSON form
+
+    PUT: Edits the details of the bonus
+
+    DELETE: Removes the bonus from a contest if the contest is not active
+    """
+    return HttpNotImplementedResponse('Contest-Bonus not yet implemented')
 
 
 @login_required
