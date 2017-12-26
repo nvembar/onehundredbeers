@@ -68,7 +68,7 @@
             <div class="row leaderboard-row leaderboard-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %}">
               <div class="col-md-1 col-xs-1">{{ p.rank }}</div>
               <div class="col-md-4 col-xs-10">
-                <a href="{% url 'player-detail' contest.id p.user_name %}">{{ p.user_name }}</a>
+                <a href="{% url 'contest-player' contest.id p.user_name %}">{{ p.user_name }}</a>
               </div>
               <div class="col-md-2 col-md-push-5 col-xs-1">{{ p.total_points }}</div>
               <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">{{ p.last_checkin_beer }}</div>
