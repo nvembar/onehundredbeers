@@ -26,7 +26,7 @@ class ContestEditingTestCase(TestCase):
 
 
     def tearDown(self):
-        Contest.objects.delete()
+        Contest.objects.all().delete()
 
 
     def test_successful_add_contest(self):
@@ -125,6 +125,8 @@ class ContestEditingTestCase(TestCase):
         """
         Tests whether a new beer can be added to a contest.
         """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
         response = c.post(reverse('contest-beers', 
                                   kwargs={'contest_id': 1}),
                           content_type='application/json',
@@ -134,9 +136,6 @@ class ContestEditingTestCase(TestCase):
                                            'value': 1}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
-
-
-        pass
 
 
     def test_not_contest_runner_add_beer(self):
