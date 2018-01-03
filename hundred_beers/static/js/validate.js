@@ -63,7 +63,6 @@ var Validate = {
     },
 
     determineValidateState: function(e) {
-        console.log('Detemrmining Validate State for ' + this);
         row = $(this).parents('.checkin-row');
         console.log('Selection: ' + $(row).find('.beer-select option:selected').val());
         let selected = $(row).find('.beer-select option:selected').val();
@@ -108,11 +107,13 @@ var Validate = {
             let row = $(this).parents('.checkin-row'); 
             let uvId = $(row).data('validationId');
             let selected = $(row).find('.beer-select option:selected').val();
-            console.log('Validating ' + uvId + ' as ' + selected);
             let checkboxes = $(row).find('.bonus-checkbox:checked');
             let bonuses = null;
             if (checkboxes.length > 0) {
-                bonuses = checkboxes.map(function(c) { return $(c).data('bonusType'); });
+                bonuses = $(checkboxes).map(
+                    function() { 
+                        return $(this).data('bonusType'); 
+                    }).get();
             }
             let promise = null;
             if (selected) {
@@ -217,5 +218,4 @@ $(function() {
             }
         }
     });
-    console.log('Finished validate.js');
 });
