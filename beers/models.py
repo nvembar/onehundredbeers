@@ -59,6 +59,7 @@ class Beer(models.Model):
     brewery_lat = models.FloatField(null=True, blank=True)
     brewery_lon = models.FloatField(null=True, blank=True)
     untappd_id = models.CharField(max_length=25, null=True, blank=True)
+    untappd_url = models.URLField(null=True, blank=True)
     last_updated = models.DateTimeField()
 
     objects = BeerManager()
