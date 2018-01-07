@@ -1,13 +1,15 @@
+import logging
 from beers import models
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, Group
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics, permissions
+from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
-                                  ContestPlayerSerializer
+                                  ContestBeerSerializer, ContestPlayerSerializer
 
+logger = logging.getLogger(__name__)
 
 class PlayerList(generics.ListAPIView):
     """
@@ -84,3 +86,37 @@ class ContestPlayerDetail(generics.RetrieveAPIView):
                                            player__id=player_id,)
         return contest_player
         
+class ContestBeerList(generics.ListCreateAPIView):
+    queryset = models.Contest_Beer.objects.all()
+    serializer_class = ContestBeerSerializer
+
+    def perform_create(self, serializer):
+        contest_id = self.kwargs['contest_id']
+        contest = models.Contest.objects.get(id=contest_id)
+        beer_name = self.request.data['name']
+        brewery_name = self.request.data['brewery']
+        beer_filter = models.Beer.objects.filter(name=beer_name, brewery=brewery_name)
+        if beer_filter.exists():
+            beer = beer_filter.get()
+            if models.Contest_Beer.objects.filter(beer=beer, contest=contest).exists():
+                raise serializers.ValidationError(
+                        {'non_field_errors': ['Duplicate beer/contest pairing']})
+        serializer.save(contest=contest)
+
+    def get_queryset(self):
+        contest_id = self.kwargs['contest_id']
+        return models.Contest_Beer.objects.select_related('beer', 
+                'challenger').filter(contest__id=contest_id).order_by('beer_name')
+
+class ContestBeerDetail(generics.RetrieveAPIView):
+    queryset = models.Contest_Beer.objects.all()
+    serializer_class = ContestBeerSerializer
+
+    def get_object(self):
+        contest_id = self.kwargs['contest_id']
+        contest_beer_id = self.kwargs['contest_beer_id']
+        contest_beer = get_object_or_404(models.Contest_Beer, 
+                                         contest__id = contest_id,
+                                         id = contest_beer_id,)
+        return contest_beer
+
