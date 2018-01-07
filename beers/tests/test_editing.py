@@ -5,6 +5,7 @@ import json
 from django.test import TestCase, override_settings, Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from rest_framework import status
 from beers.models import Beer, Brewery, Contest, Contest_Player, \
                          Unvalidated_Checkin, Contest_Checkin, Contest_Beer, \
                          Contest_Brewery, Player
@@ -36,13 +37,15 @@ class ContestEditingTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.post(reverse('contests'),
+        start_date = timezone.make_aware(datetime.datetime(2018, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2018, 12, 31))
+        response = c.post(reverse('contest-list'),
                           content_type='application/json',
                           data=json.dumps({'name': 'Contest 1',
-                                           'start_date': '2018-01-01',
-                                           'end_date': '2018-12-31'}),
+                                           'start_date': start_date.isoformat(),
+                                           'end_date': end_date.isoformat()}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         contest = Contest.objects.get(name='Contest 1')
         self.assertIsNotNone(contest)
         self.assertEqual(contest.creator.user.username, 'runner1')
@@ -61,13 +64,15 @@ class ContestEditingTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='user1', password='password1%'))
-        response = c.post(reverse('contests'),
+        start_date = timezone.make_aware(datetime.datetime(2018, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2018, 12, 31))
+        response = c.post(reverse('contest-list'),
                           content_type='application/json',
                           data=json.dumps({'name': 'Contest 1',
-                                           'start_date': '2018-01-01',
-                                           'end_date': '2018-12-31'}),
+                                           'start_date': start_date.isoformat(),
+                                           'end_date': end_date.isoformat()}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Contest.objects.filter(name='Contest 1').count(), 0)
 
 
@@ -77,13 +82,15 @@ class ContestEditingTestCase(TestCase):
         added if a user is not logged in
         """
         c = Client()
-        response = c.post(reverse('contests'),
+        start_date = timezone.make_aware(datetime.datetime(2018, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2018, 12, 31))
+        response = c.post(reverse('contest-list'),
                           content_type='application/json',
                           data=json.dumps({'name': 'Contest 1',
-                                           'start_date': '2018-01-01',
-                                           'end_date': '2018-12-31'}),
+                                           'start_date': start_date.isoformat(),
+                                           'end_date': end_date.isoformat()}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Contest.objects.filter(name='Contest 1').count(), 0)
 
 
@@ -94,15 +101,17 @@ class ContestEditingTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.post(reverse('contests'),
+        start_date = timezone.make_aware(datetime.datetime(2019, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2018, 12, 31))
+        response = c.post(reverse('contest-list'),
                           content_type='application/json',
                           data=json.dumps({'name': 'Contest 1',
-                                           'start_date': '2019-01-01',
-                                           'end_date': '2018-12-31'}),
+                                           'start_date': start_date.isoformat(),
+                                           'end_date': end_date.isoformat()}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Contests.objects.filter(name='Contest 1').count(), 0)
-        self.assertIsNotNone(response.json()['errors']['start_date'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Contest.objects.filter(name='Contest 1').count(), 0)
+        self.assertIsNotNone(response.json()['non_field_errors'])
 
 
     def test_nonunique_contest_name_add_contest(self):
@@ -112,15 +121,17 @@ class ContestEditingTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.post(reverse('contests'),
+        start_date = timezone.make_aware(datetime.datetime(2018, 1, 1))
+        end_date = timezone.make_aware(datetime.datetime(2018, 12, 31))
+        response = c.post(reverse('contest-list'),
                           content_type='application/json',
                           data=json.dumps({'name': 'Contest Base',
-                                           'start_date': '2019-01-01',
-                                           'end_date': '2019-12-31'}),
+                                           'start_date': start_date.isoformat(),
+                                           'end_date': end_date.isoformat()}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Contest.objects.filter(name='Contest Base').count(), 1)
-        self.assertTrue('name' in response.json()['errors'])
+        self.assertTrue('name' in response.json())
 
 
     def test_successful_add_beer(self):
@@ -130,7 +141,7 @@ class ContestEditingTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
         contest = Contest.objects.get(name='Contest Base')
-        response = c.post(reverse('contest-beers', 
+        response = c.post(reverse('contest-beer-list', 
                                   kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'Beer 1',
@@ -158,7 +169,7 @@ class ContestEditingTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='user1', password='password1%'))
         contest = Contest.objects.get(name='Contest Base')
-        response = c.post(reverse('contest-beers', 
+        response = c.post(reverse('contest-beer-list', 
                                   kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'Beer 1',
@@ -181,7 +192,7 @@ class ContestEditingTestCase(TestCase):
         contest = Contest.objects.get(name='Contest Base')
         contest.active = True
         contest.save()
-        response = c.post(reverse('contest-beers', 
+        response = c.post(reverse('contest-beer-list', 
                                   kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'Beer 1',
@@ -202,7 +213,7 @@ class ContestEditingTestCase(TestCase):
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
         contest = Contest.objects.get(name='Contest Base')
-        response = c.post(reverse('contest-beers', 
+        response = c.post(reverse('contest-beer-list', 
                                   kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'Beer 1',
