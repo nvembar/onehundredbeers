@@ -67,7 +67,7 @@ class ContestEditingTestCase(TestCase):
                                            'start_date': '2018-01-01',
                                            'end_date': '2018-12-31'}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(Contest.objects.filter(name='Contest 1').count(), 0)
 
 
@@ -102,6 +102,7 @@ class ContestEditingTestCase(TestCase):
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Contests.objects.filter(name='Contest 1').count(), 0)
+        self.assertIsNotNone(response.json()['errors']['start_date'])
 
 
     def test_nonunique_contest_name_add_contest(self):
@@ -117,8 +118,9 @@ class ContestEditingTestCase(TestCase):
                                            'start_date': '2019-01-01',
                                            'end_date': '2019-12-31'}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(Contest.objects.filter(name='Contest Base').count(), 1)
+        self.assertTrue('name' in response.json()['errors'])
 
 
     def test_successful_add_beer(self):
@@ -127,22 +129,46 @@ class ContestEditingTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
         response = c.post(reverse('contest-beers', 
-                                  kwargs={'contest_id': 1}),
+                                  kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
-                                           'value': 1}),
+                                           'value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 200)
+        beer_filter = Beer.objects.filter(name='Beer 1')
+        self.assertEqual(beer_filter.count(), 1)
+        beer = beer_filter.get()
+        self.assertEqual(beer.brewery, 'Brewery 1')
+        cbeer_filter = Contest_Beer.objects.filter(beer=beer)
+        self.assertEqual(cbeer_filter.count(), 1)
+        contest_beer = cbeer_filter.get()
+        self.assertEqual(contest_beer.contest.id, contest.id)
+        self.assertEqual(contest_beer.point_value, 2)
+        self.assertEqual(response.json()['id'], contest_beer.id)
 
 
     def test_not_contest_runner_add_beer(self):
         """
         Tests whether a non-contest runner is prevented from adding a beer.
         """
-        pass
+        c = Client()
+        self.assertTrue(c.login(username='user1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
+        response = c.post(reverse('contest-beers', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'value': 2}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Beer.objects.filter(name='Beer 1').count(), 0)
+        self.assertEqual(Contest_Beer.filter(contest=contest).count(), 0)
 
 
     def test_active_add_beer(self):
@@ -150,7 +176,22 @@ class ContestEditingTestCase(TestCase):
         Tests whether a contest runner is prevented from adding a beer to an
         active contest.
         """
-        pass
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
+        contest.active = True
+        contest.save()
+        response = c.post(reverse('contest-beers', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'value': 2}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Beer.objects.filter('Beer 1').count(), 0)
+        self.assertTrue('general' in response.json()['errors'])
 
 
     def test_nonunique_add_beer(self):
@@ -158,7 +199,38 @@ class ContestEditingTestCase(TestCase):
         Tests whether a beer fails to be added to a contest based on non-unique
         Untappd URLs
         """
-        pass
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
+        response = c.post(reverse('contest-beers', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'value': 2}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 200)
+        beer_filter = Beer.objects.filter(name='Beer 1')
+        self.assertEqual(beer_filter.count(), 1)
+        beer = beer_filter.get()
+        self.assertEqual(beer.brewery, 'Brewery 1')
+        cbeer_filter = Contest_Beer.objects.filter(beer=beer)
+        self.assertEqual(cbeer_filter.count(), 1)
+        contest_beer = cbeer_filter.get()
+        self.assertEqual(contest_beer.contest.id, contest.id)
+        self.assertEqual(contest_beer.point_value, 2)
+        self.assertEqual(response.json()['id'], contest_beer.id)
+        response = c.post(reverse('contest-beers', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'value': 2}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('general' in response.json()['errors'])
 
 
     def test_successful_add_brewery(self):
