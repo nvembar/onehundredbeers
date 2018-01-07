@@ -75,7 +75,7 @@ class ContestManager(models.Manager):
         update date, beer count, and user count"""
         contest = self.create(name=name, creator=creator,
                               start_date=start_date, end_date=end_date,
-                              active=True, created_on=timezone.now(),
+                              active=False, created_on=timezone.now(),
                               last_updated=timezone.now(),
                               user_count=0, beer_count=0)
         return contest
@@ -85,7 +85,7 @@ class ContestManager(models.Manager):
 class Contest(models.Model):
     "Represents a contest"
 
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, unique=True)
     creator = models.ForeignKey(Player, default=1)
     active = models.BooleanField(default=False)
     created_on = models.DateTimeField()
@@ -265,6 +265,9 @@ class Contest_Player(models.Model):
     last_checkin_load = models.DateTimeField(
         "Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = (('contest', 'player'),)
 
     def __compute_losses(self):
         """
