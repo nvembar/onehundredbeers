@@ -1,6 +1,6 @@
 from beers import models
 from django.contrib.auth.models import User
-from rest_framework import serializers
+from rest_framework import serializers, validators
 from rest_framework.reverse import reverse
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
@@ -106,3 +106,63 @@ class ContestPlayerSerializer(serializers.HyperlinkedModelSerializer):
                   'last_checkin_load',
                   'rank',)
 
+class ChallengerHyperlink(serializers.HyperlinkedRelatedField):
+    view_name = 'contest-player-detail'
+
+    def get_url(self, challenger_id, view_name, request, format):
+        """
+        Parses out the url for the challenger for a Contest Beer
+        """
+        # The object passed in is a PKOnlyObject, not the whole Contest_Player
+        challenger = models.Contest_Player.objects.get(id=challenger_id.pk)
+        url_kwargs = { 
+            'contest_id': challenger.contest.id,
+            'player_id': challenger.player.id,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+class ContestBeerHyperlink(serializers.HyperlinkedIdentityField):
+    view_name = 'contest-beer-detail'
+
+    def get_url(self, contest_beer, view_name, request, format):
+        url_kwargs = { 
+            'contest_id': contest_beer.contest.id,
+            'contest_beer_id': contest_beer.id,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+class ContestBeerSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+#url = ContestBeerHyperlink(view_name='contest-beer-detail',)
+    name = serializers.CharField(required=True, max_length=250, source='beer.name')
+    brewery = serializers.CharField(required=True, max_length=250, source='beer.brewery')
+    untappd_url = serializers.URLField(source='beer.untappd_url')
+    brewery_city = serializers.CharField(required=False, 
+                                         max_length=250, 
+                                         source='beer.brewery_city')
+    brewery_state = serializers.CharField(required=False,
+                                          max_length=250, 
+                                          source='beer.brewery_state')
+    brewery_lat = serializers.FloatField(required=False, source='beer.brewery_lat')
+    brewery_lon = serializers.FloatField(required=False, source='beer.brewery_lon')
+    point_value = serializers.IntegerField()
+    challenger = ChallengerHyperlink(view_name='contest-player-detail', 
+                                     read_only=True,
+                                     required=False,)
+    challenge_point_loss = serializers.IntegerField(required=False,)
+    max_point_loss = serializers.IntegerField(required=False,)
+    challenge_point_value = serializers.IntegerField(required=False,)
+    total_drank = serializers.IntegerField(required=False, read_only=True,)
+
+    def create(self, validated_data):
+        contest = validated_data['contest']
+        beer = None
+        beer_filter = models.Beer.objects.filter(
+                name=validated_data['beer']['name'],
+                brewery=validated_data['beer']['brewery'])
+        if beer_filter.exists():
+            beer = beer_filter.get()
+        else:
+            beer = models.Beer.objects.create_beer(**validated_data['beer'])
+        contest_beer = contest.add_beer(beer, validated_data.get('point_value', 1))
+        return contest_beer
