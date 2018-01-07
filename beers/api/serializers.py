@@ -30,6 +30,18 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
     user_count = serializers.ReadOnlyField()
     beer_count = serializers.ReadOnlyField()
 
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError('Start date must be before end date')
+        return data
+
+    def create(self, validated_data):
+        contest = models.Contest.objects.create_contest(validated_data['name'], 
+                                                        validated_data['creator'],
+                                                        validated_data['start_date'],
+                                                        validated_data['end_date'],)
+        return contest
+
     class Meta:
         model = models.Contest
         extra_kwargs = {
@@ -37,7 +49,10 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
         }
         fields = ('id', 
                   'url', 
+                  'name',
                   'creator', 
+                  'start_date',
+                  'end_date',
                   'active', 
                   'created_on', 
                   'last_updated',
