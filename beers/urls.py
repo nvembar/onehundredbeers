@@ -82,4 +82,10 @@ urlpatterns = [
     url(r'^api/contests/(?P<contest_id>[0-9]+)/players/(?P<player_id>[0-9]+)$',
         api_views.ContestPlayerDetail.as_view(),
         name='contest-player-detail',),
+    url(r'^api/contests/(?P<contest_id>[0-9]+)/beers/$',
+        api_views.ContestBeerList.as_view(),
+        name='contest-beer-list',),
+    url(r'^api/contests/(?P<contest_id>[0-9]+)/beers/(?P<contest_beer_id>[0-9]+)$',
+        api_views.ContestBeerDetail.as_view(),
+        name='contest-beer-detail',),
 ]
