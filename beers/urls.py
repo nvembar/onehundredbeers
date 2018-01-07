@@ -3,7 +3,7 @@
 
 from django.conf.urls import url, include
 from beers.views import user, validation, contest
-
+import beers.api.views as api_views
 
 urlpatterns = [
     url(r'^$', contest.index, name='index'),
@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^signup$', user.signup, name='signup'),
     url(r'^profile', user.update_profile, name='profile'),
     url(r'^contests/$', contest.contests, name='contests'),
-    url(r'^contests/add$', contest.contest_add, name='contest-add'),
+#url(r'^contests/add$', contest.contest_add, name='contest-add'),
     url(r'^contests/(?P<contest_id>[0-9]+)/$',
         contest.contest,
         name='contest'),
@@ -64,4 +64,22 @@ urlpatterns = [
         validation.initiate_recover,
         name='initiate-recover'),
     url(r'^instructions$', contest.instructions, name='instructions'),
+    url(r'^api/players/$', 
+        api_views.PlayerList.as_view(), 
+        name='player-list',),
+    url(r'^api/players/(?P<id>[0-9]+)$', 
+        api_views.PlayerDetail.as_view(), 
+        name='player-detail',),
+    url(r'^api/contests/$', 
+        api_views.ContestList.as_view(),
+        name='contest-list',),
+    url(r'^api/contests/(?P<id>[0-9]+)$', 
+        api_views.ContestDetail.as_view(),
+        name='contest-detail',),
+    url(r'^api/contests/(?P<contest_id>[0-9]+)/players/$',
+        api_views.ContestPlayerList.as_view(),
+        name='contest-player-list',),
+    url(r'^api/contests/(?P<contest_id>[0-9]+)/players/(?P<player_id>[0-9]+)$',
+        api_views.ContestPlayerDetail.as_view(),
+        name='contest-player-detail',),
 ]
