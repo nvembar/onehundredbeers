@@ -34,12 +34,14 @@ class Player(models.Model):
 
 class BeerManager(models.Manager):
     """Manages beer data"""
-    def create_beer(self, name, brewery, style='', description='',
+    def create_beer(self, name, brewery, untappd_url='',
+                    style='', description='',
                     brewery_city='', brewery_state=''):
         """Creates a contest with defaults on active status, creation date,
         update date, beer count, and user count"""
         beer = self.create(name=name, brewery=brewery,
                            style=style, description=description,
+                           untappd_url=untappd_url,
                            brewery_city=brewery_city,
                            brewery_state=brewery_state,
                            last_updated=timezone.now())
@@ -505,6 +507,9 @@ class Contest_Beer(models.Model):
         help_text='The number of points the challenger gets ' +
             'for drinking this beer')
     total_drank = models.IntegerField("number of players who drank this beer")
+
+    class Meta:
+        unique_together = (('contest', 'beer'),)
 
     def __str__(self):
         return "{0}/{1}".format(self.beer.name, self.beer.brewery)
