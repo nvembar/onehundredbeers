@@ -200,7 +200,7 @@ class ContestEditingTestCase(TestCase):
                                            'untappd_url': 'https://untappd.com/beer/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Beer.objects.filter(name='Beer 1').count(), 0)
         self.assertIsNotNone(response.json()['non_field_errors'])
 
@@ -240,9 +240,47 @@ class ContestEditingTestCase(TestCase):
                                            'untappd_url': 'https://untappd.com/beer/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIsNotNone(response.json()['non_field_errors'])
 
+    def test_successful_delete_beer(self):
+        """
+        Tests whether a beer can be deleted successfully
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        beer = Beer.objects.create_beer('Beer 1', 'Brewery 1')
+        contest = Contest.objects.get(name='Contest Base')
+        contest_beer = contest.add_beer(beer)
+        cb_id = contest_beer.id
+        beer_id = beer.id
+        response = c.delete(reverse('contest-beer-detail',
+                                    kwargs={'contest_id': contest.id,
+                                            'contest_beer_id': cb_id}),
+                            content_type='application/json',
+                            HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Contest_Beer.objects.filter(id=cb_id).exists())
+        self.assertFalse(Beer.objects.filter(id=beer_id).exists())
+
+    def test_non_runner_delete_beer(self):
+        """
+        Tests whether a beer does not get deleted if a non-runner tries to delete it
+        """
+        c = Client()
+        beer = Beer.objects.create_beer('Beer 1', 'Brewery 1')
+        contest = Contest.objects.get(name='Contest Base')
+        contest_beer = contest.add_beer(beer)
+        cb_id = contest_beer.id
+        beer_id = beer.id
+        response = c.delete(reverse('contest-beer-detail',
+                                    kwargs={'contest_id': contest.id,
+                                            'contest_beer_id': cb_id}),
+                            content_type='application/json',
+                            HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Contest_Beer.objects.filter(id=cb_id).exists())
+        self.assertTrue(Beer.objects.filter(id=beer_id).exists())
 
     def test_successful_add_brewery(self):
         """
