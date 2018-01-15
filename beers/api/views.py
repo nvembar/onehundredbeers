@@ -96,6 +96,9 @@ class ContestBeerList(generics.ListCreateAPIView):
         beer_name = self.request.data['name']
         brewery_name = self.request.data['brewery']
         beer_filter = models.Beer.objects.filter(name=beer_name, brewery=brewery_name)
+        if contest.active:
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['Cannot add beers to active contest']})
         if beer_filter.exists():
             beer = beer_filter.get()
             if models.Contest_Beer.objects.filter(beer=beer, contest=contest).exists():
@@ -108,7 +111,7 @@ class ContestBeerList(generics.ListCreateAPIView):
         return models.Contest_Beer.objects.select_related('beer', 
                 'challenger').filter(contest__id=contest_id).order_by('beer_name')
 
-class ContestBeerDetail(generics.RetrieveAPIView):
+class ContestBeerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Contest_Beer.objects.all()
     serializer_class = ContestBeerSerializer
 
