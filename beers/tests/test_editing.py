@@ -201,8 +201,8 @@ class ContestEditingTestCase(TestCase):
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(Beer.objects.filter('Beer 1').count(), 0)
-        self.assertTrue('general' in response.json()['errors'])
+        self.assertEqual(Beer.objects.filter(name='Beer 1').count(), 0)
+        self.assertIsNotNone(response.json()['non_field_errors'])
 
 
     def test_nonunique_add_beer(self):
@@ -241,7 +241,6 @@ class ContestEditingTestCase(TestCase):
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 400)
-        print(repr(response.content))
         self.assertIsNotNone(response.json()['non_field_errors'])
 
 
