@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^signup$', user.signup, name='signup'),
     url(r'^profile', user.update_profile, name='profile'),
     url(r'^contests/$', contest.contests, name='contests'),
-#url(r'^contests/add$', contest.contest_add, name='contest-add'),
+    url(r'^contests/add$', contest.contest_add, name='contest-add'),
     url(r'^contests/(?P<contest_id>[0-9]+)/$',
         contest.contest,
         name='contest'),
