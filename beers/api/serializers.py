@@ -167,5 +167,15 @@ class ContestBeerSerializer(serializers.Serializer):
         contest_beer = contest.add_beer(beer, validated_data.get('point_value', 1))
         return contest_beer
 
-    def update(self, validated_data):
-        pass
+    def update(self, contest_beer, validated_data):
+        errors = {}
+        if contest_beer.beer.name != validated_data['beer']['name']:
+            errors['name'] = ['Beer name cannot be changed through update']
+        if contest_beer.beer.brewery != validated_data['beer']['brewery']:
+            errors['brewery'] = ['Brewery name value cannot be changed through update']
+        if contest_beer.brewery.untappd_url != validated_data['beer']['untappd_url']:
+            errors['untappd_url'] = ['Untappd URL value cannot be changed through update']
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+        contest_beer.point_value = validated_data['point_value']
+        contest_beer.save()
