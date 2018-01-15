@@ -63,11 +63,15 @@ class ContestList(generics.ListCreateAPIView):
 class ContestDetail(generics.RetrieveUpdateAPIView):
     queryset = models.Contest.objects.all()
     serializer_class = ContestSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
     lookup_field = 'id'
 
 class ContestPlayerList(generics.ListCreateAPIView):
     queryset = models.Contest_Player.objects.all()
     serializer_class = ContestPlayerSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
 
     def get_queryset(self):
         contest_id = self.kwargs['contest_id']
@@ -77,6 +81,8 @@ class ContestPlayerList(generics.ListCreateAPIView):
 class ContestPlayerDetail(generics.RetrieveAPIView):
     queryset = models.Contest_Player.objects.all()
     serializer_class = ContestPlayerSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
 
     def get_object(self):
         contest_id = self.kwargs['contest_id']
@@ -89,6 +95,8 @@ class ContestPlayerDetail(generics.RetrieveAPIView):
 class ContestBeerList(generics.ListCreateAPIView):
     queryset = models.Contest_Beer.objects.all()
     serializer_class = ContestBeerSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
 
     def perform_create(self, serializer):
         contest_id = self.kwargs['contest_id']
@@ -96,6 +104,7 @@ class ContestBeerList(generics.ListCreateAPIView):
         beer_name = self.request.data['name']
         brewery_name = self.request.data['brewery']
         beer_filter = models.Beer.objects.filter(name=beer_name, brewery=brewery_name)
+        # XXX: This should probably be moved into models.Contest.add_beer
         if contest.active:
             raise serializers.ValidationError(
                     {'non_field_errors': ['Cannot add beers to active contest']})
@@ -114,7 +123,17 @@ class ContestBeerList(generics.ListCreateAPIView):
 class ContestBeerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Contest_Beer.objects.all()
     serializer_class = ContestBeerSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
 
+    def perform_destroy(self, contest_beer):
+        beer_id = contest_beer.beer.id
+        contest_beer.delete()
+        if models.Contest_Beer.objects.filter(beer__id=beer_id).count() == 0:
+            # There are no other contest beers corresponding to the given Beer object
+            # so we should delete the beer object
+            models.Beer.objects.filter(id=beer_id).delete()
+        
     def get_object(self):
         contest_id = self.kwargs['contest_id']
         contest_beer_id = self.kwargs['contest_beer_id']
@@ -122,4 +141,3 @@ class ContestBeerDetail(generics.RetrieveUpdateDestroyAPIView):
                                          contest__id = contest_id,
                                          id = contest_beer_id,)
         return contest_beer
-
