@@ -133,7 +133,7 @@ class ContestBeerHyperlink(serializers.HyperlinkedIdentityField):
 
 class ContestBeerSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-#url = ContestBeerHyperlink(view_name='contest-beer-detail',)
+    url = ContestBeerHyperlink(view_name='contest-beer-detail',)
     name = serializers.CharField(required=True, max_length=250, source='beer.name')
     brewery = serializers.CharField(required=True, max_length=250, source='beer.brewery')
     untappd_url = serializers.URLField(source='beer.untappd_url')
@@ -166,3 +166,6 @@ class ContestBeerSerializer(serializers.Serializer):
             beer = models.Beer.objects.create_beer(**validated_data['beer'])
         contest_beer = contest.add_beer(beer, validated_data.get('point_value', 1))
         return contest_beer
+
+    def update(self, validated_data):
+        pass
