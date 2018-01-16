@@ -1,0 +1,36 @@
+
+
+<div class="row beer-row beer-header">
+  <div class="col-xs-4">Beer</div>
+  <div class="col-xs-4">Brewery</div>
+  <div class="col-xs-1">State</div>
+  <div class="col-xs-1">Points</div>
+  {{#if player }}
+    <div class="col-xs-1">Checkin</div>
+  {{/if}}
+  {{#if editing }}
+  <div class="col-xs-1">+/-</div>
+  {{/if}}
+</div>
+{{#each beers}}
+<div class="row beer-row">
+    <div class="col-xs-4">{{ this.name }}</div>
+    <div class="col-xs-4">{{ this.brewery }}</div>
+    <div class="col-xs-1">{{ this.brewery_state }}</div>
+    <div class="col-xs-1">{{ this.point_value }}</div>
+    {{#if player }}
+    <div class="col-xs-1">
+    {{#if this.checked_into }}
+    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+    {{/if}}
+    </div>
+    {{/if}}
+    {{#if editing}}
+    <div class="col-xs-1">
+    <button type="button" class="btn btn-default" aria-label="Delete">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </button>
+    </div>
+    {{/if}}
+</div>
+{{/each}}
