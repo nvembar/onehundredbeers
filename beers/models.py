@@ -80,6 +80,8 @@ class ContestManager(models.Manager):
                               active=False, created_on=timezone.now(),
                               last_updated=timezone.now(),
                               user_count=0, beer_count=0)
+        # Add the creator as a player
+        contest_player = contest.add_player(creator)
         return contest
 
 
@@ -148,8 +150,12 @@ class Contest(models.Model):
         additional field 'rank' which includes the ranking of the player
         """
         contest_players = Contest_Player.objects.filter(contest=self)
+        if not contest_players.exists():
+            return []
         contest_players = list(contest_players.order_by('-total_points',
                                                         'user_name'))
+        if not self.active:
+            return contest_players
         max_points = Contest_Beer.objects.filter(contest=self).aggregate(
             models.Sum('point_value'))['point_value__sum']
         rank = 0

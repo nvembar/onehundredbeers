@@ -22,12 +22,14 @@ def index(request):
     """Renders the index page with all the contest info"""
     all_contests = Contest.objects.order_by('-created_on')[:5]
     active = None
+    is_runner = False
     if is_authenticated_user_contest_runner(request):
         player = Player.objects.get(user=request.user)
+        is_runner = True
         for c in all_contests:
             if c.creator.id == player.id:
                 c.is_creator = True
-    context = {'contests': all_contests}
+    context = {'contests': all_contests,'is_runner': is_runner,}
     if all_contests:
         active = all_contests[0]
         leaderboard = active.ranked_players()

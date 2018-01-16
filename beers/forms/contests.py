@@ -25,9 +25,14 @@ class SubmitButtonField(forms.Field):
 class ContestForm(forms.Form):
     "Form for creating a new contest"
 
-    name = forms.CharField(max_length=250)
-    start_date = forms.DateField()
-    end_date = forms.DateField()
+    name = forms.CharField(max_length=250, 
+            widget=forms.TextInput(attrs={'class': 'form-control'}))
+    start_date = forms.DateField(
+            widget=forms.TextInput(attrs={'class': 'form-control datepicker',
+                                          'data-provide': 'datepicker'}))
+    end_date = forms.DateField(
+            widget=forms.TextInput(attrs={'class': 'form-control datepicker',
+                                          'data-provide': 'datepicker'}))
     re_name = re.compile('^[A-Za-z][A-Za-z0-9_\-\'"\.\! ]{0,249}$')
 
     def clean_name(self):

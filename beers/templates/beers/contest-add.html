@@ -4,49 +4,61 @@
   Add Contest - One Hundred Beers
 {% endblock %}
 
-{% block content %}
-{% if form.non_field_errors %}
-<div class="error-info">
-  <ul>
-    {% for k, v in form.errors.items %}
-      {% for e in v %}
-        <li>{{ k }}: {{ e }}</li>
-      {% endfor %}
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
-
-  <form action="{% url 'contest-add' %}" method="post">
-    {% csrf_token %}
-    <div class="login-form">
-      <div class="login-label">{{ form.name.label_tag }}</div>
-      <div class="login-field">{{ form.name }}</div>
-      {% if form.name.errors %}
-      <div class="error-info">
-        {{ form.name.label }} Errors:<br/>
-        {{ form.name.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.start_date.label_tag }}</div>
-      <div class="login-field">{{ form.start_date }}</div>
-      {% if form.start_date.errors %}
-      <div class="error-info">
-        {{ form.start_date.label }} Errors:<br/>
-        {{ form.start_date.errors }}
-      </div>
-      {% endif %}
-      <div class="login-label">{{ form.end_date.label_tag }}</div>
-      <div class="login-field">{{ form.end_date }}</div>
-      {% if form.end_date.errors %}
-      <div class="error-info">
-        {{ form.end_date.label }} Errors:<br/>
-        {{ form.end_date.errors }}
-      </div>
-      {% endif %}
-      <div class="login-button-row">
-        <input type="submit" value="Add Contest"/>
-      </div>
-    </div>
-  </form>
+{% block scripts %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" integrity="sha256-I4gvabvvRivuPAYFqevVhZl88+vNf2NksupoBxMQi04=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js" integrity="sha256-TueWqYu0G+lYIimeIcMI8x1m14QH/DQVt4s9m/uuhPw=" crossorigin="anonymous"></script>
+<script>
+    $(document).ready(function() { $('.datepicker').datepicker(); })
+</script>
 {% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if form.non_field_errors %}
+    <div class="error-info">
+      <ul>
+        {% for k, v in form.errors.items %}
+          {% for e in v %}
+            <li>{{ k }}: {{ e }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+          <form action="{% url 'contest-add' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group {% if form.name.errors %}has-error{% endif %}">
+              {{ form.name.label_tag }}
+              {{ form.name }}
+              {% if form.name.errors %}
+              <br/>Errors:<br/>{{ form.name.errors }}
+              {% endif %}
+            </div>
+            <div class="form-group {% if form.start_date.errors %}has-error{% endif %}">
+              {{ form.start_date.label_tag }}
+              {{ form.start_date }}
+              {% if form.start_date.errors %}
+              <br/>Errors:<br/>{{ form.start_date.errors }}
+              {% endif %}
+            </div>
+            <div class="form-group {% if form.end_date.errors %}has-error{% endif %}">
+              {{ form.end_date.label_tag }}
+              {{ form.end_date }}
+              {% if form.end_date.errors %}
+              <br/>Errors:<br/>{{ form.end_date.errors }}
+              {% endif %}
+            </div>
+              <div class="login-button-row">
+                <input type="submit" value="Add Contest"/>
+              </div>
+            </div>
+          </form>
+      </div>
+   </div>
+</div>
+{% endblock %}
+
