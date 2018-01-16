@@ -204,6 +204,33 @@ var Validate = {
     },
 };
 
+var EditContest = {
+
+  addBeerFromForm: function(contest) {
+    console.log('In addBeerFromForm');
+    let beer_data = {};
+    beer_data['name'] = document.getElementById('beer-name').value;
+    beer_data['brewery'] = document.getElementById('brewery-name').value;
+    beer_data['brewery_state'] = document.getElementById('brewery-state').value;
+    beer_data['untappd_url'] = document.getElementById('untappd').value;
+    beer_data['point_value'] = document.getElementById('point-value').value;
+    let promise = contest.addBeer(beer_data);
+    promise.then(
+      function () {
+        contest.loadBeers(function (beers) {
+          console.log('Loaded beers');
+          console.log(JSON.stringify(beers, null, 2));
+          $('.beer-list').html(Handlebars.templates.beer_table(contest));
+        });
+      }
+    ).fail(function(jqXHR) {
+        console.log('Failed to add beer');
+        console.log(jqXHR.responseText);
+    });
+  },
+
+};
+
 $(function() {
     csrfSafeMethod = function(method) {
         // these HTTP methods do not require CSRF protection

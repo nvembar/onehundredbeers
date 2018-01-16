@@ -31,6 +31,17 @@ var Contests = {
                 });
             },
 
+            loadBeers: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/beers';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    that.beers = data;
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
             validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 
@@ -84,6 +95,22 @@ var Contests = {
                 method: 'POST'
               });
             },
+
+
+            addBeer: function(data) {
+              let url = this.baseUrl + 'api/contests/' + this.contestId + '/beers/';
+              console.log('Calling addBeer with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                method: 'POST',
+              });
+            },
+
         }
     }
 };

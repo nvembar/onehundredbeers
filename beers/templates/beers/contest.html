@@ -9,6 +9,8 @@
   <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
   {{ form.media }}
   {% if is_creator %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.js" integrity="sha256-dIqy4LRyYdutozP+Dvr146n7yj9l/h3LxK0nmNUxqo4=" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="{% static 'js/templates.runtime.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
   <script type="text/javascript">
@@ -89,7 +91,12 @@
               <div class="col-xs-4">Brewery</div>
               <div class="col-xs-1">State</div>
               <div class="col-xs-1">Points</div>
-              {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
+              {% if contest.active and contest_player %}
+                <div class="col-xs-1">Checkin</div>
+              {% endif %}
+              {% if not contest.active and is_creator %}
+              <div class="col-xs-1">+/-</div>
+              {% endif %}
             </div>
 			{% for b in contest_beers %}
             <div class="row beer-row beer-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}beer-checkedin{% endif %}">
@@ -97,16 +104,64 @@
               <div class="col-xs-4">{{ b.beer.brewery }}</div>
               <div class="col-xs-1">{{ b.beer.brewery_state }}</div>
               <div class="col-xs-1">{{ b.point_value }}</div>
-              {% if contest_player %}
+              {% if contest.active and contest_player %}
               <div class="col-xs-1">
                 {% if b.checked_into %}
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                 {% endif %}
               </div>
               {% endif %}
+              {% if not contest.active and is_creator %}
+              <div class="col-xs-1">
+                <button type="button" class="btn btn-default" aria-label="Delete">
+                  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+              </div>
+              {% endif %}
+            </div>
+            {% empty %}
+            <div class="row beer-row">
+              No beers yet added to this contest.
             </div>
             {% endfor %}
           </div>
+          {% if not contest.active and is_creator %}
+          <hr/>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Add Beer</h3>
+            </div>
+            <div class="panel-body">
+              <form>
+                <div class="form-group">
+                  <label for="beer-name">Beer</label>
+                  <input id="beer-name" class="form-control" type="text" placeholder="Beer"/>
+                </div>
+                <div class="form-group">
+                  <label for="brewery-name">Brewery</label>
+                  <input id="brewery-name" class="form-control" type="text" placeholder="Brewery"/>
+                </div>
+                <div class="form-group">
+                  <label for="brewery-state">Brewery State</label>
+                  <input id="brewery-state" class="form-control" type="text" placeholder="State"/>
+                </div>
+                <div class="form-group">
+                  <label for="untappd">Untappd URL</label>
+                  <input id="untappd" class="form-control" type="text" placeholder="URL"/>
+                </div>
+                <div class="form-group">
+                  <label for="point-value">Point value</label>
+                  <input id="point-value" class="form-control" type="text" placeholder="Point"/>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn btn-default" aria-label="Add" onclick="EditContest.addBeerFromForm(contest)">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          {% endif %}
       </div>
       <div role="tabpanel" class="tab-pane" id="breweries">
           <div class="brewery-list">

@@ -564,3 +564,8 @@ img.column-icon {
 .validation-buttons {
   float: right;
 }
+
+/* line 653, ../../../styles/sass/beers.scss */
+.beer-entry {
+  width: 90%;
+}
