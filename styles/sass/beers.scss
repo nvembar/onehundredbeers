@@ -578,16 +578,16 @@ $validation-button-color: #599bb3;
     padding: 3px;
 }
 
+.beer-row:nth-child(even) {
+    background-color: aliceblue;
+}
+
+.beer-row:nth-child(odd) {
+    background-color: beige;
+}
+
 .beer-header {
   @extend .data-header;
-}
-
-.beer-odd {
-  @extend .data-row-odd;
-}
-
-.beer-even {
-  @extend .data-row-even;
 }
 
 .beer-checkedin {
