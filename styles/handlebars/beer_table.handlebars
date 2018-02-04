@@ -13,7 +13,7 @@
   {{/if}}
 </div>
 {{#each beers}}
-<div class="row beer-row">
+<div class="row beer-row {{#if this.checked_into }}beer-checkedin{{/if}}">
     <div class="col-xs-4">{{ this.name }}</div>
     <div class="col-xs-4">{{ this.brewery }}</div>
     <div class="col-xs-1">{{ this.brewery_state }}</div>
@@ -25,7 +25,7 @@
     {{/if}}
     </div>
     {{/if}}
-    {{#if editing}}
+    {{#if ../editing }}
     <div class="col-xs-1">
     <button type="button" class="btn btn-default" aria-label="Delete">
       <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
@@ -34,3 +34,6 @@
     {{/if}}
 </div>
 {{/each}}
+{{#if editing}}
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addBeer">Add Beer</button>
+{{/if}}
