@@ -28,7 +28,7 @@ templates['beer_table'] = template({"1":function(container,depth0,helpers,partia
 },"7":function(container,depth0,helpers,partials,data) {
     return "    <span class=\"glyphicon glyphicon-ok\" aria-hidden=\"true\"></span>\n";
 },"9":function(container,depth0,helpers,partials,data) {
-    return "    <div class=\"col-xs-1\">\n    <button type=\"button\" class=\"btn btn-default\" aria-label=\"Delete\">\n      <span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span>\n    </button>\n    </div>\n";
+    return "    <div class=\"col-xs-1\">\n    <button type=\"button\" class=\"btn btn-default\" aria-label=\"Delete\">\n      <span class=\"glyphicon glyphicon-minus\" aria-hidden=\"true\"></span>\n    </button>\n    </div>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {});
 
