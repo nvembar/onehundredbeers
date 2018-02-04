@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [os.getenv('ALLLOWED_HOSTS', default='*')]
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
 	'beers.apps.BeersConfig',
     'django.contrib.admin',
     'django.contrib.auth',

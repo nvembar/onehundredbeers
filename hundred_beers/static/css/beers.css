@@ -515,52 +515,84 @@ img.column-icon {
 }
 
 /* line 533, ../../../styles/sass/beers.scss */
+.edit-buttons {
+  padding-left: 2px;
+  padding-right: 2px;
+  float: right;
+}
+
+/* line 539, ../../../styles/sass/beers.scss */
+.edit-button {
+  margin-left: 2px;
+}
+
+/* line 543, ../../../styles/sass/beers.scss */
 .data-header, .leaderboard-header, .beer-header, .brewery-header, .challenge-header, .checkin-header {
   background-color: darkgrey;
   font-weight: bold;
 }
 
-/* line 538, ../../../styles/sass/beers.scss */
-.data-row-odd, .leaderboard-odd, .beer-odd, .brewery-odd, .challenge-odd, .checkin-odd {
+/* line 548, ../../../styles/sass/beers.scss */
+.data-row-odd, .leaderboard-odd, .brewery-odd, .challenge-odd, .checkin-odd {
   background-color: beige;
 }
 
-/* line 542, ../../../styles/sass/beers.scss */
-.data-row-even, .leaderboard-even, .beer-even, .brewery-even, .challenge-even, .checkin-even {
+/* line 552, ../../../styles/sass/beers.scss */
+.data-row-even, .leaderboard-even, .brewery-even, .challenge-even, .checkin-even {
   background-color: aliceblue;
 }
 
-/* line 546, ../../../styles/sass/beers.scss */
+/* line 556, ../../../styles/sass/beers.scss */
 .data-row-checkedin, .beer-checkedin, .brewery-checkedin, .challenge-checkedin {
   color: black;
   background-color: lightgreen;
   font-style: italic;
 }
 
-/* line 552, ../../../styles/sass/beers.scss */
+/* line 562, ../../../styles/sass/beers.scss */
 .leaderboard {
   padding-left: 15px;
   padding-right: 15px;
   margin-top: 10px;
 }
 
-/* line 558, ../../../styles/sass/beers.scss */
+/* line 568, ../../../styles/sass/beers.scss */
 .leaderboard-row {
   padding: 3px;
 }
 
-/* line 577, ../../../styles/sass/beers.scss */
+/* line 584, ../../../styles/sass/beers.scss */
+.beer-list {
+  margin-bottom: 5px;
+}
+
+/* line 588, ../../../styles/sass/beers.scss */
 .beer-row {
   padding: 3px;
 }
 
-/* line 632, ../../../styles/sass/beers.scss */
+/* line 592, ../../../styles/sass/beers.scss */
+.beer-row:nth-child(even) {
+  background-color: aliceblue;
+}
+
+/* line 596, ../../../styles/sass/beers.scss */
+.beer-row:nth-child(odd) {
+  background-color: beige;
+}
+
+/* line 643, ../../../styles/sass/beers.scss */
 .checkin-row {
   padding: 3px;
   border: thin solid;
 }
 
-/* line 649, ../../../styles/sass/beers.scss */
+/* line 660, ../../../styles/sass/beers.scss */
 .validation-buttons {
   float: right;
+}
+
+/* line 664, ../../../styles/sass/beers.scss */
+.beer-entry {
+  width: 90%;
 }
