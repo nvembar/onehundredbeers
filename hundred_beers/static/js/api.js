@@ -113,7 +113,7 @@ var Contests = {
 
             deleteBeer: function(beerId) {
               let url = this.baseUrl + 'api/contests/' 
-                                     + this.contestId + '/beers/' + beersId;
+                                     + this.contestId + '/beers/' + beerId;
               console.log('Calling deleteBeer');
               return $.ajax({
                 url: url,
