@@ -40,7 +40,7 @@ templates['beer_table'] = template({"1":function(container,depth0,helpers,partia
     + container.escapeExpression(container.lambda((depth0 != null ? depth0.id : depth0), depth0))
     + ")\"></span>\n    </button>\n    </div>\n";
 },"15":function(container,depth0,helpers,partials,data) {
-    return "<button type=\"button\" class=\"btn btn-primary\" data-toggle=\"modal\" data-target=\"#addBeer\">Add Beer</button>\n";
+    return "<div class=\"edit-buttons\">\n  <button type=\"button\" class=\"btn edit-button\" data-toggle=\"modal\" data-target=\"#addChallengeBeer\">Add Challenge Beer</button>\n  <button type=\"button\" class=\"btn btn-primary edit-button\" data-toggle=\"modal\" data-target=\"#addBeer\">Add Beer</button>\n</div>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : (container.nullContext || {});
 

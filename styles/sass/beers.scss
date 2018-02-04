@@ -530,6 +530,16 @@ $validation-button-color: #599bb3;
     padding-right: 15px;
 }
 
+.edit-buttons {
+    padding-left: 2px;
+    padding-right: 2px;
+    float: right;
+}
+
+.edit-button {
+    margin-left: 2px;
+}
+
 .data-header {
   background-color: darkgrey;
   font-weight: bold;
@@ -572,6 +582,7 @@ $validation-button-color: #599bb3;
 }
 
 .beer-list {
+    margin-bottom: 5px;
 }
 
 .beer-row {
