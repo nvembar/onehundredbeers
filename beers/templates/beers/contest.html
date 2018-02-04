@@ -13,6 +13,7 @@
   <script type="text/javascript" src="{% static 'js/templates.runtime.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/edit-contest.js' %}"></script>
   <script type="text/javascript">
   $(function() {
       console.log('Getting a new contest');
@@ -35,6 +36,13 @@
       ];
       contest = Contests.init('{% url 'index' %}', {{ contest.id }});
       contest.selectData = selectData;
+      {% if contest.active and contest_player %}
+      contest.player = true;
+      {% endif %}
+      {% if not contest.active and is_creator %}
+      contest.editing = true;
+      EditContest.displayBeers(contest);
+      {% endif %}
       Validate.displayCheckins(contest, 1);
   });
   </script>
@@ -42,6 +50,9 @@
 {% endblock %}
 
 {% block content %}
+{% if not contest.active and is_creator %}
+{% include "includes/add-beer-modal.html" %}
+{% endif %}
 	<div class="page-header">
 		<h1>{{ contest.name }}</h1>
 	</div>
@@ -124,44 +135,10 @@
               No beers yet added to this contest.
             </div>
             {% endfor %}
+            {% if not contest.active and is_creator %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addBeer">Add Beer</button>
+            {% endif %}
           </div>
-          {% if not contest.active and is_creator %}
-          <hr/>
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">Add Beer</h3>
-            </div>
-            <div class="panel-body">
-              <form>
-                <div class="form-group">
-                  <label for="beer-name">Beer</label>
-                  <input id="beer-name" class="form-control" type="text" placeholder="Beer"/>
-                </div>
-                <div class="form-group">
-                  <label for="brewery-name">Brewery</label>
-                  <input id="brewery-name" class="form-control" type="text" placeholder="Brewery"/>
-                </div>
-                <div class="form-group">
-                  <label for="brewery-state">Brewery State</label>
-                  <input id="brewery-state" class="form-control" type="text" placeholder="State"/>
-                </div>
-                <div class="form-group">
-                  <label for="untappd">Untappd URL</label>
-                  <input id="untappd" class="form-control" type="text" placeholder="URL"/>
-                </div>
-                <div class="form-group">
-                  <label for="point-value">Point value</label>
-                  <input id="point-value" class="form-control" type="text" placeholder="Point"/>
-                </div>
-                <div class="form-group">
-                  <button type="button" class="btn btn-default" aria-label="Add" onclick="EditContest.addBeerFromForm(contest)">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          {% endif %}
       </div>
       <div role="tabpanel" class="tab-pane" id="breweries">
           <div class="brewery-list">
