@@ -1,5 +1,5 @@
 
-
+<div id="alert-for-beer" class="alert-for-tab"></div>
 <div class="row beer-row beer-header">
   <div class="col-xs-4">Beer</div>
   <div class="col-xs-4">Brewery</div>
@@ -12,8 +12,11 @@
   <div class="col-xs-1">+/-</div>
   {{/if}}
 </div>
+{{#unless beers}}
+<div class="col-xs-12"><span>No beers added to the contest yet</span></div>
+{{/unless}}
 {{#each beers}}
-<div class="row beer-row {{#if this.checked_into }}beer-checkedin{{/if}}">
+<div id="beer-{{this.id}}" class="row beer-row {{#if this.checked_into }}beer-checkedin{{/if}}">
     <div class="col-xs-4">{{ this.name }}</div>
     <div class="col-xs-4">{{ this.brewery }}</div>
     <div class="col-xs-1">{{ this.brewery_state }}</div>
@@ -28,7 +31,7 @@
     {{#if ../editing }}
     <div class="col-xs-1">
     <button type="button" class="btn btn-default" aria-label="Delete">
-      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+      <span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="EditContest.removeBeerFromContest(contest, {{ this.id }})"></span>
     </button>
     </div>
     {{/if}}
