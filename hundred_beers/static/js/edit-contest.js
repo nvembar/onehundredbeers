@@ -12,6 +12,7 @@ var EditContest = {
   clearErrorStyling: function() {
     // Clear any styling from errors
     $('#alert-for-modal').empty();
+    $('.alert-for-tab').empty();
     $('div.modal-body div.form-group.has-error').removeClass('has-error');
     $('div.form-group span.help-block').remove();
   },
@@ -74,13 +75,18 @@ var EditContest = {
   },
 
   removeBeerFromContest: function (contest, beerId) {
-    let promise = contest.deleteBeer(beerId);
-    return promise.then( 
-        function () { EditContest.displayBeers(contest); }
-    ).fail(function(jqXHR) {
-        console.log('Failed to add beer');
-        console.log(jqXHR.responseText);
-    });
+    return contest.deleteBeer(beerId).then(
+      function () { 
+        $('#beer-' + beerId).fadeOut();
+        return $('#beer-' + beerId).promise();
+      }
+    ).then(
+      function () { return EditContest.displayBeers(contest); }
+    ).fail(
+      function (jqXHR) {
+        $('#alert-for-beer').html('<div class="alert alert-danger">Error deleting beer ' + jqXHR.responseText + '</div>')
+      }
+    );
   },
 
 };
