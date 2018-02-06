@@ -1,5 +1,6 @@
 """Models supporting One Hundred Beers"""
 
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -62,12 +63,15 @@ class Beer(models.Model):
     brewery_lon = models.FloatField(null=True, blank=True)
     untappd_id = models.CharField(max_length=25, null=True, blank=True)
     untappd_url = models.URLField(null=True, blank=True)
+    brewery_url = models.URLField(null=True, blank=True)
     last_updated = models.DateTimeField()
 
     objects = BeerManager()
 
     def __str__(self):
-        return self.name + ' / ' + self.brewery
+        return "Beer[{}<{}> / {}<{}>]".format(self.name, 
+                                        self.untappd_url, 
+                                        self.brewery, self.brewery_url)
 
 class ContestManager(models.Manager):
     "Manager for contests"
@@ -218,12 +222,15 @@ class Brewery(models.Model):
     untappd_id = models.CharField(max_length=25, null=True, blank=True,)
     untappd_url = models.URLField(null=True, blank=True,)
     state = models.CharField(max_length=250)
+    location = models.CharField(max_length=250, null=True, blank=True, default=None)
     last_updated = models.DateTimeField()
 
     objects = Brewery_Manager()
 
     def __str__(self):
-        return self.name
+        return "Brewery[name={}, url={}, location={}]".format(self.name,
+                                                              self.untappd_url,
+                                                              self.location)
 
 class Contest_BreweryManager(models.Manager):
 
@@ -537,11 +544,27 @@ class Unvalidated_Checkin(models.Model):
     untappd_checkin_date = models.DateTimeField()
     brewery = models.CharField(max_length=250, default='')
     beer = models.CharField(max_length=250, default='')
+    beer_url = models.URLField(null=True, default=None)
+    brewery_url = models.URLField(null=True, default=None)
+    photo_url = models.URLField(null=True, default=None)
+    rating = models.IntegerField(null=True, default=None)
 
     objects = Unvalidated_CheckinManager()
 
     def __str__(self):
-        return "Unvalidated checkin: {0}".format(self.untappd_title)
+        return """"Checkin[beer={},
+                       brewery={},
+                       beer_url={},
+                       brewery_url={},
+                       checkin_url={},
+                       time={},
+                       photo_url={}]""".format(self.beer, 
+                                              self.brewery,
+                                              self.beer_url,
+                                              self.brewery_url,
+                                              self.untappd_checkin,
+                                              self.untappd_checkin_date.isoformat(),
+                                              self.photo_url)
 
 class Checkin(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
