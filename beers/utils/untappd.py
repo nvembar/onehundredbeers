@@ -86,6 +86,9 @@ def parse_beer(url, followBrewery=True):
                 # We're in the right title block
                 result.name = header.string.strip()
                 breweryLink = div.find('a')
+                if breweryLink is None:
+                    raise UntappdParseException(
+                            'Could not find expected brewery link in {}'.format(url))
                 result.brewery = breweryLink.string.strip()
                 breweryUrl  = urljoin(response.geturl(), breweryLink['href'])
                 styleP = div.find('p', class_='style')
