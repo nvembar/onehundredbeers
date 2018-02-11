@@ -147,6 +147,7 @@ class ContestEditingTestCase(TestCase):
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -175,6 +176,7 @@ class ContestEditingTestCase(TestCase):
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
@@ -198,6 +200,7 @@ class ContestEditingTestCase(TestCase):
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -219,6 +222,7 @@ class ContestEditingTestCase(TestCase):
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -238,6 +242,7 @@ class ContestEditingTestCase(TestCase):
                           data=json.dumps({'name': 'Beer 1',
                                            'brewery': 'Brewery 1',
                                            'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
