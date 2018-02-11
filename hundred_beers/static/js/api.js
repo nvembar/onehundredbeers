@@ -122,6 +122,28 @@ var Contests = {
                 method: 'DELETE',
               });
             },
+
+            lookupBeer: function(untappdUrl) {
+              let url = this.baseUrl + 'api/lookup/beer'
+              return $.ajax({
+                url: url,
+                data: { 'url': untappdUrl, },
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'GET',
+              })
+            },
+                        
+            lookupBrewery: function(untappdUrl) {
+              let url = this.baseUrl + 'api/lookup/brewery'
+              return $.ajax({
+                url: url,
+                data: { 'url': untappdUrl, },
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'GET',
+              })
+            },
         }
     }
 };

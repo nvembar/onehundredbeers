@@ -88,4 +88,8 @@ urlpatterns = [
     url(r'^api/contests/(?P<contest_id>[0-9]+)/beers/(?P<contest_beer_id>[0-9]+)$',
         api_views.ContestBeerDetail.as_view(),
         name='contest-beer-detail',),
+    url(r'^api/lookup/beer', api_views.BeerLookup.as_view(), name='beer-lookup'),
+    url(r'^api/lookup/brewery', 
+        api_views.BreweryLookup.as_view(), 
+        name='brewery-lookup'),
 ]

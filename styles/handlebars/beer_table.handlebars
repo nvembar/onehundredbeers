@@ -1,9 +1,8 @@
 
 <div id="alert-for-beer" class="alert-for-tab"></div>
 <div class="row beer-row beer-header">
-  <div class="col-xs-4">Beer</div>
-  <div class="col-xs-4">Brewery</div>
-  <div class="col-xs-1">State</div>
+  <div class="col-xs-5">Beer</div>
+  <div class="col-xs-5">Brewery</div>
   <div class="col-xs-1">Points</div>
   {{#if player }}
     <div class="col-xs-1">Checkin</div>
@@ -17,9 +16,20 @@
 {{/unless}}
 {{#each beers}}
 <div id="beer-{{this.id}}" class="row beer-row {{#if this.checked_into }}beer-checkedin{{/if}}">
-    <div class="col-xs-4">{{ this.name }}</div>
-    <div class="col-xs-4">{{ this.brewery }}</div>
-    <div class="col-xs-1">{{ this.brewery_state }}</div>
+    <div class="col-xs-5">
+      {{#if this.untappd_url}}
+      <a href="{{ this.untappd_url }}">{{ this.name }}</a>
+      {{else}}
+      {{ this.name }}
+      {{/if}}
+    </div>
+    <div class="col-xs-5">
+      {{#if this.untappd_url}}
+      <a href="{{ this.brewery_url }}">{{ this.brewery }}</a>
+      {{else}}
+      {{ this.brewery }}
+      {{/if}}
+    </div>
     <div class="col-xs-1">{{ this.point_value }}</div>
     {{#if player }}
     <div class="col-xs-1">

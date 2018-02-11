@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><script type="text/javascript">(window.NREUM||(NREUM={})).loader_config={xpid:"Vg4HVFBADQoFVFZbAAI="};window.NREUM||(NREUM={}),__nr_require=function(t,n,e){function r(e){if(!n[e]){var o=n[e]={exports:{}};t[e][0].call(o.exports,function(n){var o=t[e][1][n];return r(o||n)},o,o.exports)}return n[e].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<e.length;o++)r(e[o]);return r}({1:[function(t,n,e){function r(t){try{s.console&&console.log(t)}catch(n){}}var o,i=t("ee"),a=t(15),s={};try{o=localStorage.getItem("__nr_flags").split(","),console&&"function"==typeof console.log&&(s.console=!0,o.indexOf("dev")!==-1&&(s.dev=!0),o.indexOf("nr_dev")!==-1&&(s.nrDev=!0))}catch(c){}s.nrDev&&i.on("internal-error",function(t){r(t.stack)}),s.dev&&i.on("fn-err",function(t,n,e){r(e.stack)}),s.dev&&(r("NR AGENT IN DEVELOPMENT MODE"),r("flags: "+a(s,function(t,n){return t}).join(", ")))},{}],2:[function(t,n,e){function r(t,n,e,r,o){try{d?d-=1:i("err",[o||new UncaughtException(t,n,e)])}catch(s){try{i("ierr",[s,c.now(),!0])}catch(u){}}return"function"==typeof f&&f.apply(this,a(arguments))}function UncaughtException(t,n,e){this.message=t||"Uncaught error with no additional information",this.sourceURL=n,this.line=e}function o(t){i("err",[t,c.now()])}var i=t("handle"),a=t(16),s=t("ee"),c=t("loader"),f=window.onerror,u=!1,d=0;c.features.err=!0,t(1),window.onerror=r;try{throw new Error}catch(l){"stack"in l&&(t(8),t(7),"addEventListener"in window&&t(5),c.xhrWrappable&&t(9),u=!0)}s.on("fn-start",function(t,n,e){u&&(d+=1)}),s.on("fn-err",function(t,n,e){u&&(this.thrown=!0,o(e))}),s.on("fn-end",function(){u&&!this.thrown&&d>0&&(d-=1)}),s.on("internal-error",function(t){i("ierr",[t,c.now(),!0])})},{}],3:[function(t,n,e){t("loader").features.ins=!0},{}],4:[function(t,n,e){function r(t){}if(window.performance&&window.performance.timing&&window.performance.getEntriesByType){var o=t("ee"),i=t("handle"),a=t(8),s=t(7),c="learResourceTimings",f="addEventListener",u="resourcetimingbufferfull",d="bstResource",l="resource",p="-start",h="-end",m="fn"+p,w="fn"+h,v="bstTimer",y="pushState",g=t("loader");g.features.stn=!0,t(6);var b=NREUM.o.EV;o.on(m,function(t,n){var e=t[0];e instanceof b&&(this.bstStart=g.now())}),o.on(w,function(t,n){var e=t[0];e instanceof b&&i("bst",[e,n,this.bstStart,g.now()])}),a.on(m,function(t,n,e){this.bstStart=g.now(),this.bstType=e}),a.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),this.bstType])}),s.on(m,function(){this.bstStart=g.now()}),s.on(w,function(t,n){i(v,[n,this.bstStart,g.now(),"requestAnimationFrame"])}),o.on(y+p,function(t){this.time=g.now(),this.startPath=location.pathname+location.hash}),o.on(y+h,function(t){i("bstHist",[location.pathname+location.hash,this.startPath,this.time])}),f in window.performance&&(window.performance["c"+c]?window.performance[f](u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["c"+c]()},!1):window.performance[f]("webkit"+u,function(t){i(d,[window.performance.getEntriesByType(l)]),window.performance["webkitC"+c]()},!1)),document[f]("scroll",r,{passive:!0}),document[f]("keypress",r,!1),document[f]("click",r,!1)}},{}],5:[function(t,n,e){function r(t){for(var n=t;n&&!n.hasOwnProperty(u);)n=Object.getPrototypeOf(n);n&&o(n)}function o(t){s.inPlace(t,[u,d],"-",i)}function i(t,n){return t[1]}var a=t("ee").get("events"),s=t(18)(a,!0),c=t("gos"),f=XMLHttpRequest,u="addEventListener",d="removeEventListener";n.exports=a,"getPrototypeOf"in Object?(r(document),r(window),r(f.prototype)):f.prototype.hasOwnProperty(u)&&(o(window),o(f.prototype)),a.on(u+"-start",function(t,n){var e=t[1],r=c(e,"nr@wrapped",function(){function t(){if("function"==typeof e.handleEvent)return e.handleEvent.apply(e,arguments)}var n={object:t,"function":e}[typeof e];return n?s(n,"fn-",null,n.name||"anonymous"):e});this.wrapped=t[1]=r}),a.on(d+"-start",function(t){t[1]=this.wrapped||t[1]})},{}],6:[function(t,n,e){var r=t("ee").get("history"),o=t(18)(r);n.exports=r,o.inPlace(window.history,["pushState","replaceState"],"-")},{}],7:[function(t,n,e){var r=t("ee").get("raf"),o=t(18)(r),i="equestAnimationFrame";n.exports=r,o.inPlace(window,["r"+i,"mozR"+i,"webkitR"+i,"msR"+i],"raf-"),r.on("raf-start",function(t){t[0]=o(t[0],"fn-")})},{}],8:[function(t,n,e){function r(t,n,e){t[0]=a(t[0],"fn-",null,e)}function o(t,n,e){this.method=e,this.timerDuration=isNaN(t[1])?0:+t[1],t[0]=a(t[0],"fn-",this,e)}var i=t("ee").get("timer"),a=t(18)(i),s="setTimeout",c="setInterval",f="clearTimeout",u="-start",d="-";n.exports=i,a.inPlace(window,[s,"setImmediate"],s+d),a.inPlace(window,[c],c+d),a.inPlace(window,[f,"clearImmediate"],f+d),i.on(c+u,r),i.on(s+u,o)},{}],9:[function(t,n,e){function r(t,n){d.inPlace(n,["onreadystatechange"],"fn-",s)}function o(){var t=this,n=u.context(t);t.readyState>3&&!n.resolved&&(n.resolved=!0,u.emit("xhr-resolved",[],t)),d.inPlace(t,y,"fn-",s)}function i(t){g.push(t),h&&(x?x.then(a):w?w(a):(E=-E,O.data=E))}function a(){for(var t=0;t<g.length;t++)r([],g[t]);g.length&&(g=[])}function s(t,n){return n}function c(t,n){for(var e in t)n[e]=t[e];return n}t(5);var f=t("ee"),u=f.get("xhr"),d=t(18)(u),l=NREUM.o,p=l.XHR,h=l.MO,m=l.PR,w=l.SI,v="readystatechange",y=["onload","onerror","onabort","onloadstart","onloadend","onprogress","ontimeout"],g=[];n.exports=u;var b=window.XMLHttpRequest=function(t){var n=new p(t);try{u.emit("new-xhr",[n],n),n.addEventListener(v,o,!1)}catch(e){try{u.emit("internal-error",[e])}catch(r){}}return n};if(c(p,b),b.prototype=p.prototype,d.inPlace(b.prototype,["open","send"],"-xhr-",s),u.on("send-xhr-start",function(t,n){r(t,n),i(n)}),u.on("open-xhr-start",r),h){var x=m&&m.resolve();if(!w&&!m){var E=1,O=document.createTextNode(E);new h(a).observe(O,{characterData:!0})}}else f.on("fn-end",function(t){t[0]&&t[0].type===v||a()})},{}],10:[function(t,n,e){function r(t){var n=this.params,e=this.metrics;if(!this.ended){this.ended=!0;for(var r=0;r<d;r++)t.removeEventListener(u[r],this.listener,!1);if(!n.aborted){if(e.duration=a.now()-this.startTime,4===t.readyState){n.status=t.status;var i=o(t,this.lastSize);if(i&&(e.rxSize=i),this.sameOrigin){var c=t.getResponseHeader("X-NewRelic-App-Data");c&&(n.cat=c.split(", ").pop())}}else n.status=0;e.cbTime=this.cbTime,f.emit("xhr-done",[t],t),s("xhr",[n,e,this.startTime])}}}function o(t,n){var e=t.responseType;if("json"===e&&null!==n)return n;var r="arraybuffer"===e||"blob"===e||"json"===e?t.response:t.responseText;return h(r)}function i(t,n){var e=c(n),r=t.params;r.host=e.hostname+":"+e.port,r.pathname=e.pathname,t.sameOrigin=e.sameOrigin}var a=t("loader");if(a.xhrWrappable){var s=t("handle"),c=t(11),f=t("ee"),u=["load","error","abort","timeout"],d=u.length,l=t("id"),p=t(14),h=t(13),m=window.XMLHttpRequest;a.features.xhr=!0,t(9),f.on("new-xhr",function(t){var n=this;n.totalCbs=0,n.called=0,n.cbTime=0,n.end=r,n.ended=!1,n.xhrGuids={},n.lastSize=null,p&&(p>34||p<10)||window.opera||t.addEventListener("progress",function(t){n.lastSize=t.loaded},!1)}),f.on("open-xhr-start",function(t){this.params={method:t[0]},i(this,t[1]),this.metrics={}}),f.on("open-xhr-end",function(t,n){"loader_config"in NREUM&&"xpid"in NREUM.loader_config&&this.sameOrigin&&n.setRequestHeader("X-NewRelic-ID",NREUM.loader_config.xpid)}),f.on("send-xhr-start",function(t,n){var e=this.metrics,r=t[0],o=this;if(e&&r){var i=h(r);i&&(e.txSize=i)}this.startTime=a.now(),this.listener=function(t){try{"abort"===t.type&&(o.params.aborted=!0),("load"!==t.type||o.called===o.totalCbs&&(o.onloadCalled||"function"!=typeof n.onload))&&o.end(n)}catch(e){try{f.emit("internal-error",[e])}catch(r){}}};for(var s=0;s<d;s++)n.addEventListener(u[s],this.listener,!1)}),f.on("xhr-cb-time",function(t,n,e){this.cbTime+=t,n?this.onloadCalled=!0:this.called+=1,this.called!==this.totalCbs||!this.onloadCalled&&"function"==typeof e.onload||this.end(e)}),f.on("xhr-load-added",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&!this.xhrGuids[e]&&(this.xhrGuids[e]=!0,this.totalCbs+=1)}),f.on("xhr-load-removed",function(t,n){var e=""+l(t)+!!n;this.xhrGuids&&this.xhrGuids[e]&&(delete this.xhrGuids[e],this.totalCbs-=1)}),f.on("addEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-added",[t[1],t[2]],n)}),f.on("removeEventListener-end",function(t,n){n instanceof m&&"load"===t[0]&&f.emit("xhr-load-removed",[t[1],t[2]],n)}),f.on("fn-start",function(t,n,e){n instanceof m&&("onload"===e&&(this.onload=!0),("load"===(t[0]&&t[0].type)||this.onload)&&(this.xhrCbStart=a.now()))}),f.on("fn-end",function(t,n){this.xhrCbStart&&f.emit("xhr-cb-time",[a.now()-this.xhrCbStart,this.onload,n],n)})}},{}],11:[function(t,n,e){n.exports=function(t){var n=document.createElement("a"),e=window.location,r={};n.href=t,r.port=n.port;var o=n.href.split("://");!r.port&&o[1]&&(r.port=o[1].split("/")[0].split("@").pop().split(":")[1]),r.port&&"0"!==r.port||(r.port="https"===o[0]?"443":"80"),r.hostname=n.hostname||e.hostname,r.pathname=n.pathname,r.protocol=o[0],"/"!==r.pathname.charAt(0)&&(r.pathname="/"+r.pathname);var i=!n.protocol||":"===n.protocol||n.protocol===e.protocol,a=n.hostname===document.domain&&n.port===e.port;return r.sameOrigin=i&&(!n.hostname||a),r}},{}],12:[function(t,n,e){function r(){}function o(t,n,e){return function(){return i(t,[f.now()].concat(s(arguments)),n?null:this,e),n?void 0:this}}var i=t("handle"),a=t(15),s=t(16),c=t("ee").get("tracer"),f=t("loader"),u=NREUM;"undefined"==typeof window.newrelic&&(newrelic=u);var d=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],l="api-",p=l+"ixn-";a(d,function(t,n){u[n]=o(l+n,!0,"api")}),u.addPageAction=o(l+"addPageAction",!0),u.setCurrentRouteName=o(l+"routeName",!0),n.exports=newrelic,u.interaction=function(){return(new r).get()};var h=r.prototype={createTracer:function(t,n){var e={},r=this,o="function"==typeof n;return i(p+"tracer",[f.now(),t,e],r),function(){if(c.emit((o?"":"no-")+"fn-start",[f.now(),r,o],e),o)try{return n.apply(this,arguments)}finally{c.emit("fn-end",[f.now()],e)}}}};a("setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(t,n){h[n]=o(p+n)}),newrelic.noticeError=function(t){"string"==typeof t&&(t=new Error(t)),i("err",[t,f.now()])}},{}],13:[function(t,n,e){n.exports=function(t){if("string"==typeof t&&t.length)return t.length;if("object"==typeof t){if("undefined"!=typeof ArrayBuffer&&t instanceof ArrayBuffer&&t.byteLength)return t.byteLength;if("undefined"!=typeof Blob&&t instanceof Blob&&t.size)return t.size;if(!("undefined"!=typeof FormData&&t instanceof FormData))try{return JSON.stringify(t).length}catch(n){return}}}},{}],14:[function(t,n,e){var r=0,o=navigator.userAgent.match(/Firefox[\/\s](\d+\.\d+)/);o&&(r=+o[1]),n.exports=r},{}],15:[function(t,n,e){function r(t,n){var e=[],r="",i=0;for(r in t)o.call(t,r)&&(e[i]=n(r,t[r]),i+=1);return e}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],16:[function(t,n,e){function r(t,n,e){n||(n=0),"undefined"==typeof e&&(e=t?t.length:0);for(var r=-1,o=e-n||0,i=Array(o<0?0:o);++r<o;)i[r]=t[n+r];return i}n.exports=r},{}],17:[function(t,n,e){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],18:[function(t,n,e){function r(t){return!(t&&t instanceof Function&&t.apply&&!t[a])}var o=t("ee"),i=t(16),a="nr@original",s=Object.prototype.hasOwnProperty,c=!1;n.exports=function(t,n){function e(t,n,e,o){function nrWrapper(){var r,a,s,c;try{a=this,r=i(arguments),s="function"==typeof e?e(r,a):e||{}}catch(f){l([f,"",[r,a,o],s])}u(n+"start",[r,a,o],s);try{return c=t.apply(a,r)}catch(d){throw u(n+"err",[r,a,d],s),d}finally{u(n+"end",[r,a,c],s)}}return r(t)?t:(n||(n=""),nrWrapper[a]=t,d(t,nrWrapper),nrWrapper)}function f(t,n,o,i){o||(o="");var a,s,c,f="-"===o.charAt(0);for(c=0;c<n.length;c++)s=n[c],a=t[s],r(a)||(t[s]=e(a,f?s+o:o,i,s))}function u(e,r,o){if(!c||n){var i=c;c=!0;try{t.emit(e,r,o,n)}catch(a){l([a,e,r,o])}c=i}}function d(t,n){if(Object.defineProperty&&Object.keys)try{var e=Object.keys(t);return e.forEach(function(e){Object.defineProperty(n,e,{get:function(){return t[e]},set:function(n){return t[e]=n,n}})}),n}catch(r){l([r])}for(var o in t)s.call(t,o)&&(n[o]=t[o]);return n}function l(n){try{t.emit("internal-error",n)}catch(e){}}return t||(t=o),e.inPlace=f,e.flag=a,e}},{}],ee:[function(t,n,e){function r(){}function o(t){function n(t){return t&&t instanceof r?t:t?c(t,s,i):i()}function e(e,r,o,i){if(!l.aborted||i){t&&t(e,r,o);for(var a=n(o),s=h(e),c=s.length,f=0;f<c;f++)s[f].apply(a,r);var d=u[y[e]];return d&&d.push([g,e,r,a]),a}}function p(t,n){v[t]=h(t).concat(n)}function h(t){return v[t]||[]}function m(t){return d[t]=d[t]||o(e)}function w(t,n){f(t,function(t,e){n=n||"feature",y[e]=n,n in u||(u[n]=[])})}var v={},y={},g={on:p,emit:e,get:m,listeners:h,context:n,buffer:w,abort:a,aborted:!1};return g}function i(){return new r}function a(){(u.api||u.feature)&&(l.aborted=!0,u=l.backlog={})}var s="nr@context",c=t("gos"),f=t(15),u={},d={},l=n.exports=o();l.backlog=u},{}],gos:[function(t,n,e){function r(t,n,e){if(o.call(t,n))return t[n];var r=e();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(t,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return t[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(t,n,e){function r(t,n,e,r){o.buffer([t],r),o.emit(t,n,e)}var o=t("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(t,n,e){function r(t){var n=typeof t;return!t||"object"!==n&&"function"!==n?-1:t===window?0:a(t,i,function(){return o++})}var o=1,i="nr@id",a=t("gos");n.exports=r},{}],loader:[function(t,n,e){function r(){if(!x++){var t=b.info=NREUM.info,n=l.getElementsByTagName("script")[0];if(setTimeout(u.abort,3e4),!(t&&t.licenseKey&&t.applicationID&&n))return u.abort();f(y,function(n,e){t[n]||(t[n]=e)}),c("mark",["onload",a()+b.offset],null,"api");var e=l.createElement("script");e.src="https://"+t.agent,n.parentNode.insertBefore(e,n)}}function o(){"complete"===l.readyState&&i()}function i(){c("mark",["domContent",a()+b.offset],null,"api")}function a(){return E.exists&&performance.now?Math.round(performance.now()):(s=Math.max((new Date).getTime(),s))-b.offset}var s=(new Date).getTime(),c=t("handle"),f=t(15),u=t("ee"),d=window,l=d.document,p="addEventListener",h="attachEvent",m=d.XMLHttpRequest,w=m&&m.prototype;NREUM.o={ST:setTimeout,SI:d.setImmediate,CT:clearTimeout,XHR:m,REQ:d.Request,EV:d.Event,PR:d.Promise,MO:d.MutationObserver};var v=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1044.min.js"},g=m&&w&&w[p]&&!/CriOS/.test(navigator.userAgent),b=n.exports={offset:s,now:a,origin:v,features:{},xhrWrappable:g};t(12),l[p]?(l[p]("DOMContentLoaded",i,!1),d[p]("load",r,!1)):(l[h]("onreadystatechange",o),d[h]("onload",r)),c("mark",["firstbyte",s],null,"api");var x=0,E=t(17)},{}]},{},["loader",2,10,4,3]);</script>
+<title>Santo - Saint Arnold Brewing Company - Untappd</title>
+<meta property="og:site_name" content="Untappd" />
+
+<meta name="description" content="Santo brewed by Saint Arnold Brewing Company as an Kölsch style beer, which has 3.5 out of 5, with 28,473 ratings and reviews on Untappd." />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+<meta property="fb:app_id" content="153339744679495" />
+<meta property="og:url" content="https://untappd.comb/saint-arnold-brewing-company-santo/68727" />
+<meta property="og:title" content="Santo - Saint Arnold Brewing Company - Untappd" />
+<meta property="og:image" content="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" />
+<meta property="og:description" content="Santo brewed by Saint Arnold Brewing Company as an Kölsch style beer, which has 3.5 out of 5, with 28,473 ratings and reviews on Untappd." />
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@untappd">
+<meta name="twitter:title" content="Santo by Saint Arnold Brewing Company | Untappd ">
+<meta name="twitter:description" content="Santo, which is a Kölsch at 4.9% ABV, has a rating of 3.5 out of 5, with 28,473 ratings and reviews on Untappd.">
+<meta name="twitter:image:src" content="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg">
+<meta name="twitter:domain" content="untappd.com">
+<meta name="twitter:app:name:iphone" content="Untappd">
+<meta name="twitter:app:name:android" content="Untappd">
+<meta name="twitter:app:id:iphone" content="id449141888">
+<meta name="twitter:app:id:googleplay" content="com.untappdllc.app">
+<script type="application/ld+json">
+			{"@context":"http:\/\/schema.org\/","@type":"Brewery","name":"Santo","aggregateRating":{"@type":"AggregateRating","ratingValue":3.53902,"bestRating":"5","ratingCount":28473}}		</script>
+
+<script type="text/javascript">
+			(function(b,r,a,n,c,h,_,s,d,k){if(!b[n]||!b[n]._q){for(;s<_.length;)c(h,_[s++]);d=r.createElement(a);d.async=1;d.src="https://cdn.branch.io/branch-latest.min.js";k=r.getElementsByTagName(a)[0];k.parentNode.insertBefore(d,k);b[n]=h}})(window,document,"script","branch",function(b,r){b[r]=function(){b._q.push([r,arguments])}},{_q:[],_v:1},"addListener applyCode banner closeBanner creditHistory credits data deepview deepviewCta first getCode init link logout redeem referrals removeListener sendSMS setIdentity track validateCode".split(" "), 0);
+			branch.init('key_live_dkd8Nr651lqTGtpGipS2Bijfxrc1L2Mk');
+
+			branch.banner({
+			    icon: 'https://untappd.akamaized.net/logos/ut_icon_144.png',
+			    title: 'Untappd - Discover Beer',
+			    description: 'Download the Untappd app today!',
+			    position: 'bottom'
+			}, {});
+			</script>
+<meta name="author" content="The Untappd Team" />
+<meta name="Copyright" content="Copyright Untappd 2018. All Rights Reserved." />
+<meta name="DC.title" content="Untappd" />
+<meta name="DC.subject" content="Santo brewed by Saint Arnold Brewing Company as an Kölsch style beer, which has 3.5 out of 5, with 28,473 ratings and reviews on Untappd." />
+<meta name="DC.creator" content="The Untappd Team" />
+<meta name="google-site-verification" content="EnR7QavTgiLCzZCCOv_OARCHsHhFwkwnJdG0Sti9Amg" />
+<meta name="bitly-verification" content="b3080898518a" />
+
+<link rel="apple-touch-icon" sizes="144x144" href="https://untappd.akamaized.net/assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="https://untappd.akamaized.net/assets/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="https://untappd.akamaized.net/assets/favicon-16x16.png" sizes="16x16">
+<link rel="manifest" href="https://untappd.akamaized.net/assets/manifest.json">
+<link rel="mask-icon" href="https://untappd.akamaized.net/assets/safari-pinned-tab.svg" color="#5bbad5">
+<link id="canonical" rel="canonical" href="https://untappd.comb/saint-arnold-brewing-company-santo/68727">
+<link rel="apple-touch-icon" href="https://untappd.akamaized.net/assets/images/ut-touch-icon.png" />
+<link rel="stylesheet" href="https://untappd.akamaized.net/assets/css/master.min.css?v=3.1.2" />
+<link rel="stylesheet" href="https://untappd.akamaized.net/assets/v3/css/style.css?v=3.1.2" />
+<script src="https://untappd.akamaized.net/assets/v3/js/common/min/site_common_min.js?v=2.2.0"></script>
+<!--[if lte IE 7]><script src="https://untappd.akamaized.net/assets/js/ie6.js?v=2.2.0"></script><![endif]-->
+<link rel="stylesheet" href="https://untappd.akamaized.net/assets/css/facybox.min.css?v=3.1.2" />
+<link rel="stylesheet" href="https://untappd.akamaized.net/assets/css/jquery.notifyBar.min.css?v=3.1.2" />
+<link rel="stylesheet" href="https://untappd.akamaized.net/assets/css/tipsy.min.css?v=3.1.2" type="text/css" media="screen" title="no title" charset="utf-8">
+<script type="text/javascript" language="Javascript">
+			$(document).ready(function(){
+				$(".tip").tipsy({fade: true});
+				$('.badge_hint').tipsy({gravity: 's', fade: true});
+				$('.disabled').tipsy({gravity: 'n', fade: true});
+
+				refreshTime(".timezoner", "D MMM YY", true);
+
+				$(".tab").click(function(){
+					$(".tab-area li").removeClass('active');
+					$(this).parent().addClass('active');
+					$(".list").hide();
+					$($(this).attr("href")).show();
+					return false;
+				});
+			});
+
+			</script>
+
+<script type="text/javascript" language="Javascript">
+	onChangeInterval = "";
+	if(!(window.console && console.log)) {
+	  console = {
+	    log: function(){},
+	    debug: function(){},
+	    info: function(){},
+	    warn: function(){},
+	    error: function(){}
+	  };
+	}
+	</script>
+
+<script type="text/javascript" src="https://untappd.akamaized.net/assets/libs/js/algoliasearch.min.js?v2.2.0"></script>
+<script type="text/javascript" src="https://untappd.akamaized.net/assets/libs/js/autocomplete.min.js?v2.2.0"></script>
+<script type="text/javascript" src="https://untappd.akamaized.net/assets/libs/js/lodash.min.js?v2.2.0"></script>
+<script type="text/javascript" src="https://untappd.akamaized.net/assets/js/global/autosearch_tracking.min.js?v2.2.0"></script>
+</head>
+<style type="text/css">
+	.hidden {display: none;}
+</style>
+<body onunload="">
+<div id="mobile_nav_user">
+</div>
+<div id="mobile_nav_site">
+<form class="search_box" method="get" action="/search">
+<input type="text" class="track-focus search-input-desktop" autocomplete="off" data-track="desktop_search" placeholder="Find a beer, brewery or bar..." name="q" />
+<input type="submit" value="Submit the form!" style="position: absolute; top: 0; left: 0; z-index: 0; width: 1px; height: 1px; visibility: hidden;" />
+<div class="autocomplete">
+</div>
+</form>
+<ul>
+<li><a class="track-click" data-track="mobile_menu" data-href=":thepub" href="/thepub">The Pub</a></li>
+<li><a class="track-click" data-track="mobile_menu" data-href=":beer/top_rated" href="/beer/top_rated">Top Rated</a></li>
+<li><a class="track-click" data-track="mobile_menu" data-href=":supporter" href="/supporter">Supporter</a></li>
+<li><a class="track-click" data-track="mobile_menu" data-href=":external/help" target="_blank" href="http://help.untappd.com">Help</a></li>
+<li><a class="track-click" data-track="mobile_menu" data-href=":sidebar/login" href="/login">Login</a></li>
+<li><a class="track-click" data-track="mobile_menu" data-href=":sidebar/create" href="/create?source=mobilemenu">Sign Up</a></li>
+</ul>
+</div>
+<header>
+<div class="inner">
+<p class="logo"><a class="track-click" data-track="desktop_header" data-href=":root" href="/">Untappd</a></p>
+<div class="get_user_desktop">
+<a class="sign_in track-click" data-track="mobile_header" data-href=":login" href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727">Sign In</a>
+<a href="/create" class="join track_click" data-track="mobile_header" data-href=":create">Join Now</a>
+</div>
+<div onclick="trackMobileEvent('menu');" class="mobile_menu_btn">Menu</div>
+<div id="nav_site">
+<ul>
+<li><a class="track-click" data-track="desktop_menu" data-href=":thepub" href="/thepub">The Pub</a></li>
+<li><a class="track-click" data-track="desktop_menu" data-href=":beer/top_rated" href="/beer/top_rated">Top Rated</a></li>
+<li><a class="track-click" data-track="desktop_menu" data-href=":supporter" href="/supporter">Supporter</a></li>
+<li><a class="track-click" data-track="desktop_menu" data-href=":external/help" target="_blank" href="http://help.untappd.com">Help</a></li>
+</ul>
+<form class="search_box" method="get" action="/search">
+<input type="text" class="track-focus search-input-desktop" autocomplete="off" data-track="desktop_search" placeholder="Find a beer, brewery or bar..." name="q" />
+<input type="submit" value="Submit the form!" style="position: absolute; top: 0; left: 0; z-index: 0; width: 1px; height: 1px; visibility: hidden;" />
+<div class="autocomplete">
+</div>
+</form>
+</div>
+</div>
+</header>
+<style type="text/css">
+    .ac-selected {
+        background-color: #f8f8f8;
+    }
+</style>
+<div class="nav_open_overlay"></div>
+<div id="slide">
+
+<div class="cont beer-page">
+<div class="main">
+<div class="box b_info">
+<div class="content">
+<div class="top">
+<div class="basic">
+<a class="label" href="/b/saint-arnold-brewing-company-santo/68727">
+<img src="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg"> </a>
+<div class="name">
+<h1>Santo</h1> <p class="brewery">
+<a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<p class="style">Kölsch</p>
+</div>
+<div class="actions mobile">
+<a class="check open-checkin-btn" href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727">Check-in</a>
+<a class="add" href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727">Add</a>
+</div>
+</div>
+<div class="stats">
+<p>
+<span class="stat">Total</span>
+<span class="count">48,129</span>
+</p><p>
+<span class="stat">Unique</span>
+<span class="count">32,391</span>
+</p><p>
+<span class="stat">Monthly</span>
+<span class="count">196</span>
+</p><p>
+<span class="stat">You</span>
+<span class="count"><a href="/login?go_to=https%3A%2F%2Funtappd.com%2F%2Fb%2Fsaint-arnold-brewing-company-santo%2F68727%3Ffilter%3Dyou" class="track-click" data-track="beer" data-href=":feed/filteryou/header">0</a></span>
+</p>
+</div>
+</div>
+<div class="details">
+<p class="abv">
+4.9% ABV </p><p class="ibu">
+17 IBU </p><p class="rating">
+<span class="rating small r350"></span>
+<span class="num">(3.54)</span> </p><p class="raters">
+28,473 Ratings </p><p class="date">
+Added 08/02/11 </p>
+</div>
+<div class="bottom">
+<div class="actions desktop">
+<a class="add tip" title="Add to Wishlist" href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727">Add</a>
+<a class="check open-checkin-btn tip" title="Check-in" href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727">Check-in</a>
+</div>
+<div class="desc">
+<div class="beer-descrption-read-more">
+Santo is a black Kölsch, which technically doesn’t exist as a style, but this is as&#8230; <a href="#" class="read-more track-click" data-track="beer" data-href=":info/readmore">Show More</a> </div>
+<div class="beer-descrption-read-less" style="display: none;">
+Santo is a black Kölsch, which technically doesn’t exist as a style, but this is as close as we can come to describing it. Essentially it is brewed using a Kölsch recipe with the addition of Munich and black malt. It is light bodied and floral yet with a distinct dark malt flavor. Our goal was to create a dark yet refreshing beer that would pair perfectly with a plate of enchiladas. The label artwork is by Houston artist Carlos Hernandez who is known for his Day of the Dead Rock Star series of paintings and prints.<br />
+<br />
+Awards:<br />
+Silver Medal, World Beer Cup, American-Style Dark Lager, 2014<br />
+Bronze Medal, World Beer Cup, American-Style Dark Lager, 2012 <a href="#" class="read-less track-click" data-track="beer" data-href=":info/readless">Show Less</a>
+</div>
+</div>
+<div class="clearfix"></div>
+</div>
+</div>
+</div>
+<div class="photo-boxes">
+<p><a href="/user/SUPERTEX14/checkin/559037057"><img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_06/0ce6738e8173b126d8a4da48febc4283_320x320.jpg"></a></p><p><a href="/user/glensingleton/checkin/558930520"><img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/19939ae6064f32cb40811dc54de09680_320x320.jpeg"></a></p><p><a href="/user/DallasTexan/checkin/558877365"><img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/e39169d6a921fc3137961f344896f9ea_320x320.jpeg"></a></p><p><a href="/user/Unclerandy1969/checkin/558833458"><img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/ef619c487b7d4c155fef2af2459b21e9_320x320.jpeg"></a></p><p><a href="/b/saint-arnold-brewing-company-santo/68727/photos" class="track-click" data-track="beer" data-href=":photos/seemore"><span class="all">See All</span><img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/7772820b3935dfe18204d2c9d3cfecb1_320x320.jpg"></a></p> </div>
+<div class="box activity">
+<div class="content">
+<div class="filters">
+<span>Sort by:</span>
+ <span class="current">
+Global
+</span><span>
+<a href="/login?go_to=https%3A%2F%2Funtappd.com%2F%2Fb%2Fsaint-arnold-brewing-company-santo%2F68727%3Ffilter%3Dyou" class="track-click" data-track="beer" data-href=":feed/filterfriends">Friends</a>
+</span><span>
+<a href="/login?go_to=https%3A%2F%2Funtappd.com%2F%2Fb%2Fsaint-arnold-brewing-company-santo%2F68727%3Ffilter%3Dyou" class="track-click" data-track="beer" data-href=":feed/filteryou">You</a>
+</span>
+</div>
+<h3>Global Recent Activity</h3>
+<div id="main-stream">
+<div class="item" id="checkin_559037057" data-checkin-id="559037057">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/SUPERTEX14">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/c8a7ea18bd99d664a8db1eb19404c74e_100x100.jpg" alt="Mike">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/SUPERTEX14" class="user">Mike</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<p class="purchased">Purchased at <a href="/v/fiesta-mart-inc/7067196">Fiesta Mart Inc</a></p>
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/bottle@3x.png">
+<span>Bottle</span>
+</p>
+<span class="rating small r425"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_99Bottles_sm.jpg" alt="99 Bottles (Level 27)">
+<span>Earned the 99 Bottles (Level 27) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/SUPERTEX14/checkin/559037057" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_06/0ce6738e8173b126d8a4da48febc4283_320x320.jpg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/SUPERTEX14/checkin/559037057" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Tue, 06 Feb 2018 00:14:10 +0000</a>
+<a href="/user/SUPERTEX14/checkin/559037057" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_559010650" data-checkin-id="559010650">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/JamieLinn">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/661ed8847c23a3dcd370017ae951a00f_100x100.jpg" alt="Jamie H.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/JamieLinn" class="user">Jamie H.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a> at <a href="/v/warehouse-saloon-billiards/465354">Warehouse Saloon & Billiards</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<span class="rating small r350"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_HoppedDown_sm.jpg" alt="Hopped Down (Level 9)">
+<span>Earned the Hopped Down (Level 9) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/JamieLinn/checkin/559010650" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 22:17:23 +0000</a>
+<a href="/user/JamieLinn/checkin/559010650" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558930520" data-checkin-id="558930520">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/glensingleton">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/be63c7e6821516d35a1b3cbf230c3c6c_thumb.jpg" alt="Glen S.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/glensingleton" class="user">Glen S.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a> at <a href="/v/the-watering-hole/2562996">The Watering Hole</a>
+</p>
+<div class="checkin-comment">
+<p class="purchased">Purchased at <a href="/v/the-watering-hole/2562996">The Watering Hole</a></p>
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/draft@3x.png">
+<span>Draft</span>
+</p>
+<span class="rating small r450"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_HoppedDown_sm.jpg" alt="Hopped Down (Level 4)">
+<span>Earned the Hopped Down (Level 4) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/glensingleton/checkin/558930520" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/19939ae6064f32cb40811dc54de09680_320x320.jpeg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/glensingleton/checkin/558930520" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 06:32:09 +0000</a>
+<a href="/user/glensingleton/checkin/558930520" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers"> <span class="count">
+<span>1</span>
+</span><span class="toast-list">
+<a class="user-toasts tip track-click" data-user-name="Don47" href="/user/Don47" title="Don B." data-track="activity_feed" data-href=":feed/userprofiletoast">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/1a9fbecd65aa6af9272f32af333bac98_100x100.jpg">
+</a>
+</span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558905905" data-checkin-id="558905905">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Jwdenver95">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/2289fe0ab370d8397afe2bcff852b8e9_100x100.jpg" alt="John S.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Jwdenver95" class="user">John S.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_RidingSteady_sm.jpg" alt="Riding Steady (Level 6)">
+<span>Earned the Riding Steady (Level 6) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Jwdenver95/checkin/558905905" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 03:40:35 +0000</a>
+<a href="/user/Jwdenver95/checkin/558905905" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558879513" data-checkin-id="558879513">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/RunningNutMeg">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/f4338e359c69e73d3facba2b14beabd5_100x100.jpg" alt="Megan S.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/RunningNutMeg" class="user">Megan S.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<p class="comment-text">
+Super booowwllll </p>
+<div class="rating-serving">
+<span class="rating small r350"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_BrewBowlLII_sm.jpg" alt="Brew Bowl LII">
+<span>Earned the Brew Bowl LII badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/RunningNutMeg/checkin/558879513" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 02:34:20 +0000</a>
+<a href="/user/RunningNutMeg/checkin/558879513" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers"> <span class="count">
+<span>1</span>
+</span><span class="toast-list">
+<a class="user-toasts tip track-click" data-user-name="Actsteve" href="/user/Actsteve" title="Steve J." data-track="activity_feed" data-href=":feed/userprofiletoast">
+<img class="lazy" data-original="https://gravatar.com/avatar/10a20225d043f0377c2f17a90e084924?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2">
+</a>
+</span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558877365" data-checkin-id="558877365">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/DallasTexan">
+<img class="lazy" data-original="https://gravatar.com/avatar/924015cf4c0ed1126a8e5d9f056df436?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2" alt="Charly S.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/DallasTexan" class="user">Charly S.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<span class="rating small r300"></span>
+</div>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/DallasTexan/checkin/558877365" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/e39169d6a921fc3137961f344896f9ea_320x320.jpeg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/DallasTexan/checkin/558877365" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 02:31:15 +0000</a>
+<a href="/user/DallasTexan/checkin/558877365" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558876017" data-checkin-id="558876017">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/DallasTexan">
+<img class="lazy" data-original="https://gravatar.com/avatar/924015cf4c0ed1126a8e5d9f056df436?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2" alt="Charly S.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/DallasTexan" class="user">Charly S.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<span class="rating small r300"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_BrewBowlLII_sm.jpg" alt="Brew Bowl LII">
+<span>Earned the Brew Bowl LII badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/DallasTexan/checkin/558876017" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 02:29:31 +0000</a>
+<a href="/user/DallasTexan/checkin/558876017" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558859458" data-checkin-id="558859458">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Matterhorn87">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/b2b3e861762a9357cd092544156c0136_100x100.jpg" alt="Matthew H.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Matterhorn87" class="user">Matthew H.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/can@3x.png?v=1">
+<span>Can</span>
+</p>
+<span class="rating small r350"></span>
+</div>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/Matterhorn87/checkin/558859458" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/7772820b3935dfe18204d2c9d3cfecb1_320x320.jpg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Matterhorn87/checkin/558859458" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 02:06:45 +0000</a>
+<a href="/user/Matterhorn87/checkin/558859458" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers"> <span class="count">
+<span>1</span>
+</span><span class="toast-list">
+<a class="user-toasts tip track-click" data-user-name="sharkrocket7" href="/user/sharkrocket7" title="Shawn P." data-track="activity_feed" data-href=":feed/userprofiletoast">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/0e7b1c968a934e6538702a5b03b004d2_100x100.jpg">
+</a>
+</span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558835280" data-checkin-id="558835280">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/wasserbar">
+<img class="lazy" data-original="https://gravatar.com/avatar/2c491e8aa95d271afd20755a175e54ac?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2" alt="Eugene D.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/wasserbar" class="user">Eugene D.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a> at <a href="/v/nextdoor-bar-lounge/154800">NEXTDOOR Bar & Lounge</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/draft@3x.png">
+<span>Draft</span>
+</p>
+<span class="rating small r350"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_america_sm.jpg" alt="Land of the Free (Level 9)">
+<span>Earned the Land of the Free (Level 9) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/wasserbar/checkin/558835280" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 01:39:16 +0000</a>
+<a href="/user/wasserbar/checkin/558835280" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558833458" data-checkin-id="558833458">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Unclerandy1969">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/dbc17214852968793b0e1047c6beadec_100x100.jpeg" alt="Randall N.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Unclerandy1969" class="user">Randall N.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<p class="comment-text">
+Not bad, liked it ice cold </p>
+<p class="purchased">Purchased at <a href="/v/heb/2722812">H-E-B</a></p>
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/bottle@3x.png">
+<span>Bottle</span>
+</p>
+<span class="rating small r325"></span>
+</div>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/Unclerandy1969/checkin/558833458" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/ef619c487b7d4c155fef2af2459b21e9_320x320.jpeg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Unclerandy1969/checkin/558833458" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 01:37:18 +0000</a>
+<a href="/user/Unclerandy1969/checkin/558833458" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558813865" data-checkin-id="558813865">
+<div class="avatar">
+<div class="avatar-holder">
+<span class="supporter"></span> <a href="/user/BeerBikeRun">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/4d00fe1100acfe6aa4d918e59f4b1819_100x100.jpg" alt="Jordan M.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/BeerBikeRun" class="user">Jordan M.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<p class="comment-text">
+I remember the logo but forgot how good this beer is </p>
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/can@3x.png?v=1">
+<span>Can</span>
+</p>
+<span class="rating small r475"></span>
+ </div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_RidingSteady_sm.jpg" alt="Riding Steady (Level 43)">
+<span>Earned the Riding Steady (Level 43) badge!</span>
+</span>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_kolsch_sm.jpg" alt="Respect the Kölsch (Level 2)">
+<span>Earned the Respect the Kölsch (Level 2) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+<p class="photo">
+<a href="/user/BeerBikeRun/checkin/558813865" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckinphoto">
+<img class="lazy" data-original="https://untappd.akamaized.net/photos/2018_02_05/8072ad71e7a9968a80add304a493edc5_320x320.jpeg" img="Check-in Photo">
+</a>
+</p>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/BeerBikeRun/checkin/558813865" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 01:10:44 +0000</a>
+<a href="/user/BeerBikeRun/checkin/558813865" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558795448" data-checkin-id="558795448">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Griffithsjacob">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/9196cea01ff9ef5a08b3ea0f4bcf8eac_thumb.jpg" alt="Jacob G.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Griffithsjacob" class="user">Jacob G.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a> at <a href="/v/longwood/632878">Longwood</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/can@3x.png?v=1">
+<span>Can</span>
+</p>
+<span class="rating small r400"></span>
+</div>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Griffithsjacob/checkin/558795448" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 00:49:48 +0000</a>
+<a href="/user/Griffithsjacob/checkin/558795448" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558745494" data-checkin-id="558745494">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Gruberm">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/9be08722000c3f9ee1ea5a05a6afe0ea_100x100.jpg" alt="Matt G.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Gruberm" class="user">Matt G.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<span class="rating small r350"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_RidingSteady_sm.jpg" alt="Riding Steady (Level 11)">
+<span>Earned the Riding Steady (Level 11) badge!</span>
+</span>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_WheelofStyles_sm.jpg" alt="Wheel of Styles (Level 15)">
+<span>Earned the Wheel of Styles (Level 15) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Gruberm/checkin/558745494" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Mon, 05 Feb 2018 00:05:02 +0000</a>
+<a href="/user/Gruberm/checkin/558745494" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558739221" data-checkin-id="558739221">
+<div class="avatar">
+<div class="avatar-holder">
+<a href="/user/Coltonryan">
+<img class="lazy" data-original="https://gravatar.com/avatar/3bf4ca1f1b3d6bdd68b198453232eedc?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2" alt="Colton">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/Coltonryan" class="user">Colton</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/can@3x.png?v=1">
+<span>Can</span>
+</p>
+<span class="rating small r350"></span>
+</div>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/Coltonryan/checkin/558739221" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Sun, 04 Feb 2018 23:59:45 +0000</a>
+<a href="/user/Coltonryan/checkin/558739221" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers" style="display: none;"> <span class="count"><span>0</span></span>
+<span class="toast-list"></span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="item" id="checkin_558706701" data-checkin-id="558706701">
+<div class="avatar">
+<div class="avatar-holder">
+<span class="supporter"></span> <a href="/user/darkhawkkg">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/5b57c58afc35b7ecc79a243eac7a61e3_100x100.jpg" alt="kevin g.">
+</a>
+</div>
+</div>
+<div class="checkin">
+<div class="top">
+<a href="/b/saint-arnold-brewing-company-santo/68727" class="label">
+<img class="lazy" data-original="https://untappd.akamaized.net/site/beer_logos/beer-68727_f6188_sm.jpeg" alt="Saint Arnold Brewing Company by Santo">
+</a>
+<p class="text">
+<a href="/user/darkhawkkg" class="user">kevin g.</a> is drinking a <a href="/b/saint-arnold-brewing-company-santo/68727">Santo</a> by <a href="/w/saint-arnold-brewing-company/2940">Saint Arnold Brewing Company</a> at <a href="/v/summerwood/577068">Summerwood</a>
+</p>
+<div class="checkin-comment">
+<div class="rating-serving">
+<p class="serving">
+<img src="https://untappd.akamaized.net/static_app_assets/can@3x.png?v=1">
+<span>Can</span>
+</p>
+<span class="rating small r325"></span>
+</div>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_BrewBowlLII_sm.jpg" alt="Brew Bowl LII">
+<span>Earned the Brew Bowl LII badge!</span>
+</span>
+<span class="badge">
+<img class="lazy" data-original="https://untappd.akamaized.net/badges/bdg_GloryCan_sm.jpg" alt="For the Can (Level 11)">
+<span>Earned the For the Can (Level 11) badge!</span>
+</span>
+<span style="display: block; clear: both;"></span>
+</div>
+</div>
+<div class="feedback">
+<div class="actions_bar">
+</div>
+<div class="bottom">
+<a href="/user/darkhawkkg/checkin/558706701" class="time timezoner track-click" data-track="activity_feed" data-href=":feed/viewcheckindate">Sun, 04 Feb 2018 23:31:41 +0000</a>
+<a href="/user/darkhawkkg/checkin/558706701" class="track-click" data-track="activity_feed" data-href=":feed/viewcheckintext">View Detailed Check-in</a>
+</div>
+<div class="cheers"> <span class="count">
+<span>1</span>
+</span><span class="toast-list">
+<a class="user-toasts tip track-click" data-user-name="DannyMcGraw" href="/user/DannyMcGraw" title="Danny M." data-track="activity_feed" data-href=":feed/userprofiletoast">
+<img class="lazy" data-original="https://untappd.akamaized.net/profile/a55f7a708610059ffdd0152c08fb70af_100x100.jpg">
+</a>
+</span>
+</div>
+<div class="comments">
+<div class="comments-container">
+</div>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="https://untappd.akamaized.net/assets/v3/js/common/min/feed_scripts_min.js?v=2.2.0"></script>
+<script id="delete-checkin-container" type="text/x-handlebars-template">
+				<div class="delete-confirm-checkin"></div>
+			</script>
+<script id="delete-checkin-template" type="text/x-handlebars-template">
+				<div class="modal delete-confirm"><div class="inner"><div class="top"><a class="close" href="#"></a><h3 style="margin-bottom: 0px; padding-bottom: 0px; border-bottom: none;">Confirm Check-in Deletion</h3></div><div class="error" id="delete-checkin-error" style="display: none;"></div><div class="delete-confirm-message" style="padding: 24px; text-align: center; webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;"><p><strong>Warning</strong> - Are you sure you want to delete this check-in? This cannot be undone. All badges that are associated with this check-in will be removed.</p><div class="inner-container" style="width: 80%; margin: 15px auto;"><a href="#" class="check-confirm-deletion" data-checkin-id="{{checkin_id}}" style="margin-top: 15px;">Confirm Deletion</a><p id="checkin-delete-loader" class="stream-loading"><span></span></p></div></div></div></div>
+			</script>
+<script id="comment-template" type="text/x-handlebars-template">
+				{{#each items}}<div class="comment" id="comment_{{this.comment_id}}"><div class="avatar"><div class="avatar-holder">{{#if this.user.supporter}} <span class="supporter"></span>{{/if}}<a href="/user/{{this.user.user_name}}"><img src="{{this.user.user_avatar}}" alt="Your Avatar"></a></div></div><div class="text"><p><a href="/user/{{this.user.user_name}}">{{this.user.first_name}} {{this.user.last_name}}</a>: <abbr id="checkincomment_{{this.comment_id}}">{{{this.comment}}}</abbr></p><p class="meta"><span class="time timezoner">{{this.created_at}}</span>{{#if this.comment_editor}}<a href="#" class="comment-edit" data-comment-id="{{this.comment_id}}">Edit</a>{{/if}}{{#if this.comment_owner}}<a href="#" class="comment-delete" data-comment-id="{{this.comment_id}}">Delete</a>{{/if}}</p></div></div>{{#if this.comment_editor}}<div class="comment" id="commentedit_{{this.comment_id}}" style="display: none;"><div class="avatar"><div class="avatar-holder">{{#if this.user.supporter}} <span class="supporter"></span>{{/if}}<a href="/user/{{this.user.user_name}}"><img src="{{this.user.user_avatar}}" alt="Your Avatar"></a></div></div><div class="text"><form class="editing"><p class="editerror_{{this.comment_id}} post-error" style="display: none;">There was a problem posting your comment, please try again.</p><textarea name="comment" id="commentBox_{{this.comment_id}}" onkeydown="limitTextReverse($('#commentBox_{{this.comment_id}}'),$('#commentedit_{{this.comment_id}} .myCount'), 140);">{{{this.comment}}}</textarea><span class="comment-loading" style="display: none;"></span><span class="counter"><abbr class="myCount">0</abbr>/140</span><span class="actions"><a href="#" class="submit comment-update-save" data-comment-id="{{this.comment_id}}">Update</a><a href="#" data-comment-id="{{this.comment_id}}" class="cancel comment-update-cancel">Cancel</a></span></form></div></div>{{/if}}{{/each}}
+			</script>
+</div>
+<a href="/login?go_to=https://untappd.com/b/saint-arnold-brewing-company-santo/68727" class="yellow button more_checkins track-click" data-track="beer" data-href=":feed/showmoreloggedout">Show More</a>
+<p class="stream-loading"><span></span></p>
+</div>
+</div>
+</div>
+<div class="sidebar">
+<p class="edit" style="text-align: center;">
+<a href="/login?go_to=https://untappd.com/beer/propose_edit/68727">Propose Edit</a>
+<a href="/login?go_to=https://untappd.com/beer/propose_dupe/68727">Propose Duplicate</a>
+</p>
+<div class="box">
+<div class="content">
+<h3>Loyal Drinkers (<a href="#" title="This data is refreshed every 48 hours." class="tip">?</a>)</h3>
+<div class="drinkers">
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/TysonDailey" title="Tyson D. (152 check-ins)"><span><img src="https://untappd.akamaized.net/profile/b290e11f544d865432cb07d1e1fd7ca9_100x100.jpg"></span></a>
+ <a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/nathanmiller" title="Nathan M. (61 check-ins)"><span><img src="https://untappd.akamaized.net/profile/84695c1bc52efa141c1a4f254c2e31af_thumb.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/turb0_n3gr0DAMUS" title="dan v. (61 check-ins)"><span><img src="https://gravatar.com/avatar/f2c35538e0fc97cf3fb50ad87a50aad0?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/TBender15" title="Tony B. (51 check-ins)"><span><img src="https://untappd.akamaized.net/profile/97cd95752df5c9261a84dd619635da38_thumb.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/Dutchgingerale" title="Carrie P. (50 check-ins)"><span><img src="https://gravatar.com/avatar/72d52f6a2128a538384b8ee3f9b902f9?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/lauramac95" title="Laura M. (47 check-ins)"><span><img src="https://untappd.akamaized.net/profile/3683e95adbfd1410c538bac1419e3395_100x100.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/Bobbywobbie" title="Bob T. (46 check-ins)"><span><img src="https://untappd.akamaized.net/profile/678ec83ffcaad416734d30e7722c01ad_100x100.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/kevin417" title="Kevin B. (43 check-ins)"><span><img src="https://untappd.akamaized.net/profile/ce75ffbbd7f3ca499d974a15d44b2ad0_thumb.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/TMWillis17" title="Todd W. (41 check-ins)"><span><img src="https://untappd.akamaized.net/profile/290fdf8af4bc1d302e93fcb64424b18f_100x100.jpeg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/Magerton" title="Michelle  (40 check-ins)"><span><img src="https://untappd.akamaized.net/profile/edc7f5a3027798d1c802530329f3bdc4_100x100.jpg"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/csechelski" title="Chris S. (39 check-ins)"><span><img src="https://gravatar.com/avatar/283b07976d7aea4722e2b39483b1fbb7?size=100&d=https%3A%2F%2Funtappd.akamaized.net%2Fsite%2Fassets%2Fimages%2Fdefault_avatar_v2_gravatar.jpg%3Fv%3D2"></span></a>
+<a class="tip track-click" data-track="sidebar" data-href=":loyal/drinkers" href="/user/entalvis" title="Wil E. (39 check-ins)"><span><img src="https://untappd.akamaized.net/profile/6d420866acced063a7f9cf12b15ecbf3_thumb.jpg"></span></a>
+</div>
+</div>
+</div>
+<div class="box">
+<div class="content">
+<h3>Similar Beers</h3>
+<a href="/b/saint-arnold-brewing-company-fancy-lawnmower/2425" class="item track-click" data-track="sidebar" data-href=":beer/similar">
+<img src="https://untappd.akamaized.net/site/beer_logos/beer-2425_3db6a_sm.jpeg"><p>
+<span class="name">Fancy Lawnmower</span>
+<span class="brewery">Saint Arnold Brewing Company</span>
+</p>
+</a>
+<a href="/b/karbach-brewing-co-love-street-summer-seasonal/340846" class="item track-click" data-track="sidebar" data-href=":beer/similar">
+<img src="https://untappd.akamaized.net/site/beer_logos/beer-_340846_sm_85befe468096d0fd5914e1a26b22da.jpeg"><p>
+<span class="name">Love Street</span>
+<span class="brewery">Karbach Brewing Co</span>
+</p>
+</a>
+<a href="/b/eureka-heights-brew-co-buckle-bunny/1645750" class="item track-click" data-track="sidebar" data-href=":beer/similar">
+<img src="https://untappd.akamaized.net/site/beer_logos/beer-1645750_a8997_sm.jpeg"><p>
+<span class="name">Buckle Bunny</span>
+<span class="brewery">Eureka Heights Brew Co</span>
+</p>
+</a>
+<a href="/b/gulf-coast-brewery-summer-blonde-ale/1809830" class="item track-click" data-track="sidebar" data-href=":beer/similar">
+<img src="https://untappd.akamaized.net/site/beer_logos/beer-1809830_000bd_sm.jpeg"><p>
+<span class="name">Summer Blonde Ale</span>
+<span class="brewery">Gulf Coast Brewery</span>
+</p>
+</a>
+<a href="/b/platypus-brewing-woomba-wheat-ale/2394557" class="item track-click" data-track="sidebar" data-href=":beer/similar">
+<img src="https://untappd.akamaized.net/site/assets/images/temp/badge-beer-default.png"><p>
+<span class="name">'Woomba Wheat Ale</span>
+<span class="brewery">Platypus Brewing</span>
+</p>
+</a>
+</div>
+</div>
+<div class="box">
+<div class="content">
+<h3>Verified Locations</h3> <a href="/v/bean-and-grape/7295755" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://untappd.akamaized.net/venuelogos/venue_7295755_8f9b7811_bg_88.png"><p>
+<span class="name">Bean & Grape</span>
+<span class="location">Midland, TX </span> </p>
+</a>
+<a href="/v/old-chicago-pizza-and-taproom/5413788" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://untappd.akamaized.net/venuelogos/venue_5413788_eaac5f3b_bg_88.png"><p>
+<span class="name">Old Chicago - Tyler Texas</span>
+<span class="location">Tyler, TX </span> </p>
+</a>
+<a href="/v/guru-burgers-crepes/265149" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://untappd.akamaized.net/venuelogos/venue_265149_da3c6ec1_bg_88.png"><p>
+<span class="name">Guru Burgers & Crepes</span>
+<span class="location">Sugar Land, TX </span> </p>
+</a>
+<a href="/v/raven-tower/4223968" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://untappd.akamaized.net/venuelogos/venue_4223968_67248f8d_bg_88.png"><p>
+<span class="name">The Raven Tower</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/grain-to-glass/2227851" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://untappd.akamaized.net/venuelogos/venue_2227851_9de73792_bg_88.png"><p>
+<span class="name">Grain To Glass</span>
+<span class="location">McAllen, TX </span> </p>
+</a>
+</div>
+</div>
+<div class="box">
+<div class="content">
+<h3>Popular Locations</h3> <a href="/v/saint-arnold-brewing-company/19036" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/food/brewery_bg_88.png"><p>
+<span class="name">Saint Arnold Brewing Company</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/smart-financial-centre/5823911" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/arts_entertainment/musicvenue_bg_88.png"><p>
+<span class="name">Smart Financial Centre</span>
+<span class="location">Sugar Land, TX </span> </p>
+</a>
+<a href="/v/3rd-bar-eating-house/806080" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/food/seafood_bg_88.png"><p>
+<span class="name">3rd Bar Eating House</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/capt-bennys-seafood/699128" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/food/seafood_bg_88.png"><p>
+<span class="name">Capt Benny's Seafood</span>
+<span class="location">Deer Park, TX </span> </p>
+</a>
+<a href="/v/wicklow-heights/6801188" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/nightlife/pub_bg_88.png"><p>
+<span class="name">Wicklow Heights</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/iii-forks/497443" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/food/steakhouse_bg_88.png"><p>
+<span class="name">III Forks</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/the-quarter-bar/528" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/nightlife/pub_bg_88.png"><p>
+<span class="name">The Quarter Bar</span>
+<span class="location">Dallas, TX </span> </p>
+</a>
+<a href="/v/texs-riverwalk-sports-bar/957289" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/food/default_bg_88.png"><p>
+<span class="name">Tex's Riverwalk Sports Bar</span>
+<span class="location">San Antonio, TX </span> </p>
+</a>
+<a href="/v/nextdoor-bar-lounge/154800" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/nightlife/pub_bg_88.png"><p>
+<span class="name">NEXTDOOR Bar & Lounge</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+<a href="/v/on-the-kirb/5430955" class="item track-click" data-track="sidebar" data-href=":venue/toplist">
+<img src="https://ss3.4sqi.net/img/categories_v2/nightlife/sportsbar_bg_88.png"><p>
+<span class="name">On The Kirb</span>
+<span class="location">Houston, TX </span> </p>
+</a>
+</div>
+</div>
+</div>
+</div>
+<script>
+    $(document).ready(function() {
+        $(".read-less").on("click", function() {
+            $(".beer-descrption-read-less").hide();
+            $(".beer-descrption-read-more").show();
+            return false;
+        });
+
+        $(".read-more").on("click", function() {
+            $(".beer-descrption-read-more").hide();
+            $(".beer-descrption-read-less").show();
+            return false;
+        });
+    })
+    </script>
+<iframe src="/profile/impression?id=68727&type=venue_beer_impressions&raw=%7B%22verified%22%3A%5B7295755%2C5413788%2C265149%2C4223968%2C2227851%5D%2C%22popular%22%3A%5B19036%2C5823911%2C806080%2C699128%2C6801188%2C497443%2C528%2C957289%2C154800%2C5430955%5D%7D&nomobile=true" width="0" height="0" tabindex="-1" title="empty" class="hidden"></iframe><iframe src="/profile/stats?id=68727&type=beer&is_supporter=0&nomobile=true" width="0" height="0" tabindex="-1" title="empty" class="hidden"></iframe> <div id="footer">
+<p class="copyright">&copy; 2018 Untappd, Inc.<br /><br /></p>
+<ul>
+<li><a class="track-click" data-track="footer" data-href=":footer" href="/about">About Us</a></li>
+<li><a class="track-click" data-track="footer" data-href=":api" href="/api">API</a></li>
+<li><a class="track-click" data-track="footer" data-href=":business" href="http://untappd.com/business/breweries">Breweries</a></li>
+<li><a class="track-click" data-track="footer" data-href=":store" href="http://untpd.it/store" target="_blank">Untappd Store</a></li>
+<li><a class="track-click" data-track="footer" data-href=":help" href="http://help.untappd.com" target="_blank">Support</a></li>
+<li><a class="track-click" data-track="footer" data-href=":blog" href="http://blog.untappd.com" target="_blank">Blog</a></li>
+<li><a class="track-click" data-track="footer" data-href=":twitter" href="http://twitter.com/untappd" target="_blank">Twitter</a></li>
+<li><a class="track-click" data-track="footer" data-href=":facebook" href="http://facebook.com/untappd" target="_blank">Facebook</a></li>
+<li><a class="track-click" data-track="footer" data-href=":badgevoting" href="/uservote/badges">Badge Voting</a></li>
+<li><a class="track-click" data-track="footer" data-href=":terms" href="/terms">Terms</a></li>
+<li><a class="track-click" data-track="footer" data-href=":privacy" href="/privacy">Privacy</a></li>
+<li><a class="track-click" data-track="footer" data-href=":contact_email" href="/cdn-cgi/l/email-protection#7c15121a133c0912081d0c0c18521f1311">Contact Untappd</a></li>
+</ul>
+</div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/d07b1474/cloudflare-static/email-decode.min.js"></script><script type="text/javascript">
+	   // Clear Text Feild
+	function clearText(thefield){
+		if (thefield.defaultValue==thefield.value)
+		thefield.value = ""
+	}
+
+
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-11061050-10']);
+	  _gaq.push(['_trackPageview']);
+
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+
+	</script>
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+	  (adsbygoogle = window.adsbygoogle || []).push({
+	    google_ad_client: "ca-pub-7299652902588817",
+	    enable_page_level_ads: true
+	  });
+	</script>
+<script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"9cfba25275","applicationID":"59507973","transactionName":"NAdTZEZUChUFW0JdVg1NcFNAXAsIS3pTUUtMEVRcUVYQ","queueTime":0,"applicationTime":183,"atts":"GEBEEg5OGUpGWRQOQh4f","errorBeacon":"bam.nr-data.net","agent":""}</script></body>
+</html>

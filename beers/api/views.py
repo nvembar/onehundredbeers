@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
                                   ContestBeerSerializer, ContestPlayerSerializer
+import beers.utils.untappd as untappd
 
 logger = logging.getLogger(__name__)
 
@@ -141,3 +142,46 @@ class ContestBeerDetail(generics.RetrieveUpdateDestroyAPIView):
                                          contest__id = contest_id,
                                          id = contest_beer_id,)
         return contest_beer
+
+
+class BeerLookup(APIView):
+    """Looking up beer data from Untappd from URL"""
+
+    def get(self, request, format=None):
+        """Retrieves beer info based on URL"""
+        if 'url' not in request.query_params:
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['No URL provided']})
+        try:
+            beer = untappd.parse_beer(request.query_params['url'])
+            logger.info('Looking up beer at URL: %s', request.query_params['url'])
+            beer_object = {'name': beer.name,
+                           'brewery': beer.brewery,
+                           'style': beer.style,
+                           'untappd_url': beer.untappd_url,
+                           'brewery_url': beer.brewery_url,
+                          }
+            return Response(beer_object)
+        except untappd.UntappdParseException as e:
+            raise serializers.ValidationError({'non_field_errors': ['{}'.format(e)]})
+
+class BreweryLookup(APIView):
+    """Looking up brewery data from Untappd from URL"""
+
+    def get(self, request, format=None):
+        """Retrieves beer info based on URL"""
+        if 'url' not in request.query_params:
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['No URL provided']})
+        try:
+            brewery = untappd.parse_brewery(request.query_params['url'])
+            logger.info('Looking up brewery at URL: %s', request.query_params['url'])
+            brewery_object = {'name': brewery.name,
+                              'untappd_url': brewery.untappd_url,
+                              'location': brewery.location,
+                             }
+            return Response(brewery_object)
+        except untappd.UntappdParseException as e:
+            raise serializers.ValidationError({'non_field_errors': ['{}'.format(e)]})
+
+
