@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 RE_RATING = re.compile('r[0-9]{3}')
 
-class UntappdException(Exception):
+class UntappdParseException(Exception):
     pass
 
 def parse_checkin(url):
@@ -31,20 +31,22 @@ def parse_checkin(url):
         # Get beer info and error if it's not there
         checkinInfo = soup.find("div", class_="beer")
         if checkinInfo is None:
-            raise UntappdException("Unable to find beer information (in div)  on page")
+            raise UntappdParseException(
+                    "Unable to find beer information on checkin page")
         links = checkinInfo.find_all("a")
         for link in links:
             if 'href' not in link.attrs:
                 continue
             if link['href'].startswith('/b/'):
                 result.beer = link.string.strip()
-                result.beer_url = link['href']
+                result.beer_url = urljoin(response.geturl(), link['href'])
             elif link['href'].startswith('/brewery/'):
                 result.brewery = link.string.strip()
-                result.brewery_url = link['href']
+                result.brewery_url = urljoin(response.geturl(), link['href'])
 
         if result.beer is None or result.beer_url is None:
-            raise UntappdException("Unable to find beer information link on page")
+            raise UntappdParseException(
+                    "Unable to find beer information link on page")
 
         timeP = soup.find('p', class_='time')
         if timeP is not None:
@@ -52,10 +54,7 @@ def parse_checkin(url):
                     timeP.string.strip(), 
                     '%a, %d %b %Y %H:%M:%S %z')
 
-        # Optional canonical URL
-        canonical = soup.find('link', id='canonical')
-        if canonical is not None:
-            result.untappd_checkin = canonical['href']
+        result.untappd_checkin = response.geturl()
 
         # Optional photo information
         photoDiv = soup.find("div", class_="photo")
@@ -72,13 +71,13 @@ def parse_checkin(url):
                     result.rating = int(cls[1:])
         return result
 
-def parse_beer(url):
+def parse_beer(url, followBrewery=True):
     with urlopen(url) as response:
         soup = BeautifulSoup(response, "html.parser")
         result = Beer()
         divs = soup.find_all('div', class_='name')
         if len(divs) == 0:
-            raise UntappdException("Expected Beer URL at {}".format(url))
+            raise UntappdParseException("Expected Beer URL at {}".format(url))
         breweryUrl = None
         result.untappd_url = response.geturl()
         for div in divs:
@@ -93,8 +92,11 @@ def parse_beer(url):
                 if styleP is not None:
                     result.style = styleP.string.strip()
                 break
-        brewery = parse_brewery(breweryUrl)
-        result.brewery_url = brewery.untappd_url
+        if followBrewery:       
+            brewery = parse_brewery(breweryUrl)
+            result.brewery_url = brewery.untappd_url
+        else:
+            result.brewery_url = breweryUrl
         return result
 
 def parse_brewery(url):
@@ -104,8 +106,7 @@ def parse_brewery(url):
         result.untappd_url = response.geturl()
         divs = soup.find_all('div', class_='name')
         if len(divs) == 0:
-            raise UntappdException("Expected Brewery URL at {}".format(url))
-        breweryUrl = None
+            raise UntappdParseException("Expected Brewery URL at {}".format(url))
         for div in divs:
             header = div.find('h1')
             if header is not None:
