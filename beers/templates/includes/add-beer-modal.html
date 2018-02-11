@@ -7,6 +7,13 @@
       <div class="modal-body">
       <div id="alert-for-modal"></div>
       <form>
+        <div class="form-inline">
+          <div class="form-group">
+            <label class="control-label" for="untappd_url">Untappd URL</label>
+            <input id="untappd_url" class="form-control" type="text" placeholder="URL"/>
+          </div>
+          <button id="lookup_beer" type="button" class="btn btn-primary" onclick="EditContest.populateBeerFromLookup(contest)">Load data from URL</button>
+        </div>
         <div class="form-group">
           <label class="control-label" for="name">Beer</label>
           <input id="name" class="form-control" type="text" placeholder="Beer"/>
@@ -16,12 +23,8 @@
           <input id="brewery" class="form-control" type="text" placeholder="Brewery"/>
         </div>
         <div class="form-group">
-          <label class="control-label" for="brewery_state">Brewery State</label>
-          <input id="brewery_state" class="form-control" type="text" placeholder="State"/>
-        </div>
-        <div class="form-group">
-          <label class="control-label" for="untappd_url">Untappd URL</label>
-          <input id="untappd_url" class="form-control" type="text" placeholder="URL"/>
+          <label class="control-label" for="brewery_url">Brewery URL</label>
+          <input id="brewery_url" class="form-control" type="text" placeholder="Brewery URL"/>
         </div>
         <div class="form-group">
           <label class="control-label" for="point_value">Point value</label>

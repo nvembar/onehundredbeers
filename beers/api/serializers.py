@@ -137,6 +137,7 @@ class ContestBeerSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=250, source='beer.name')
     brewery = serializers.CharField(required=True, max_length=250, source='beer.brewery')
     untappd_url = serializers.URLField(source='beer.untappd_url')
+    brewery_url = serializers.URLField(source='beer.brewery_url')
     brewery_city = serializers.CharField(required=False, 
                                          max_length=250, 
                                          source='beer.brewery_city')

@@ -36,7 +36,7 @@ class Player(models.Model):
 class BeerManager(models.Manager):
     """Manages beer data"""
     def create_beer(self, name, brewery, untappd_url='',
-                    style='', description='',
+                    style='', description='', brewery_url='',
                     brewery_city='', brewery_state=''):
         """Creates a contest with defaults on active status, creation date,
         update date, beer count, and user count"""
@@ -45,6 +45,7 @@ class BeerManager(models.Manager):
                            untappd_url=untappd_url,
                            brewery_city=brewery_city,
                            brewery_state=brewery_state,
+                           brewery_url=brewery_url,
                            last_updated=timezone.now())
         return beer
 
