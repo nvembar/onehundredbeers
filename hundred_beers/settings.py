@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'djangobower',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -129,21 +128,19 @@ LOADER_ROLE_ARN = os.getenv("LOADER_ROLE_ARN")
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'staticfiles'))
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = [
 	"django.contrib.staticfiles.finders.FileSystemFinder",
  	"django.contrib.staticfiles.finders.AppDirectoriesFinder",
-	"djangobower.finders.BowerFinder"]
+]
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
+    os.path.abspath(os.path.join(BASE_DIR, '..', 'node_modules')),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-
-BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, '..')
-BOWER_INSTALLED_APPS = ( 'jquery#^3.2.1', 'tablesorter', 'js-cookie', 'select2' )
 
 LOGIN_REDIRECT_URL = '/'
 

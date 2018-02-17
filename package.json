@@ -1,0 +1,18 @@
+{
+  "name": "hundred_beers",
+  "version": "2.0.0a",
+  "description": "One Hundred Beers contest",
+  "main": "manage.py",
+  "repository": "https://github.com/nvembar/onehundredbeers.git",
+  "author": "nvembar <navin.vembar@gmail.com>",
+  "license": "CC0",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "3",
+    "bootstrap-datepicker": "^1.7.1",
+    "handlebars": "^4.0.11",
+    "jquery": "^3.3.1",
+    "js-cookie": "^2.2.0",
+    "select2": "^4.0.6-rc.1"
+  }
+}
