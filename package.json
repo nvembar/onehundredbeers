@@ -9,6 +9,7 @@
   "private": true,
   "dependencies": {
     "bootstrap": "3",
+    "bootstrap-datepicker": "^1.7.1",
     "handlebars": "^4.0.11",
     "jquery": "^3.3.1",
     "js-cookie": "^2.2.0",

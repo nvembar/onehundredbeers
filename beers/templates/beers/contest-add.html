@@ -5,8 +5,9 @@
 {% endblock %}
 
 {% block scripts %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" integrity="sha256-I4gvabvvRivuPAYFqevVhZl88+vNf2NksupoBxMQi04=" crossorigin="anonymous" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js" integrity="sha256-TueWqYu0G+lYIimeIcMI8x1m14QH/DQVt4s9m/uuhPw=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="{% static "bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" %}"/>
+<script src="{% static "bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js" %}"></script>
 <script>
     $(document).ready(function() { $('.datepicker').datepicker(); })
 </script>
