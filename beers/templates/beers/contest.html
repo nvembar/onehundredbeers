@@ -9,7 +9,9 @@
   <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
   {{ form.media }}
   {% if is_creator %}
+{% comment %}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.runtime.js" integrity="sha256-dIqy4LRyYdutozP+Dvr146n7yj9l/h3LxK0nmNUxqo4=" crossorigin="anonymous"></script>
+{% endcomment %}
   <script type="text/javascript" src="{% static 'js/templates.runtime.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
