@@ -42,6 +42,17 @@ var Contests = {
                 });
             },
 
+            loadBreweries: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/breweries';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    that.breweries = data;
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
             validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 
@@ -60,6 +71,7 @@ var Contests = {
                 method: 'POST'
               });
             },
+
 
             validateBrewery: function(uvId, breweryId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
@@ -123,8 +135,34 @@ var Contests = {
               });
             },
 
+            addBrewery: function(data) {
+              let url = this.baseUrl + 'api/contests/' + this.contestId + '/breweries/';
+              console.log('Calling addBrewery with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                method: 'POST',
+              });
+            },
+
+            deleteBrewery: function(breweryId) {
+              let url = this.baseUrl + 'api/contests/' 
+                                     + this.contestId + '/breweries/' + breweryId;
+              console.log('Calling deleteBrewery');
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'DELETE',
+              });
+            },
+
             lookupBeer: function(untappdUrl) {
-              let url = this.baseUrl + 'api/lookup/beer'
+              let url = this.baseUrl + 'api/lookup/beer';
               return $.ajax({
                 url: url,
                 data: { 'url': untappdUrl, },
@@ -135,7 +173,8 @@ var Contests = {
             },
                         
             lookupBrewery: function(untappdUrl) {
-              let url = this.baseUrl + 'api/lookup/brewery'
+              let url = this.baseUrl + 'api/lookup/brewery';
+              console.log('Looking up brewery at URL: ' + untappdUrl);
               return $.ajax({
                 url: url,
                 data: { 'url': untappdUrl, },
