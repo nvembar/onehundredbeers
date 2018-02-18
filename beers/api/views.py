@@ -153,9 +153,9 @@ class ContestBreweryList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         contest_id = self.kwargs['contest_id']
         contest = models.Contest.objects.get(id=contest_id)
-        brewery_name = self.request.data['name']
+        name = self.request.data['name']
         brewery_filter = models.Brewery.objects.filter(name=name)
-        # XXX: This should probably be moved into models.Contest.add_beer
+        # XXX: This should probably be moved into models.Contest.add_brewery
         if contest.active:
             raise serializers.ValidationError(
                     {'non_field_errors': ['Cannot add brewery to active contest']})

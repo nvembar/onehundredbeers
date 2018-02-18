@@ -208,9 +208,9 @@ class ContestBrewerySerializer(serializers.Serializer):
         if brewery_filter.exists():
             brewery = brewery_filter.get()
         else:
-            brewery = models.Brewery.objects.create_beer(**validated_data['brewery'])
-        contest_brewery = contest.add_beer(brewery, 
-                                           validated_data.get('point_value', 1))
+            brewery = models.Brewery.objects.create_brewery(**validated_data['brewery'])
+        contest_brewery = contest.add_brewery(brewery, 
+                                              validated_data.get('point_value', 1))
         return contest_brewery
 
     def update(self, contest_brewery, validated_data):
