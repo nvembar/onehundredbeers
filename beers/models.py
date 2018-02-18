@@ -213,7 +213,7 @@ class Contest(models.Model):
 
 class Brewery_Manager(models.Manager):
 
-    def create_brewery(self, name, untappd_url, location,):
+    def create_brewery(self, name, untappd_url, location=None,):
         return self.create(name=name, 
                            untappd_url=untappd_url,
                            location=location,

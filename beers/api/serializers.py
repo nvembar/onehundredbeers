@@ -196,9 +196,11 @@ class ContestBrewerySerializer(serializers.Serializer):
     url = ContestBreweryHyperlink(view_name='contest-brewery-detail',)
     name = serializers.CharField(required=True, max_length=250, source='brewery.name')
     untappd_url = serializers.URLField(source='brewery.untappd_url')
-    location = serializers.CharField(max_length=250, source='brewery.location')
+    location = serializers.CharField(required=False, 
+                                     max_length=250, 
+                                     source='brewery.location')
     point_value = serializers.IntegerField()
-    total_visited= serializers.IntegerField(required=False, read_only=True,)
+    total_visited = serializers.IntegerField(required=False, read_only=True,)
 
     def create(self, validated_data):
         contest = validated_data['contest']
