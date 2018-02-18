@@ -227,3 +227,49 @@ class ContestBrewerySerializer(serializers.Serializer):
         contest_brewery.point_value = validated_data['point_value']
         contest_brewery.save()
 
+class ContestBonusHyperlink(serializers.HyperlinkedIdentityField):
+    view_name = 'contest-bonus-detail'
+
+    def get_url(self, contest_bonus, view_name, request, format):
+        url_kwargs = { 
+            'contest_id': contest_bonus.contest.id,
+            'contest_bonus_id': contest_bonus.id,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+class HashTagListField(serializers.ListField):
+    child = serializers.CharField()
+
+    def to_representation(self, hash_tags):
+        return hash_tags.split(',')
+
+class ContestBonusSerializer(serializers.HyperlinkedModelSerializer):
+    serializer_url_field = ContestBonusHyperlink
+    
+    contest = serializers.HyperlinkedRelatedField(many=False, 
+                                                  read_only=True,
+                                                  view_name='contest-detail',
+                                                  lookup_field='id',)
+
+    hash_tags = HashTagListField()
+
+    def create(self, validated_data):
+        bonus = validated_data['contest'].add_bonus(validated_data['name'],
+                                                    validated_data['description'],
+                                                    validated_data['hash_tags'],
+                                                    validated_data['point_value'],)
+        return bonus
+        
+    class Meta:
+        model = models.Contest_Bonus
+        extra_kwargs = {
+            'url': {'view_name': 'contest-bonus-detail', 'lookup_field': 'id'}
+        }
+        fields = ('id', 
+                  'contest',
+                  'url', 
+                  'name',
+                  'description', 
+                  'hash_tags',
+                  'point_value',
+                 )
