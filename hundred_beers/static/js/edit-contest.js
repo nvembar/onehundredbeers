@@ -1,17 +1,9 @@
 
 var EditContest = {
 
-  displayBeers: function(contest) {
-    contest.loadBeers(function (beers) {
-      console.log('Loaded beers');
-      console.log(JSON.stringify(contest, null, 2));
-      $('.beer-list').html(Handlebars.templates.beer_table(contest));
-    });
-  },
-
   clearErrorStyling: function() {
     // Clear any styling from errors
-    $('#alert-for-modal').empty();
+    $('.alert-for-modal').empty();
     $('.alert-for-tab').empty();
     $('div.modal-body div.form-group.has-error').removeClass('has-error');
     $('div.form-group span.help-block').remove();
@@ -21,26 +13,24 @@ var EditContest = {
     $('div.modal-body div.form-group input.form-control').val('');
   },
 
-  setAlert: function(alertText, isError) {
+  setAlert: function(selector, alertText, isError) {
     let style = isError ? 'alert-danger' : 'alert-success';
-    $('#alert-for-modal').html(
+    selector.find('.alert-for-modal').html(
       '<div class="alert ' + style + '" role="alert">' + alertText + '</div>');
   },
 
-  addToContestFromForm: function(contest, fn, keys, nameKey) {
-    console.log('In addBeerFromForm');
+  addToContestFromForm: function(contest, fn, keys, selector, nameKey) {
     EditContest.clearErrorStyling();
     let data = {};
     for (let k of keys) {
-      data[k] = document.getElementById(k).value;
+      data[k] = selector.find('#' + k).val();
     }
     let promise = fn.call(contest, data);
     return promise.then(
       function () {
-        EditContest.setAlert('Added ' + data[nameKey], false);
+        EditContest.setAlert(selector, 'Added ' + data[nameKey], false);
       }
     ).fail(function(jqXHR) {
-        console.log('Failed to add beer');
         console.log(jqXHR.responseText);
         alertText = 'Failed to add ' + data[nameKey];
         response = JSON.parse(jqXHR.responseText);
@@ -55,19 +45,35 @@ var EditContest = {
             }
             alertText += "</ul>\n";
           } else {
-            let formGroup = $('#' + k).parent('.form-group');
+            let formGroup = selector.find('#' + k).parent('.form-group');
             formGroup.addClass('has-error');
             formGroup.append('<span class="help-block">' + response[k] + '</span>');
           }
         }
-        EditContest.setAlert(alertText, true);
+        EditContest.setAlert(selector, alertText, true);
     });
   },
+
+  displayBeers: function(contest) {
+    contest.loadBeers(function (beers) {
+      console.log('Loaded beers');
+      $('.beer-list').html(Handlebars.templates.beer_table(contest));
+    });
+  },
+
+  displayBreweries: function(contest) {
+    contest.loadBreweries(function (breweries) {
+      console.log('Loaded breweries');
+      $('.brewery-list').html(Handlebars.templates.brewery_table(contest));
+    });
+  },
+
 
   addBeerFromForm: function(contest) {
     console.log('In addBeerFromForm');
     let keys = ['name', 'brewery', 'brewery_url', 'untappd_url', 'point_value'];
-    EditContest.addToContestFromForm(contest, contest.addBeer, keys, 'name').done(
+    EditContest.addToContestFromForm(contest, contest.addBeer, 
+                                     keys, $('#addBeer'), 'name').done(
             function () { 
               EditContest.displayBeers(contest); 
               EditContest.clearFormData();
@@ -90,23 +96,71 @@ var EditContest = {
   },
 
   populateBeerFromLookup: function (contest) {
-    let untappdUrl = $('#untappd_url').val();
+    let untappdUrl = $('#addBeer #untappd_url').val();
     $('#lookup_beer').prop('disabled', true);
     return contest.lookupBeer(untappdUrl).then(
       function (beer) {
-        $('#untappd_url').val(beer['untappd_url']);
-        $('#name').val(beer['name']);
-        $('#brewery').val(beer['brewery']);
-        $('#brewery_url').val(beer['brewery_url']);
+        $('#addBeer #untappd_url').val(beer['untappd_url']);
+        $('#addBeer #name').val(beer['name']);
+        $('#addBeer #brewery').val(beer['brewery']);
+        $('#addBeer #brewery_url').val(beer['brewery_url']);
       }
     ).fail(
       function (jqXHR) {
         errorData = JSON.parse(jqXHR.responseText);
-        $('#alert-for-modal').html('<div class="alert alert-danger">Invalid Untappd Beer URL:' + errorData['non_field_errors'][0] + '</div>');
+        $('#alert-for-beer-modal').html('<div class="alert alert-danger">Invalid Untappd Beer URL:' + errorData['non_field_errors'][0] + '</div>');
       }
     ).always(
       function () {
         $('#lookup_beer').prop('disabled', false);
+      }
+    );
+  },
+
+  addBreweryFromForm: function(contest) {
+    console.log('In addBreweryFromForm');
+    let keys = ['name', 'location', 'untappd_url', 'point_value'];
+    EditContest.addToContestFromForm(contest, contest.addBrewery, 
+                                     keys, $('#addBrewery'), 'name').done(
+            function () { 
+              EditContest.displayBreweries(contest); 
+              EditContest.clearFormData();
+            });
+  },
+
+
+  removeBreweryFromContest: function (contest, breweryId) {
+    return contest.deleteBrewery(breweryId).then(
+      function () { 
+        $('#brewery-' + breweryId).fadeOut();
+        return $('#brewery-' + breweryId).promise();
+      }
+    ).then(
+      function () { return EditContest.displayBreweries(contest); }
+    ).fail(
+      function (jqXHR) {
+        $('#alert-for-brewery').html('<div class="alert alert-danger">Error deleting brewery' + jqXHR.responseText + '</div>')
+      }
+    );
+  },
+
+  populateBreweryFromLookup: function (contest) {
+    let untappdUrl = $('#addBrewery #untappd_url').val();
+    $('#lookup_brewery').prop('disabled', true);
+    return contest.lookupBrewery(untappdUrl).then(
+      function (brewery) {
+        $('#addBrewery #untappd_url').val(brewery['untappd_url']);
+        $('#addBrewery #name').val(brewery['name']);
+        $('#addBrewery #location').val(brewery['location']);
+      }
+    ).fail(
+      function (jqXHR) {
+        errorData = JSON.parse(jqXHR.responseText);
+        $('#alert-for-brewery-modal').html('<div class="alert alert-danger">Invalid Untappd Brewery URL:' + errorData['non_field_errors'][0] + '</div>');
+      }
+    ).always(
+      function () {
+        $('#lookup_brewery').prop('disabled', false);
       }
     );
   },

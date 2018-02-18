@@ -180,3 +180,50 @@ class ContestBeerSerializer(serializers.Serializer):
             raise serializers.ValidationError(errors)
         contest_beer.point_value = validated_data['point_value']
         contest_beer.save()
+
+class ContestBreweryHyperlink(serializers.HyperlinkedIdentityField):
+    view_name = 'contest-brewery-detail'
+
+    def get_url(self, contest_brewery, view_name, request, format):
+        url_kwargs = { 
+            'contest_id': contest_brewery.contest.id,
+            'contest_brewery_id': contest_brewery.id,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+class ContestBrewerySerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    url = ContestBreweryHyperlink(view_name='contest-brewery-detail',)
+    name = serializers.CharField(required=True, max_length=250, source='brewery.name')
+    untappd_url = serializers.URLField(source='brewery.untappd_url')
+    location = serializers.CharField(required=False, 
+                                     max_length=250, 
+                                     source='brewery.location')
+    point_value = serializers.IntegerField()
+    total_visited = serializers.IntegerField(required=False, read_only=True,)
+
+    def create(self, validated_data):
+        contest = validated_data['contest']
+        brewery = None
+        brewery_filter = models.Brewery.objects.filter(
+                name=validated_data['brewery']['name'],)
+        if brewery_filter.exists():
+            brewery = brewery_filter.get()
+        else:
+            brewery = models.Brewery.objects.create_brewery(**validated_data['brewery'])
+        contest_brewery = contest.add_brewery(brewery, 
+                                              validated_data.get('point_value', 1))
+        return contest_brewery
+
+    def update(self, contest_brewery, validated_data):
+        errors = {}
+        if contest_brewery.brewery.name != validated_data['brewery']['name']:
+            errors['name'] = ['Brewery name cannot be changed through update']
+        if contest_brewery.brewery.untappd_url != validated_data['brewery']['untappd_url']:
+            errors['untappd_url'] = \
+                ['Untappd URL value cannot be changed through update']
+        if len(errors) > 0:
+            raise serializers.ValidationError(errors)
+        contest_brewery.point_value = validated_data['point_value']
+        contest_brewery.save()
+

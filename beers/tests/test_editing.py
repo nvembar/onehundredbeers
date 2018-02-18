@@ -291,8 +291,29 @@ class ContestEditingTestCase(TestCase):
         """
         Tests whether a brewery can successfully be added to a contest based.
         """
-        pass
- 
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
+        response = c.post(reverse('contest-brewery-list', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/brewery/1',
+                                           'location': 'Location 1',
+                                           'point_value': 2}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        brewery_filter = Brewery.objects.filter(name='Brewery 1')
+        self.assertEqual(brewery_filter.count(), 1)
+        brewery = brewery_filter.get()
+        self.assertEqual(brewery.untappd_url, 'https://untappd.com/brewery/1')
+        self.assertEqual(brewery.location, 'Location 1')
+        cbrewery_filter = Contest_Brewery.objects.filter(brewery=brewery)
+        self.assertEqual(cbrewery_filter.count(), 1)
+        contest_brewery = cbrewery_filter.get()
+        self.assertEqual(contest_brewery.contest.id, contest.id)
+        self.assertEqual(contest_brewery.point_value, 2)
+        self.assertEqual(response.json()['id'], contest_brewery.id)
  
     def test_nonunique_add_brewery(self):
         """

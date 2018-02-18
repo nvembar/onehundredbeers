@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
+                                  ContestBrewerySerializer, \
                                   ContestBeerSerializer, ContestPlayerSerializer
 import beers.utils.untappd as untappd
 
@@ -143,6 +144,55 @@ class ContestBeerDetail(generics.RetrieveUpdateDestroyAPIView):
                                          id = contest_beer_id,)
         return contest_beer
 
+class ContestBreweryList(generics.ListCreateAPIView):
+    queryset = models.Contest_Brewery.objects.all()
+    serializer_class = ContestBrewerySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+
+    def perform_create(self, serializer):
+        contest_id = self.kwargs['contest_id']
+        contest = models.Contest.objects.get(id=contest_id)
+        name = self.request.data['name']
+        brewery_filter = models.Brewery.objects.filter(name=name)
+        # XXX: This should probably be moved into models.Contest.add_brewery
+        if contest.active:
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['Cannot add brewery to active contest']})
+        if brewery_filter.exists():
+            brewery = brewery_filter.get()
+            if models.Contest_Brewery.objects.filter(
+                        brewery=brewery, contest=contest).exists():
+                raise serializers.ValidationError(
+                        {'non_field_errors': ['Duplicate brewery/contest pairing']})
+        serializer.save(contest=contest)
+
+    def get_queryset(self):
+        contest_id = self.kwargs['contest_id']
+        return models.Contest_Brewery.objects.select_related('brewery',
+                ).filter(contest__id=contest_id).order_by('brewery_name')
+
+class ContestBreweryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Contest_Brewery.objects.all()
+    serializer_class = ContestBrewerySerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+
+    def perform_destroy(self, contest_brewery):
+        brewery_id = contest_brewery.brewery.id
+        contest_brewery.delete()
+        if models.Contest_Brewery.objects.filter(brewery__id=brewery_id).count() == 0:
+            # There are no other contest breweries corresponding to the given 
+            # Brewery object so we should delete the brewery object
+            models.Brewery.objects.filter(id=brewery_id).delete()
+        
+    def get_object(self):
+        contest_id = self.kwargs['contest_id']
+        contest_brewery_id = self.kwargs['contest_brewery_id']
+        contest_brewery = get_object_or_404(models.Contest_Brewery, 
+                                            contest__id = contest_id,
+                                            id = contest_brewery_id,)
+        return contest_brewery
 
 class BeerLookup(APIView):
     """Looking up beer data from Untappd from URL"""
