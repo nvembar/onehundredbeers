@@ -213,10 +213,11 @@ class Contest(models.Model):
 
 class Brewery_Manager(models.Manager):
 
-    def create_brewery(self, name, untappd_id):
+    def create_brewery(self, name, untappd_url, location,):
         return self.create(name=name, 
-													 untappd_id=untappd_id,
-													 last_updated=timezone.now())
+                           untappd_url=untappd_url,
+                           location=location,
+						   last_updated=timezone.now())
 
 class Brewery(models.Model):
     name = models.CharField(max_length=250)
