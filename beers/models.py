@@ -1,5 +1,6 @@
 """Models supporting One Hundred Beers"""
 
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -34,14 +35,17 @@ class Player(models.Model):
 
 class BeerManager(models.Manager):
     """Manages beer data"""
-    def create_beer(self, name, brewery, style='', description='',
+    def create_beer(self, name, brewery, untappd_url='',
+                    style='', description='', brewery_url='',
                     brewery_city='', brewery_state=''):
         """Creates a contest with defaults on active status, creation date,
         update date, beer count, and user count"""
         beer = self.create(name=name, brewery=brewery,
                            style=style, description=description,
+                           untappd_url=untappd_url,
                            brewery_city=brewery_city,
                            brewery_state=brewery_state,
+                           brewery_url=brewery_url,
                            last_updated=timezone.now())
         return beer
 
@@ -59,12 +63,16 @@ class Beer(models.Model):
     brewery_lat = models.FloatField(null=True, blank=True)
     brewery_lon = models.FloatField(null=True, blank=True)
     untappd_id = models.CharField(max_length=25, null=True, blank=True)
+    untappd_url = models.URLField(null=True, blank=True)
+    brewery_url = models.URLField(null=True, blank=True)
     last_updated = models.DateTimeField()
 
     objects = BeerManager()
 
     def __str__(self):
-        return self.name + ' / ' + self.brewery
+        return "Beer[{}<{}> / {}<{}>]".format(self.name, 
+                                        self.untappd_url, 
+                                        self.brewery, self.brewery_url)
 
 class ContestManager(models.Manager):
     "Manager for contests"
@@ -74,9 +82,11 @@ class ContestManager(models.Manager):
         update date, beer count, and user count"""
         contest = self.create(name=name, creator=creator,
                               start_date=start_date, end_date=end_date,
-                              active=True, created_on=timezone.now(),
+                              active=False, created_on=timezone.now(),
                               last_updated=timezone.now(),
                               user_count=0, beer_count=0)
+        # Add the creator as a player
+        contest_player = contest.add_player(creator)
         return contest
 
 
@@ -84,7 +94,7 @@ class ContestManager(models.Manager):
 class Contest(models.Model):
     "Represents a contest"
 
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, unique=True)
     creator = models.ForeignKey(Player, default=1)
     active = models.BooleanField(default=False)
     created_on = models.DateTimeField()
@@ -145,8 +155,12 @@ class Contest(models.Model):
         additional field 'rank' which includes the ranking of the player
         """
         contest_players = Contest_Player.objects.filter(contest=self)
+        if not contest_players.exists():
+            return []
         contest_players = list(contest_players.order_by('-total_points',
                                                         'user_name'))
+        if not self.active:
+            return contest_players
         max_points = Contest_Beer.objects.filter(contest=self).aggregate(
             models.Sum('point_value'))['point_value__sum']
         rank = 0
@@ -199,22 +213,26 @@ class Contest(models.Model):
 
 class Brewery_Manager(models.Manager):
 
-    def create_brewery(self, name, untappd_id):
+    def create_brewery(self, name, untappd_url, location=None,):
         return self.create(name=name, 
-													 untappd_id=untappd_id,
-													 last_updated=timezone.now())
+                           untappd_url=untappd_url,
+                           location=location,
+						   last_updated=timezone.now())
 
 class Brewery(models.Model):
     name = models.CharField(max_length=250)
     untappd_id = models.CharField(max_length=25, null=True, blank=True,)
     untappd_url = models.URLField(null=True, blank=True,)
     state = models.CharField(max_length=250)
+    location = models.CharField(max_length=250, null=True, blank=True, default=None)
     last_updated = models.DateTimeField()
 
     objects = Brewery_Manager()
 
     def __str__(self):
-        return self.name
+        return "Brewery[name={}, url={}, location={}]".format(self.name,
+                                                              self.untappd_url,
+                                                              self.location)
 
 class Contest_BreweryManager(models.Manager):
 
@@ -264,6 +282,9 @@ class Contest_Player(models.Model):
     last_checkin_load = models.DateTimeField(
         "Latest date in the last load for this player")
     rank = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = (('contest', 'player'),)
 
     def __compute_losses(self):
         """
@@ -502,6 +523,9 @@ class Contest_Beer(models.Model):
             'for drinking this beer')
     total_drank = models.IntegerField("number of players who drank this beer")
 
+    class Meta:
+        unique_together = (('contest', 'beer'),)
+
     def __str__(self):
         return "{0}/{1}".format(self.beer.name, self.beer.brewery)
 
@@ -522,11 +546,27 @@ class Unvalidated_Checkin(models.Model):
     untappd_checkin_date = models.DateTimeField()
     brewery = models.CharField(max_length=250, default='')
     beer = models.CharField(max_length=250, default='')
+    beer_url = models.URLField(null=True, default=None)
+    brewery_url = models.URLField(null=True, default=None)
+    photo_url = models.URLField(null=True, default=None)
+    rating = models.IntegerField(null=True, default=None)
 
     objects = Unvalidated_CheckinManager()
 
     def __str__(self):
-        return "Unvalidated checkin: {0}".format(self.untappd_title)
+        return """"Checkin[beer={},
+                       brewery={},
+                       beer_url={},
+                       brewery_url={},
+                       checkin_url={},
+                       time={},
+                       photo_url={}]""".format(self.beer, 
+                                              self.brewery,
+                                              self.beer_url,
+                                              self.brewery_url,
+                                              self.untappd_checkin,
+                                              self.untappd_checkin_date.isoformat(),
+                                              self.photo_url)
 
 class Checkin(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)

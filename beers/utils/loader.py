@@ -33,7 +33,6 @@ def create_contest_from_csv(name, start_date, end_date, runner, stream):
                                              creator=runner,
                                              start_date=start_date,
                                              end_date=end_date)
-    contest.add_player(runner)
 
     reader = csv.DictReader(stream,
                             fieldnames=('brewery',

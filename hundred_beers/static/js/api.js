@@ -31,6 +31,28 @@ var Contests = {
                 });
             },
 
+            loadBeers: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/beers';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    that.beers = data;
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
+            loadBreweries: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/breweries';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    that.breweries = data;
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
             validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 
@@ -49,6 +71,7 @@ var Contests = {
                 method: 'POST'
               });
             },
+
 
             validateBrewery: function(uvId, breweryId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
@@ -83,6 +106,82 @@ var Contests = {
                 dataType: 'json',
                 method: 'POST'
               });
+            },
+
+
+            addBeer: function(data) {
+              let url = this.baseUrl + 'api/contests/' + this.contestId + '/beers/';
+              console.log('Calling addBeer with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                method: 'POST',
+              });
+            },
+
+            deleteBeer: function(beerId) {
+              let url = this.baseUrl + 'api/contests/' 
+                                     + this.contestId + '/beers/' + beerId;
+              console.log('Calling deleteBeer');
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'DELETE',
+              });
+            },
+
+            addBrewery: function(data) {
+              let url = this.baseUrl + 'api/contests/' + this.contestId + '/breweries/';
+              console.log('Calling addBrewery with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                method: 'POST',
+              });
+            },
+
+            deleteBrewery: function(breweryId) {
+              let url = this.baseUrl + 'api/contests/' 
+                                     + this.contestId + '/breweries/' + breweryId;
+              console.log('Calling deleteBrewery');
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'DELETE',
+              });
+            },
+
+            lookupBeer: function(untappdUrl) {
+              let url = this.baseUrl + 'api/lookup/beer';
+              return $.ajax({
+                url: url,
+                data: { 'url': untappdUrl, },
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'GET',
+              })
+            },
+                        
+            lookupBrewery: function(untappdUrl) {
+              let url = this.baseUrl + 'api/lookup/brewery';
+              console.log('Looking up brewery at URL: ' + untappdUrl);
+              return $.ajax({
+                url: url,
+                data: { 'url': untappdUrl, },
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'GET',
+              })
             },
         }
     }

@@ -1,4 +1,6 @@
-"""View functions for seeing contest information and the index"""
+"""
+Functions for viewing and editing contests
+"""
 
 import logging
 from django.shortcuts import get_object_or_404, render
@@ -20,12 +22,14 @@ def index(request):
     """Renders the index page with all the contest info"""
     all_contests = Contest.objects.order_by('-created_on')[:5]
     active = None
+    is_runner = False
     if is_authenticated_user_contest_runner(request):
         player = Player.objects.get(user=request.user)
+        is_runner = True
         for c in all_contests:
             if c.creator.id == player.id:
                 c.is_creator = True
-    context = {'contests': all_contests}
+    context = {'contests': all_contests,'is_runner': is_runner,}
     if all_contests:
         active = all_contests[0]
         leaderboard = active.ranked_players()
@@ -34,8 +38,30 @@ def index(request):
     return render(request, 'beers/index.html', context)
 
 
+@require_http_methods(['POST', 'GET'])
 def contests(request):
-    """Returns all the contests"""
+    """
+    Gets all contests or creates a new contest. 
+
+    URL: /contests/
+
+    GET:
+    Returns all the contests 
+
+    POST
+    Creates a new contest in a inactive state
+
+    Argument are: name, start_date, end_date as POST data or 
+    { name: <name>, start_date: <start_date>, end_date: <end_date> } as JSON
+
+    Returns data (as JSON or data in the page)
+    { 
+      name: <name>, 
+      start_date: <start_date>, 
+      end_date: <end_date>,
+      last_updated: <date last updated>,
+    }
+    """
     all_contests = Contest.objects.order_by('created_on')
     player = None
     if is_authenticated_user_player(request):
@@ -55,7 +81,19 @@ def contests(request):
 
 
 def contest(request, contest_id):
-    """Gets the details of a specific contest and presents them to the user"""
+    """
+    Gets or edits the details of a specific contest and presents them to the user.
+
+    URL: /contests/:id
+
+    GET: Gets the details of the contest. For HTML response, by default, it returns 
+    all the beer, brewery and challenge details. For JSON response, it returns the
+    contest details
+
+    PUT:
+    Allows the user to edit the name, start date, end date, or active status of a 
+    contest
+    """
     this_contest = get_object_or_404(Contest, id=contest_id)
     ranked_players = this_contest.ranked_players()
     player = None
@@ -77,6 +115,21 @@ def contest(request, contest_id):
                'is_creator': is_creator,
                }
     return render(request, 'beers/contest.html', context)
+
+
+def contest_players(request):
+    """
+    Either gets the leaderboard for the given contest or allows the addition of a 
+    new player to a contest.
+
+    URL: /contest/:id/players
+
+    GET: Gets the leaderboard for the contest. Allows for retrieval by JSON or HTML
+
+    POST: Adds a player to the contest.
+    """
+    pass
+
 
 def contest_add(request):
     """Add a contest with a unique name to the list"""
@@ -101,7 +154,16 @@ def contest_add(request):
 
 
 def contest_player(request, contest_id, username):
-    """Shows the validated checkins for a player for a given contest"""
+    """
+    Shows the data associated with a player or allows the contest runner to 
+    remove a player from the game.
+
+    URL: /contests/:id/players/:player
+
+    GET: Gets the details of a given player in the context of a contest
+
+    DELETE: Removes a player from a contest (does not delete the user)
+    """
     cp = get_object_or_404(Contest_Player.objects.select_related(),
                            contest_id=contest_id,
                            user_name=username)
@@ -111,8 +173,130 @@ def contest_player(request, contest_id, username):
     return render(request, 'beers/contest-player.html', context)
 
 
+def contest_beers(request, contest_id):
+    """
+    Gets the list of a beers for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new beer to a contest.
+
+    URL: /contests/:id/beers/
+
+    GET: Gets the list of beers in a contest.
+
+    POST: Adds a new beer to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Beers not yet implemented')
+
+
 def contest_beer(request, contest_id, beer_id):
+    """
+    Gets the details of a beer for a contest, including its name, Untappd URL
+    and the players who drank it, or allows for the editing of a beer in a contest, 
+    including deletion.
+
+    URL: /contests/:id/beers/:beer_id
+
+    GET: Gets the details in HTML or JSON form
+
+    PUT: Edits the details of a beer if the contest is not active
+
+    DELETE: Removes the beer from a contest if the contest is not active
+    """
     return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+
+
+def contest_breweries(request, contest_id):
+    """
+    Gets the list of a breweries for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new brewery to a 
+    contest.
+
+    URL: /contests/:id/breweries/
+
+    GET: Gets the list of breweries in a contest.
+
+    POST: Adds a new brewery to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Beers not yet implemented')
+
+
+def contest_brewery(request, contest_id, brewery_id):
+    """
+    Gets the details of a brewery for a contest, including its name, Untappd URL
+    and the players who drank at it, or allows for the editing of a brewery in a 
+    contest, including deletion.
+
+    URL: /contests/:id/breweries/:brewery_id
+
+    GET: Gets the details in HTML or JSON form
+
+    PUT: Edits the details of a brewery if the contest is not active
+
+    DELETE: Removes the brewery from a contest if the contest is not active
+    """
+    return HttpNotImplementedResponse('Contest-Brewery Detail not yet implemented')
+    
+
+def contest_challenges(request, contest_id):
+    """
+    Gets the list of a challenges for a contest, including their names, Untappd URL
+    and the players who drank it, or allows for the addition of a new challenge to a 
+    contest.
+
+    URL: /contests/:id/challenges/
+
+    GET: Gets the list of challenges in a contest.
+
+    POST: Adds a new challenge to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Challenges not yet implemented')
+
+
+def contest_challenge(request, contest_id, beer_id):
+    """
+    Gets the details of a challenge for a contest, including its name, Untappd URL
+    and the players who drank at it, or allows for the editing of a brewery in a 
+    contest, including deletion.
+
+    URL: /contests/:id/challenges/:beer_id
+
+    GET: Gets the details in HTML or JSON form
+
+    PUT: Edits the details of a brewery if the contest is not active
+
+    DELETE: Removes the challenge from a contest if the contest is not active
+    """
+    return HttpNotImplementedResponse('Contest-Beer Detail not yet implemented')
+
+
+def contest_bonuses(request, contest_id):
+    """
+    Gets the list of a bonuses tags for a contest including the the players who 
+    got them, or allows for the addition of a new bonus to a contest.
+
+    URL: /contests/:id/bonuses/
+
+    GET: Gets the list of bonuses in a contest.
+
+    POST: Adds a new bonus to the contest.
+    """
+    return HttpNotImplementedResponse('Contest-Bonuses not yet implemented')
+
+
+def contest_bonus(request, contest_id, bonus):
+    """
+    Gets the details of a bonus for a contest, including its tag, 
+    and the players who got it, or allows for the editing of a bonus in a 
+    contest, including deletion.
+
+    URL: /contests/:id/bonus/:bonus_tag
+
+    GET: Gets the details in HTML or JSON form
+
+    PUT: Edits the details of the bonus
+
+    DELETE: Removes the bonus from a contest if the contest is not active
+    """
+    return HttpNotImplementedResponse('Contest-Bonus not yet implemented')
 
 
 @login_required
