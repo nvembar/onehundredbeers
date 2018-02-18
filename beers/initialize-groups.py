@@ -3,7 +3,7 @@ import django
 django.setup()
 
 from django.contrib.auth.models import Group, Permission
-from beers.models import Contest, Contest_Beer, Contest_Player, Checkin, Player
+from beers.models import Contest, Contest_Beer, Contest_Player, Player
 
 cr_group, created = Group.objects.get_or_create(name='G_ContestRunner')
 cr_permissions = ['add_contest', 'delete_contest', 'change_contest',

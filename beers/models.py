@@ -554,7 +554,7 @@ class Unvalidated_Checkin(models.Model):
     objects = Unvalidated_CheckinManager()
 
     def __str__(self):
-        return """"Checkin[beer={},
+        return """Checkin[beer={},
                        brewery={},
                        beer_url={},
                        brewery_url={},
@@ -567,15 +567,6 @@ class Unvalidated_Checkin(models.Model):
                                               self.untappd_checkin,
                                               self.untappd_checkin_date.isoformat(),
                                               self.photo_url)
-
-class Checkin(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
-    checkin_time = models.DateTimeField()
-    comment = models.CharField(max_length=250, null=True, blank=True, default='')
-    rating = models.IntegerField(default=-1)
-    untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
-    runner_validated = models.BooleanField(default=False)
 
 class Contest_CheckinManager(models.Manager):
     def create_checkin(self, contest_player, contest_beer, checkin_time,
