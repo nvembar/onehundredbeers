@@ -136,6 +136,7 @@ class ContestPlayerSerializer(serializers.HyperlinkedModelSerializer):
 
 class ChallengerHyperlink(serializers.HyperlinkedRelatedField):
     view_name = 'contest-player-detail'
+    queryset = models.Contest_Player.objects.all()
 
     def get_url(self, challenger_id, view_name, request, format):
         """
@@ -148,6 +149,13 @@ class ChallengerHyperlink(serializers.HyperlinkedRelatedField):
             'username': challenger.user_name,
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+    def get_object(self, view_name, view_args, view_kwargs):
+        lookup_kwargs = { 
+            'contest__id': view_kwargs['contest_id'],
+            'user_name': view_kwargs['username'],
+        }
+        return self.get_queryset().get(**lookup_kwargs)
 
 class ContestBeerHyperlink(serializers.HyperlinkedIdentityField):
     view_name = 'contest-beer-detail'
@@ -176,7 +184,6 @@ class ContestBeerSerializer(serializers.Serializer):
     brewery_lon = serializers.FloatField(required=False, source='beer.brewery_lon')
     point_value = serializers.IntegerField()
     challenger = ChallengerHyperlink(view_name='contest-player-detail', 
-                                     read_only=True,
                                      required=False,)
     challenge_point_loss = serializers.IntegerField(required=False,)
     max_point_loss = serializers.IntegerField(required=False,)
