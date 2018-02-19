@@ -79,8 +79,7 @@ class ContestPlayerList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         contest_id = self.kwargs['contest_id']
-        return models.Contest_Player.objects.filter(
-                contest__id=contest_id).order_by('-total_points', 'user_name')
+        return models.Contest.objects.get(id=contest_id).ranked_players()
 
 class ContestPlayerDetail(generics.RetrieveAPIView):
     queryset = models.Contest_Player.objects.all()

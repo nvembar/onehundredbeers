@@ -114,8 +114,7 @@ class Contest(models.Model):
                                         beer_count=0,
                                         last_checkin_date=None,
                                         last_checkin_beer=None,
-                                        last_checkin_load=self.start_date,
-                                        rank=-1)
+                                        last_checkin_load=self.start_date,)
         contest_player.save()
         return contest_player
 
@@ -209,28 +208,11 @@ class Contest(models.Model):
         Returns a list of players, in total_points ranked order, with an
         additional field 'rank' which includes the ranking of the player
         """
-        contest_players = Contest_Player.objects.filter(contest=self)
-        if not contest_players.exists():
-            return []
-        contest_players = list(contest_players.order_by('-total_points',
-                                                        'user_name'))
-        if not self.active:
-            return contest_players
-        max_points = Contest_Beer.objects.filter(contest=self).aggregate(
-            models.Sum('point_value'))['point_value__sum']
-        rank = 0
-        # Start with rank 0 and a number higher than the highest possible beer
-        # count. This forces the first iteration to step everything forward
-        last_total_points = max_points + 1
-        player_count = 0
-        for p in contest_players:
-            player_count = player_count + 1
-            # Calculate the "1224" style ranking
-            if p.total_points < last_total_points:
-                rank = player_count
-            p.rank = rank
-            last_total_points = p.total_points
-        return contest_players
+        return Contest_Player.objects.raw('SELECT *, RANK() OVER ' +
+                                          '(PARTITION BY contest_id ORDER BY ' +
+                                          'total_points DESC) as rank FROM ' +
+                                          'beers_contest_player WHERE ' +
+                                          'contest_id = %s', [self.id])
 
     def beers(self, player=None):
         """
@@ -336,7 +318,6 @@ class Contest_Player(models.Model):
         blank=True)
     last_checkin_load = models.DateTimeField(
         "Latest date in the last load for this player")
-    rank = models.IntegerField(default=0)
 
     class Meta:
         unique_together = (('contest', 'player'),)
