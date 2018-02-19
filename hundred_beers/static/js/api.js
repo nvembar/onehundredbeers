@@ -53,6 +53,17 @@ var Contests = {
                 });
             },
 
+            loadBonuses: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/bonuses';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    that.bonuses = data;
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
             validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 
@@ -108,11 +119,9 @@ var Contests = {
               });
             },
 
-
-            addBeer: function(data) {
-              let url = this.baseUrl + 'api/contests/' + this.contestId + '/beers/';
-              console.log('Calling addBeer with JSON');
-              console.log(JSON.stringify(data, null, 2));
+            addObject: function(data, toList) {
+              let url = this.baseUrl + 'api/contests/' 
+                            + this.contestId + '/' + toList + '/';
               return $.ajax({
                 url: url,
                 headers: { Accept: 'application/json' },
@@ -121,44 +130,50 @@ var Contests = {
                 dataType: 'json',
                 method: 'POST',
               });
+            },
+
+            deleteObject: function(id, fromList) {
+              let url = this.baseUrl + 'api/contests/' 
+                                     + this.contestId + '/' + fromList + '/' + id;
+              return $.ajax({
+                url: url,
+                headers: { Accept: 'application/json' },
+                contentType: 'application/json',
+                method: 'DELETE',
+              });
+            },
+
+            addBeer: function(data) {
+              console.log('Calling addBeer with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return this.addObject(data, 'beers');
             },
 
             deleteBeer: function(beerId) {
-              let url = this.baseUrl + 'api/contests/' 
-                                     + this.contestId + '/beers/' + beerId;
               console.log('Calling deleteBeer');
-              return $.ajax({
-                url: url,
-                headers: { Accept: 'application/json' },
-                contentType: 'application/json',
-                method: 'DELETE',
-              });
+              return this.deleteObject(beerId, 'beers');
             },
 
             addBrewery: function(data) {
-              let url = this.baseUrl + 'api/contests/' + this.contestId + '/breweries/';
               console.log('Calling addBrewery with JSON');
               console.log(JSON.stringify(data, null, 2));
-              return $.ajax({
-                url: url,
-                headers: { Accept: 'application/json' },
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                dataType: 'json',
-                method: 'POST',
-              });
+              return this.addObject(data, 'breweries');
             },
 
             deleteBrewery: function(breweryId) {
-              let url = this.baseUrl + 'api/contests/' 
-                                     + this.contestId + '/breweries/' + breweryId;
               console.log('Calling deleteBrewery');
-              return $.ajax({
-                url: url,
-                headers: { Accept: 'application/json' },
-                contentType: 'application/json',
-                method: 'DELETE',
-              });
+              return this.deleteObject(breweryId, 'breweries');
+            },
+
+            addBonus: function(data) {
+              console.log('Calling addBonus with JSON');
+              console.log(JSON.stringify(data, null, 2));
+              return this.addObject(data, 'bonuses');
+            },
+
+            deleteBonus: function(bonusId) {
+              console.log('Calling deleteBrewery');
+              return this.deleteObject(bonusId, 'bonuses');
             },
 
             lookupBeer: function(untappdUrl) {

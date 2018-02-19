@@ -19,11 +19,20 @@ var EditContest = {
       '<div class="alert ' + style + '" role="alert">' + alertText + '</div>');
   },
 
-  addToContestFromForm: function(contest, fn, keys, selector, nameKey) {
+  addToContestFromForm: function(contest, 
+                                 fn, 
+                                 keys, 
+                                 selector, 
+                                 nameKey='name', 
+                                 transform={}) {
     EditContest.clearErrorStyling();
     let data = {};
     for (let k of keys) {
-      data[k] = selector.find('#' + k).val();
+      if (k in transform) {
+        data[k] = transform[k](selector.find('#' + k).val());
+      } else {
+        data[k] = selector.find('#' + k).val();
+      }
     }
     let promise = fn.call(contest, data);
     return promise.then(
@@ -68,12 +77,18 @@ var EditContest = {
     });
   },
 
+  displayBonuses: function(contest) {
+    contest.loadBonuses(function (bonuses) {
+      console.log('Loaded bonuses');
+      $('.bonus-list').html(Handlebars.templates.bonus_table(contest));
+    });
+  },
 
   addBeerFromForm: function(contest) {
     console.log('In addBeerFromForm');
     let keys = ['name', 'brewery', 'brewery_url', 'untappd_url', 'point_value'];
     EditContest.addToContestFromForm(contest, contest.addBeer, 
-                                     keys, $('#addBeer'), 'name').done(
+                                     keys, $('#addBeer')).done(
             function () { 
               EditContest.displayBeers(contest); 
               EditContest.clearFormData();
@@ -121,13 +136,12 @@ var EditContest = {
     console.log('In addBreweryFromForm');
     let keys = ['name', 'location', 'untappd_url', 'point_value'];
     EditContest.addToContestFromForm(contest, contest.addBrewery, 
-                                     keys, $('#addBrewery'), 'name').done(
+                                     keys, $('#addBrewery')).done(
             function () { 
               EditContest.displayBreweries(contest); 
               EditContest.clearFormData();
             });
   },
-
 
   removeBreweryFromContest: function (contest, breweryId) {
     return contest.deleteBrewery(breweryId).then(
@@ -165,5 +179,31 @@ var EditContest = {
     );
   },
 
+  addBonusFromForm: function(contest) {
+    console.log('In addBonusFromForm');
+    let keys = ['name', 'description', 'hash_tags', 'point_value'];
+    let transform = { hash_tags: s => s.split(',').map(t => t.trim()) }
+    EditContest.addToContestFromForm(contest, contest.addBonus, 
+                                     keys, $('#addBonus'), 'name', transform).done(
+            function () { 
+              EditContest.displayBonuses(contest); 
+              EditContest.clearFormData();
+            });
+  },
+
+  removeBonusFromContest: function (contest, bonusId) {
+    return contest.deleteBonus(bonusId).then(
+      function () { 
+        $('#bonus-' + bonusId).fadeOut();
+        return $('#bonus-' + bonusId).promise();
+      }
+    ).then(
+      function () { return EditContest.displayBonuses(contest); }
+    ).fail(
+      function (jqXHR) {
+        $('#alert-for-bonus').html('<div class="alert alert-danger">Error deleting bonus ' + jqXHR.responseText + '</div>')
+      }
+    );
+  },
 };
 

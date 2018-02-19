@@ -8,7 +8,6 @@
   <script type="text/javascript" src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
   <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
   {{ form.media }}
-  {% if is_creator %}
   <script type="text/javascript" src="{% static 'handlebars/dist/handlebars.runtime.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/templates.runtime.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
@@ -41,19 +40,20 @@
       {% endif %}
       {% if not contest.active and is_creator %}
       contest.editing = true;
+      {% endif %}
       EditContest.displayBeers(contest);
       EditContest.displayBreweries(contest);
-      {% endif %}
+      EditContest.displayBonuses(contest);
       Validate.displayCheckins(contest, 1);
   });
   </script>
-  {% endif %}
 {% endblock %}
 
 {% block content %}
 {% if not contest.active and is_creator %}
 {% include "includes/add-beer-modal.html" %}
 {% include "includes/add-brewery-modal.html" %}
+{% include "includes/add-bonus-modal.html" %}
 {% endif %}
 	<div class="page-header">
 		<h1>{{ contest.name }}</h1>
@@ -64,6 +64,7 @@
       <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
       <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers</a></li>
       <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab">Breweries</a></li>
+      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab">Bonuses</a></li>
       {% if is_creator %}
       <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab">Validate</a></li>
       {% endif %}
@@ -171,6 +172,11 @@
             </div>
 		    {% endfor %}
           </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="bonuses">
+        <div class="bonus-list">
+          <p>Loading...</p>
+        </div>
       </div>
       {% if is_creator %}
       <div role="tabpanel" class="tab-pane" id="validate">

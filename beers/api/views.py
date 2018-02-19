@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
-                                  ContestBrewerySerializer, \
+                                  ContestBrewerySerializer, ContestBonusSerializer, \
                                   ContestBeerSerializer, ContestPlayerSerializer
 import beers.utils.untappd as untappd
 
@@ -46,6 +46,8 @@ class IsContestRunnerPermission(permissions.BasePermission):
         elif isinstance(obj, models.Contest_Brewery):
             contest = obj.contest
         elif isinstance(obj, models.Contest_Player):
+            contest = obj.contest
+        elif isinstance(obj, models.Contest_Bonus):
             contest = obj.contest
         elif isinstance(obj, models.Unvalidated_Checkin):
             contest = obj.contest_player.contest
@@ -193,6 +195,42 @@ class ContestBreweryDetail(generics.RetrieveUpdateDestroyAPIView):
                                             contest__id = contest_id,
                                             id = contest_brewery_id,)
         return contest_brewery
+
+class ContestBonusList(generics.ListCreateAPIView):
+    queryset = models.Contest_Bonus.objects.all()
+    serializer_class = ContestBonusSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+
+    def perform_create(self, serializer):
+        contest_id = self.kwargs['contest_id']
+        contest = models.Contest.objects.get(id=contest_id)
+        name = self.request.data['name']
+        if models.Contest_Bonus.objects.filter(contest=contest, name=name).exists():
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['Duplicate bonus/contest pairing']})
+        try:
+            serializer.save(contest=contest)
+        except ValueError as e:
+            raise serializers.ValidationError({'hash_tags': ['{}'.format(e)]})
+
+
+class ContestBonusDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Contest_Bonus.objects.all()
+    serializer_class = ContestBonusSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+
+    def perform_destroy(self, contest_bonus):
+        contest_bonus.delete()
+        
+    def get_object(self):
+        contest_id = self.kwargs['contest_id']
+        contest_bonus_id = self.kwargs['contest_bonus_id']
+        contest_bonus = get_object_or_404(models.Contest_Bonus, 
+                                          contest__id = contest_id,
+                                          id = contest_bonus_id,)
+        return contest_bonus
 
 class BeerLookup(APIView):
     """Looking up beer data from Untappd from URL"""
