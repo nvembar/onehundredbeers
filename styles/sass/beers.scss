@@ -545,18 +545,14 @@ $validation-button-color: #599bb3;
   font-weight: bold;
 }
 
-.data-row-odd {
-    background-color: beige;
-}
-
-.data-row-even {
-    background-color: aliceblue;
-}
-
 .data-row-checkedin {
   color: black;
   background-color: lightgreen;
   font-style: italic;
+}
+
+.data-table {
+    margin-bottom: 5px;
 }
 
 .leaderboard {
@@ -569,16 +565,20 @@ $validation-button-color: #599bb3;
     padding: 3px;
 }
 
+.leaderboard-row:nth-child(even) {
+    background-color: aliceblue;
+}
+
+.leaderboard-row:nth-child(odd) {
+    background-color: beige;
+}
+
 .leaderboard-header {
   @extend .data-header;
 }
 
-.leaderboard-odd {
-  @extend .data-row-odd;
-}
-
-.leaderboard-even {
-  @extend .data-row-even;
+.leaderboard-table {
+  @extend .data-table;
 }
 
 .beer-list {
@@ -605,32 +605,60 @@ $validation-button-color: #599bb3;
   @extend .data-row-checkedin;
 }
 
+.beer-table {
+  @extend .data-table;
+}
+
 .brewery-header {
   @extend .data-header;
-}
-
-.brewery-odd {
-  @extend .data-row-odd;
-}
-
-.brewery-even {
-  @extend .data-row-even;
 }
 
 .brewery-checkedin {
   @extend .data-row-checkedin;
 }
 
+.brewery-row:nth-child(even) {
+    background-color: aliceblue;
+}
+
+.brewery-row:nth-child(odd) {
+    background-color: beige;
+}
+
+.brewery-table {
+  @extend .data-table;  
+}
+
+.bonus-header {
+  @extend .data-header;
+}
+
+.bonus-checkedin {
+  @extend .data-row-checkedin;
+}
+
+.bonus-row:nth-child(even) {
+    background-color: aliceblue;
+}
+
+.bonus-row:nth-child(odd) {
+    background-color: beige;
+}
+
+.bonus-table {
+  @extend .data-table;  
+}
+
 .challenge-header {
   @extend .data-header;
 }
 
-.challenge-odd {
-  @extend .data-row-odd;
+.challenge-row:nth-child(even) {
+    background-color: aliceblue;
 }
 
-.challenge-even {
-  @extend .data-row-even;
+.challenge-row:nth-child(odd) {
+    background-color: beige;
 }
 
 .challenge-checkedin {
@@ -647,14 +675,6 @@ $validation-button-color: #599bb3;
 
 .checkin-header {
   @extend .data-header;
-}
-
-.checkin-odd {
-  @extend .data-row-odd;
-}
-
-.checkin-even {
-  @extend .data-row-even;
 }
 
 .validation-buttons {
