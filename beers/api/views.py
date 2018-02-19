@@ -205,10 +205,14 @@ class ContestBonusList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         contest_id = self.kwargs['contest_id']
         contest = models.Contest.objects.get(id=contest_id)
+        name = self.request.data['name']
+        if models.Contest_Bonus.objects.filter(contest=contest, name=name).exists():
+            raise serializers.ValidationError(
+                    {'non_field_errors': ['Duplicate bonus/contest pairing']})
         try:
             serializer.save(contest=contest)
         except ValueError as e:
-            raise serializers.ValidationError({'non_field_errors': ['{}'.format(e)]})
+            raise serializers.ValidationError({'hash_tags': ['{}'.format(e)]})
 
 
 class ContestBonusDetail(generics.RetrieveUpdateDestroyAPIView):
