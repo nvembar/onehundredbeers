@@ -17,15 +17,15 @@ class PlayerList(generics.ListAPIView):
     """
     Lists all the players across all the games.
     """
-    queryset = models.Player.objects.all()
+    queryset = models.Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
-    lookup_field = 'id'
+    lookup_field = 'user__username'
     permission_fields = (permissions.IsAuthenticatedOrReadOnly,)
 
 class PlayerDetail(generics.RetrieveUpdateAPIView):
-    queryset = models.Player.objects.all()
+    queryset = models.Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
-    lookup_field = 'id'
+    lookup_field = 'user__username'
     permission_fields = (permissions.IsAuthenticatedOrReadOnly,)
 
 class IsContestRunnerPermission(permissions.BasePermission):
@@ -89,10 +89,10 @@ class ContestPlayerDetail(generics.RetrieveAPIView):
 
     def get_object(self):
         contest_id = self.kwargs['contest_id']
-        player_id = self.kwargs['player_id']
+        username = self.kwargs['username']
         contest_player = get_object_or_404(models.Contest_Player, 
                                            contest__id=contest_id,
-                                           player__id=player_id,)
+                                           user_name=username,)
         return contest_player
         
 class ContestBeerList(generics.ListCreateAPIView):

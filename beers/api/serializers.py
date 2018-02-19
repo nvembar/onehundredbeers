@@ -1,15 +1,28 @@
+import logging
 from beers import models
 from django.contrib.auth.models import User
 from rest_framework import serializers, validators
 from rest_framework.reverse import reverse
 
+logger = logging.getLogger(__name__)
+
+class PlayerIdentityHyperlink(serializers.HyperlinkedIdentityField):
+    view_name = 'player-detail'
+
+    def get_url(self, player, view_name, request, format):
+        url_kwargs = { 
+            'user__username': player.user.username,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
+    serializer_url_field = PlayerIdentityHyperlink
     username = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
         model = models.Player
         extra_kwargs = {
-            'url': {'lookup_field': 'id'}
+            'url': {'lookup_field': 'user__username'}
         }
         fields = ('id', 
                   'url',
@@ -18,12 +31,19 @@ class PlayerSerializer(serializers.HyperlinkedModelSerializer):
                   'untappd_username',
                   'untappd_rss',)
 
+class ContestCreatorHyperlink(serializers.HyperlinkedRelatedField):
+    view_name = 'player-detail'
+
+    def get_url(self, creator_id, view_name, request, format):
+        creator = models.Player.objects.get(id=creator_id.pk)
+        url_kwargs = {
+            'user__username': creator.user.username,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
 class ContestSerializer(serializers.HyperlinkedModelSerializer):
 
-    creator = serializers.HyperlinkedRelatedField(many=False, 
-                                                  read_only=True,
-                                                  view_name='player-detail',
-                                                  lookup_field='id',)
+    creator = ContestCreatorHyperlink(read_only=True,)
     active = serializers.ReadOnlyField()
     created_on = serializers.ReadOnlyField()
     last_updated = serializers.ReadOnlyField()
@@ -59,27 +79,33 @@ class ContestSerializer(serializers.HyperlinkedModelSerializer):
                   'user_count',
                   'beer_count',)
 
-class ContestPlayerHyperlink(serializers.HyperlinkedIdentityField):
+class ContestPlayerIdentityHyperlink(serializers.HyperlinkedIdentityField):
     view_name = 'contest-player-detail'
 
     def get_url(self, contest_player, view_name, request, format):
         url_kwargs = { 
             'contest_id': contest_player.contest.id,
-            'player_id': contest_player.player.id,
+            'username': contest_player.user_name,
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
+class ContestToPlayerHyperlink(serializers.HyperlinkedRelatedField):
+    view_name = 'player-detail'
+
+    def get_url(self, player_id, view_name, request, format):
+        player = models.Player.objects.get(id=player_id.pk)
+        url_kwargs = { 
+            'user__username': player.user.username,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 class ContestPlayerSerializer(serializers.HyperlinkedModelSerializer):
-    serializer_url_field = ContestPlayerHyperlink
+    serializer_url_field = ContestPlayerIdentityHyperlink
     contest = serializers.HyperlinkedRelatedField(many=False,
                                                   read_only=True,
                                                   view_name='contest-detail',
                                                   lookup_field='id',)
-    player = serializers.HyperlinkedRelatedField(many=False,
-                                                 read_only=True,
-                                                 view_name='player-detail',
-                                                 lookup_field='id',)
+    player = ContestToPlayerHyperlink(read_only=True,)
     username = serializers.ModelField(
             model_field=models.Contest_Player()._meta.get_field('user_name'))
 
@@ -113,13 +139,13 @@ class ChallengerHyperlink(serializers.HyperlinkedRelatedField):
 
     def get_url(self, challenger_id, view_name, request, format):
         """
-        Parses out the url for the challenger for a Contest Beer
+        Parses out the url for the challenger for a Contest Beer or Contest Brewery
         """
         # The object passed in is a PKOnlyObject, not the whole Contest_Player
         challenger = models.Contest_Player.objects.get(id=challenger_id.pk)
         url_kwargs = { 
             'contest_id': challenger.contest.id,
-            'player_id': challenger.player.id,
+            'username': challenger.user_name,
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
