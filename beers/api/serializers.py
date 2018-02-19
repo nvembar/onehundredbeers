@@ -83,6 +83,8 @@ class ContestPlayerSerializer(serializers.HyperlinkedModelSerializer):
     username = serializers.ModelField(
             model_field=models.Contest_Player()._meta.get_field('user_name'))
 
+    rank = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = models.Contest_Player
         extra_kwargs = {
