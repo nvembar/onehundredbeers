@@ -200,8 +200,15 @@ class ContestBeerSerializer(serializers.Serializer):
             beer = beer_filter.get()
         else:
             beer = models.Beer.objects.create_beer(**validated_data['beer'])
-        contest_beer = contest.add_beer(beer, validated_data.get('point_value', 1))
-        return contest_beer
+        if 'challenger' in validated_data:
+            key_names = ['point_value', 'challenge_point_value', 
+                         'challenge_point_loss', 'max_point_loss']
+            kwargs = { key: value for key, value in validated_data.items() \
+                                  if key in key_names }
+            return contest.add_challenge_beer(beer, validated_data['challenger'],
+                                              **kwargs)
+        else:
+            return contest.add_beer(beer, validated_data.get('point_value', 1))
 
     def update(self, contest_beer, validated_data):
         errors = {}

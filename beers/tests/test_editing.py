@@ -399,20 +399,159 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Brewery.objects.filter(name='Brewery 1').count(), 0)
  
- 
+
     def test_successful_add_challenge_by_runner(self):
         """
         Tests whether a contest runner can add a challenge
         """
-        pass
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        contest = Contest.objects.get(name='Contest Base')
+        challenger_url = reverse('contest-player-detail', 
+                                 kwargs={'contest_id': contest.id, 
+                                         'username': 'runner1'})
+        response = c.post(reverse('contest-beer-list', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
+                                           'challenger': challenger_url,
+                                           'challenge_point_value': 12,
+                                           'max_point_loss': 12,
+                                           'challenge_point_loss': 3,
+                                           'point_value': 3}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        beer_filter = Beer.objects.filter(name='Beer 1')
+        self.assertEqual(beer_filter.count(), 1)
+        beer = beer_filter.get()
+        self.assertEqual(beer.brewery, 'Brewery 1')
+        cbeer_filter = Contest_Beer.objects.filter(beer=beer)
+        self.assertEqual(cbeer_filter.count(), 1)
+        contest_beer = cbeer_filter.get()
+        self.assertEqual(contest_beer.contest.id, contest.id)
+        self.assertEqual(contest_beer.point_value, 3)
+        self.assertIsNotNone(contest_beer.challenger)
+        self.assertEqual(contest_beer.challenger.user_name, 'runner1')
+        self.assertEqual(contest_beer.challenge_point_value, 12)
+        self.assertEqual(contest_beer.max_point_loss, 12)
+        self.assertEqual(contest_beer.challenge_point_loss, 3)
+        self.assertEqual(response.json()['id'], contest_beer.id)
 
+    def test_successful_add_challenge_for_player_by_runner(self):
+        """
+        Tests whether a contest runner can add a challenge for another player
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        player = Player.objects.get(user__username='user1')
+        contest = Contest.objects.get(name='Contest Base')
+        contest.add_player(player)
+        challenger_url = reverse('contest-player-detail', 
+                                 kwargs={'contest_id': contest.id, 
+                                         'username': 'user1'})
+        response = c.post(reverse('contest-beer-list', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
+                                           'challenger': challenger_url,
+                                           'challenge_point_value': 12,
+                                           'max_point_loss': 12,
+                                           'challenge_point_loss': 3,
+                                           'point_value': 3}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        beer_filter = Beer.objects.filter(name='Beer 1')
+        self.assertEqual(beer_filter.count(), 1)
+        beer = beer_filter.get()
+        self.assertEqual(beer.brewery, 'Brewery 1')
+        cbeer_filter = Contest_Beer.objects.filter(beer=beer)
+        self.assertEqual(cbeer_filter.count(), 1)
+        contest_beer = cbeer_filter.get()
+        self.assertEqual(contest_beer.contest.id, contest.id)
+        self.assertEqual(contest_beer.point_value, 3)
+        self.assertIsNotNone(contest_beer.challenger)
+        self.assertEqual(contest_beer.challenger.user_name, 'user1')
+        self.assertEqual(contest_beer.challenge_point_value, 12)
+        self.assertEqual(contest_beer.max_point_loss, 12)
+        self.assertEqual(contest_beer.challenge_point_loss, 3)
+        self.assertEqual(response.json()['id'], contest_beer.id)
 
-    def test_successful_add_challenge_by_runner(self):
+    def test_successful_add_challenge_by_player(self):
         """
         Tests whether a contest player can add a challenge
         """
-        pass
+        c = Client()
+        self.assertTrue(c.login(username='user1', password='password1%'))
+        player = Player.objects.get(user__username='user1')
+        contest = Contest.objects.get(name='Contest Base')
+        contest.add_player(player)
+        challenger_url = reverse('contest-player-detail', 
+                                 kwargs={'contest_id': contest.id, 
+                                         'username': 'user1'})
+        response = c.post(reverse('contest-beer-list', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
+                                           'challenger': challenger_url,
+                                           'challenge_point_value': 12,
+                                           'max_point_loss': 12,
+                                           'challenge_point_loss': 3,
+                                           'point_value': 3}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        beer_filter = Beer.objects.filter(name='Beer 1')
+        self.assertEqual(beer_filter.count(), 1)
+        beer = beer_filter.get()
+        self.assertEqual(beer.brewery, 'Brewery 1')
+        cbeer_filter = Contest_Beer.objects.filter(beer=beer)
+        self.assertEqual(cbeer_filter.count(), 1)
+        contest_beer = cbeer_filter.get()
+        self.assertEqual(contest_beer.contest.id, contest.id)
+        self.assertEqual(contest_beer.point_value, 3)
+        self.assertIsNotNone(contest_beer.challenger)
+        self.assertEqual(contest_beer.challenger.user_name, 'user1')
+        self.assertEqual(contest_beer.challenge_point_value, 12)
+        self.assertEqual(contest_beer.max_point_loss, 12)
+        self.assertEqual(contest_beer.challenge_point_loss, 3)
+        self.assertEqual(response.json()['id'], contest_beer.id)
 
+    def test_bad_add_challenge_by_player(self):
+        """
+        Tests whether a contest player cannot add a challenge if they try to add 
+        a challenge for another player
+        """
+        c = Client()
+        self.assertTrue(c.login(username='user1', password='password1%'))
+        player = Player.objects.get(user__username='user1')
+        contest = Contest.objects.get(name='Contest Base')
+        contest.add_player(player)
+        contest.add_player(Player.objects.get(user__username='user2'))
+        challenger_url = reverse('contest-player-detail', 
+                                 kwargs={'contest_id': contest.id, 
+                                         'username': 'user2'})
+        response = c.post(reverse('contest-beer-list', 
+                                  kwargs={'contest_id': contest.id}),
+                          content_type='application/json',
+                          data=json.dumps({'name': 'Beer 1',
+                                           'brewery': 'Brewery 1',
+                                           'untappd_url': 'https://untappd.com/beer/1',
+                                           'brewery_url': 'https://untappd.com/brewery/1',
+                                           'challenger': challenger_url,
+                                           'challenge_point_value': 12,
+                                           'max_point_loss': 12,
+                                           'challenge_point_loss': 3,
+                                           'point_value': 3}),
+                          HTTP_ACCEPT='application/json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_active_add_challenge(self):
         """
