@@ -66,6 +66,12 @@ var EditContest = {
   displayBeers: function(contest) {
     contest.loadBeers(function (beers) {
       console.log('Loaded beers');
+      contest.beers.forEach(function(beer) {
+        if (beer.challenger) {
+          console.log('Found challenger ' + beer.challenger + ' for ' + beer.name);
+          beer.challenger_username = beer.challenger.substring(beer.challenger.lastIndexOf('/')+1);
+        }
+      });
       $('.beer-list').html(Handlebars.templates.beer_table(contest));
     });
   },
