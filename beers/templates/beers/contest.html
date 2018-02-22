@@ -40,6 +40,18 @@
       {% endif %}
       {% if not contest.active and is_creator %}
       contest.editing = true;
+      let challengeEnable = () => 
+          $('.beer-challenge-input').prop('disabled', 
+                                          !$('#is-beer-challenge').is(':checked'));
+      $('#is-beer-challenge').change(challengeEnable);
+      contest.loadPlayers(function(players) {
+        var selector = $('#challenger');
+        selector.html('');
+        players.forEach(function (player) {
+           selector.append('<option value="' + player.url + '">' + player.username + "</option>\n");
+        });
+      });
+      $('#challenger')
       {% endif %}
       EditContest.displayBeers(contest);
       EditContest.displayBreweries(contest);
