@@ -21,8 +21,9 @@
       {{#if this.untappd_url}}
       <a href="{{ this.untappd_url }}">{{ this.name }}</a>
       {{else}}
-      {{ this.name }}
+      {{ this.name }} 
       {{/if}}
+      {{#if this.challenger}}(challenge by {{this.challenger_username}}){{/if}}
     </div>
     <div class="col-xs-5">
       {{#if this.untappd_url}}

@@ -66,6 +66,12 @@ var EditContest = {
   displayBeers: function(contest) {
     contest.loadBeers(function (beers) {
       console.log('Loaded beers');
+      contest.beers.forEach(function(beer) {
+        if (beer.challenger) {
+          console.log('Found challenger ' + beer.challenger + ' for ' + beer.name);
+          beer.challenger_username = beer.challenger.substring(beer.challenger.lastIndexOf('/')+1);
+        }
+      });
       $('.beer-list').html(Handlebars.templates.beer_table(contest));
     });
   },
@@ -87,6 +93,11 @@ var EditContest = {
   addBeerFromForm: function(contest) {
     console.log('In addBeerFromForm');
     let keys = ['name', 'brewery', 'brewery_url', 'untappd_url', 'point_value'];
+    // We only proess the challenge information if the challenge checkbox is checked
+    if ($('#is-beer-challenge').is(':checked')) {
+      keys.push('challenger', 'challenge_point_value', 
+                'challenge_point_loss', 'max_point_loss');
+    }
     EditContest.addToContestFromForm(contest, contest.addBeer, 
                                      keys, $('#addBeer')).done(
             function () { 

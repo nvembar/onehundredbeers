@@ -64,6 +64,19 @@ var Contests = {
                 });
             },
 
+            loadPlayers: function(success) {
+                let url = this.baseUrl + 'api/contests/' + this.contestId + '/players';
+                var that = this;
+                return $.getJSON(url, function(data) {
+                    // sort by username
+                    that.players = data.sort((p1,p2) => 
+                            p1.username.localeCompare(p2.usernmae));
+                    if (success != null) {
+                        success(data);
+                    }
+                });
+            },
+
             validateBeer: function(uvId, beerId, bonuses = null) {
               let url = this.contestUrl + '/checkins';
               content = { 

@@ -128,10 +128,10 @@ class Contest(models.Model):
         return beer
 
     def add_challenge_beer(self, beer, challenger,
-                           point_data={'point_value': 3,
-                                       'challenge_point_value': 12,
-                                       'point_loss': 3,
-                                       'max_point_loss': 12, }):
+                           point_value=3,
+                           challenge_point_value=12,
+                           challenge_point_loss=3,
+                           max_point_loss=12):
         """
         Adds a new beer as a challenge with default values for the points.
         Challenge beers are associated with a player in the contest. By default,
@@ -139,7 +139,17 @@ class Contest(models.Model):
         will get 3 for drinking it and also have the challenger lose 3 points
         up to a maximum of 12 points lost
         """
-        return None
+        beer = Contest_Beer(contest=self, 
+                            beer=beer,
+                            challenger=challenger,
+                            beer_name=beer.name,
+                            point_value=point_value,
+                            challenge_point_value=challenge_point_value,
+                            challenge_point_loss=challenge_point_loss,
+                            max_point_loss=max_point_loss,
+                            total_drank=0,)
+        beer.save()
+        return beer
 
     def add_brewery(self, brewery, point_value=1):
         """Adds a brewery to the contest"""

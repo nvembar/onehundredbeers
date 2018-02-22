@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, Group
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
                                   ContestBrewerySerializer, ContestBonusSerializer, \
@@ -17,15 +18,15 @@ class PlayerList(generics.ListAPIView):
     """
     Lists all the players across all the games.
     """
-    queryset = models.Player.objects.all()
+    queryset = models.Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
-    lookup_field = 'id'
+    lookup_field = 'user__username'
     permission_fields = (permissions.IsAuthenticatedOrReadOnly,)
 
 class PlayerDetail(generics.RetrieveUpdateAPIView):
-    queryset = models.Player.objects.all()
+    queryset = models.Player.objects.all().select_related('user')
     serializer_class = PlayerSerializer
-    lookup_field = 'id'
+    lookup_field = 'user__username'
     permission_fields = (permissions.IsAuthenticatedOrReadOnly,)
 
 class IsContestRunnerPermission(permissions.BasePermission):
@@ -89,21 +90,42 @@ class ContestPlayerDetail(generics.RetrieveAPIView):
 
     def get_object(self):
         contest_id = self.kwargs['contest_id']
-        player_id = self.kwargs['player_id']
+        username = self.kwargs['username']
         contest_player = get_object_or_404(models.Contest_Player, 
                                            contest__id=contest_id,
-                                           player__id=player_id,)
+                                           user_name=username,)
         return contest_player
         
 class ContestBeerList(generics.ListCreateAPIView):
     queryset = models.Contest_Beer.objects.all()
     serializer_class = ContestBeerSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsContestRunnerPermission,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         contest_id = self.kwargs['contest_id']
         contest = models.Contest.objects.get(id=contest_id)
+        contest_player = None
+        try:
+            contest_player = models.Contest_Player.objects.get(contest=contest,
+                                   player__user=self.request.user)
+        except models.Contest_Player.DoesNotExist:
+            raise PermissionDenied()
+        # The contest creator can add any challenge, and a contest player
+        # can add challenge from themselves.
+        if contest.creator.id != contest_player.player.id and \
+               ('challenger' not in serializer.validated_data or \
+                serializer.validated_data['challenger'].id != contest_player.id):
+            logger.info('Perm denied: Contest %s, Player %s, Challenger %s',
+                        contest, contest_player, 
+                        serializer.validated_data.get('challenger', None))
+            raise PermissionDenied()
+        if 'challenger' in serializer.validated_data:
+            challenger = serializer.validated_data['challenger']
+            current_cnt = models.Contest_Beer.objects.filter(contest=contest,
+                                          challenger=challenger).count()
+            if current_cnt >= 2:
+                msg = 'Too many challenges by player {}'.format(challenger.user_name)
+                raise serializers.ValidationError({'non_field_errors': [msg]})
         beer_name = self.request.data['name']
         brewery_name = self.request.data['brewery']
         beer_filter = models.Beer.objects.filter(name=beer_name, brewery=brewery_name)
