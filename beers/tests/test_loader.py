@@ -316,8 +316,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         contest.save()
         contest_player = contest.add_player(player)
         contest_player.save()
-        contest_runner = contest.add_player(runner)
-        contest_runner.save()
+        contest_runner = contest.creator
         call_command('load_checkins')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 50)
 
@@ -342,8 +341,7 @@ Brewery 5,Beer 5,https://example.com/untapped4,ST,3
         contest.save()
         contest_player = contest.add_player(player)
         contest_player.save()
-        contest_runner = contest.add_player(runner)
-        contest_runner.save()
+        contest_runner = contest.creator
         call_command('load_checkins', '--after-date', '2017-06-01')
         self.assertEqual(Unvalidated_Checkin.objects.all().count(), 8)
 

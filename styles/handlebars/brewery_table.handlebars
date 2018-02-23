@@ -1,0 +1,52 @@
+<div id="alert-for-brewery" class="alert-for-tab"></div>
+<div class="brewery-table">
+<div class="row brewery-row brewery-header">
+  <div class="col-xs-5">Brewery</div>
+  <div class="col-xs-5">Location</div>
+  <div class="col-xs-1">Points</div>
+  {{#if player }}
+    <div class="col-xs-1">Checkin</div>
+  {{/if}}
+  {{#if editing }}
+  <div class="col-xs-1">+/-</div>
+  {{/if}}
+</div>
+{{#unless breweries}}
+<div class="col-xs-12"><span>No breweries added to the contest yet</span></div>
+{{/unless}}
+{{#each breweries}}
+<div id="brewery-{{this.id}}" class="row brewery-row {{#if this.checked_into }}brewery-checkedin{{/if}}">
+    <div class="col-xs-5">
+      {{#if this.untappd_url}}
+      <a href="{{ this.untappd_url }}">{{ this.name }}</a>
+      {{else}}
+      {{ this.name }}
+      {{/if}}
+    </div>
+    <div class="col-xs-5">
+      {{ this.location }}
+    </div>
+    <div class="col-xs-1">{{ this.point_value }}</div>
+    {{#if player }}
+    <div class="col-xs-1">
+    {{#if this.checked_into }}
+    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+    {{/if}}
+    </div>
+    {{/if}}
+    {{#if ../editing }}
+    <div class="col-xs-1">
+    <button type="button" class="btn btn-default" aria-label="Delete">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="EditContest.removeBreweryFromContest(contest, {{ this.id }})"></span>
+    </button>
+    </div>
+    {{/if}}
+</div>
+{{/each}}
+</div>
+{{#if editing}}
+<div class="edit-buttons">
+  <button type="button" class="btn edit-button" data-toggle="modal" data-target="#addChallengeBrewery">Add Challenge Brewery</button>
+  <button type="button" class="btn btn-primary edit-button" data-toggle="modal" data-target="#addBrewery">Add Brewery</button>
+</div>
+{{/if}}

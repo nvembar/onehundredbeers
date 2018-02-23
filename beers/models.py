@@ -1,5 +1,7 @@
 """Models supporting One Hundred Beers"""
 
+import datetime
+import re
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -34,14 +36,17 @@ class Player(models.Model):
 
 class BeerManager(models.Manager):
     """Manages beer data"""
-    def create_beer(self, name, brewery, style='', description='',
+    def create_beer(self, name, brewery, untappd_url='',
+                    style='', description='', brewery_url='',
                     brewery_city='', brewery_state=''):
         """Creates a contest with defaults on active status, creation date,
         update date, beer count, and user count"""
         beer = self.create(name=name, brewery=brewery,
                            style=style, description=description,
+                           untappd_url=untappd_url,
                            brewery_city=brewery_city,
                            brewery_state=brewery_state,
+                           brewery_url=brewery_url,
                            last_updated=timezone.now())
         return beer
 
@@ -59,12 +64,16 @@ class Beer(models.Model):
     brewery_lat = models.FloatField(null=True, blank=True)
     brewery_lon = models.FloatField(null=True, blank=True)
     untappd_id = models.CharField(max_length=25, null=True, blank=True)
+    untappd_url = models.URLField(null=True, blank=True)
+    brewery_url = models.URLField(null=True, blank=True)
     last_updated = models.DateTimeField()
 
     objects = BeerManager()
 
     def __str__(self):
-        return self.name + ' / ' + self.brewery
+        return "Beer[{}<{}> / {}<{}>]".format(self.name, 
+                                        self.untappd_url, 
+                                        self.brewery, self.brewery_url)
 
 class ContestManager(models.Manager):
     "Manager for contests"
@@ -74,9 +83,11 @@ class ContestManager(models.Manager):
         update date, beer count, and user count"""
         contest = self.create(name=name, creator=creator,
                               start_date=start_date, end_date=end_date,
-                              active=True, created_on=timezone.now(),
+                              active=False, created_on=timezone.now(),
                               last_updated=timezone.now(),
                               user_count=0, beer_count=0)
+        # Add the creator as a player
+        contest_player = contest.add_player(creator)
         return contest
 
 
@@ -84,7 +95,7 @@ class ContestManager(models.Manager):
 class Contest(models.Model):
     "Represents a contest"
 
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, unique=True)
     creator = models.ForeignKey(Player, default=1)
     active = models.BooleanField(default=False)
     created_on = models.DateTimeField()
@@ -103,8 +114,7 @@ class Contest(models.Model):
                                         beer_count=0,
                                         last_checkin_date=None,
                                         last_checkin_beer=None,
-                                        last_checkin_load=self.start_date,
-                                        rank=-1)
+                                        last_checkin_load=self.start_date,)
         contest_player.save()
         return contest_player
 
@@ -118,10 +128,10 @@ class Contest(models.Model):
         return beer
 
     def add_challenge_beer(self, beer, challenger,
-                           point_data={'point_value': 3,
-                                       'challenge_point_value': 12,
-                                       'point_loss': 3,
-                                       'max_point_loss': 12, }):
+                           point_value=3,
+                           challenge_point_value=12,
+                           challenge_point_loss=3,
+                           max_point_loss=12):
         """
         Adds a new beer as a challenge with default values for the points.
         Challenge beers are associated with a player in the contest. By default,
@@ -129,7 +139,17 @@ class Contest(models.Model):
         will get 3 for drinking it and also have the challenger lose 3 points
         up to a maximum of 12 points lost
         """
-        return None
+        beer = Contest_Beer(contest=self, 
+                            beer=beer,
+                            challenger=challenger,
+                            beer_name=beer.name,
+                            point_value=point_value,
+                            challenge_point_value=challenge_point_value,
+                            challenge_point_loss=challenge_point_loss,
+                            max_point_loss=max_point_loss,
+                            total_drank=0,)
+        beer.save()
+        return beer
 
     def add_brewery(self, brewery, point_value=1):
         """Adds a brewery to the contest"""
@@ -139,29 +159,70 @@ class Contest(models.Model):
         brewery.save()
         return brewery
 
+    def __clean_hash_tags(self, hash_tags):
+        """
+        Takes either a string or an array of hash tags and returns a cleaned up
+        list of hash tags or raises a ValueError if not formatted correctly
+        """
+        tag_list = None
+        if isinstance(hash_tags, str):
+            tag_list = [tag.strip() for tag in hash_tags.split(',')]
+        elif isinstance(hash_tags, (list, tuple)):
+            tag_list = [tag.strip() for tag in hash_tags]
+        else:
+            raise ValueError('The hash_tags object should be a list of strings or ' +\
+                             'a comma-separated string of hash tags')
+        tag_misses  = [tag for tag in tag_list if not re.fullmatch('[A-Za-z0-9_]+', tag)]
+        if len(tag_misses) > 0:
+            raise ValueError('A hash tag should only be made with letters, numbers ' +\
+                             'and underscores: {}'.format(','.join(tag_misses)))
+        return tag_list
+
+    def __using_hash_tag(self, hash_tag):
+        """
+        Checks if a hash tag is already in use for this contest. Returns matching 
+        bonus or None if no bonus exists.
+        """
+        maybe = Contest_Bonus.objects.filter(contest=self, hash_tags__contains=hash_tag)
+        if maybe.exists():
+            for bonus in maybe:
+                maybe_tags = bonus.hash_tags
+                if hash_tag in maybe_tags.split(','):
+                    return bonus
+        return None
+
+    def add_bonus(self, name, description, hash_tags, point_value=1):
+        """
+        Adds a new bonus to the contest
+
+        hash_tags can be a plain string, a comma-separated string, or an array of 
+        strings
+        """
+        tag_list = self.__clean_hash_tags(hash_tags)
+        tag_matches = [(tag, self.__using_hash_tag(tag)) for tag in tag_list]
+        tag_conflict = list(filter(lambda t: t[1] is not None, tag_matches))
+        if len(tag_conflict) > 0:
+            error_strings = ['#{} in {}'.format(t[0], t[1].name) for t in tag_conflict]
+            raise ValueError('Hash tags are already being used: {}'.format(
+                             ','.join(error_strings)))
+        bonus = Contest_Bonus(contest=self, 
+                              name=name,
+                              description=description,
+                              hash_tags=','.join(tag_list),
+                              point_value=point_value)
+        bonus.save()
+        return bonus
+
     def ranked_players(self):
         """
         Returns a list of players, in total_points ranked order, with an
         additional field 'rank' which includes the ranking of the player
         """
-        contest_players = Contest_Player.objects.filter(contest=self)
-        contest_players = list(contest_players.order_by('-total_points',
-                                                        'user_name'))
-        max_points = Contest_Beer.objects.filter(contest=self).aggregate(
-            models.Sum('point_value'))['point_value__sum']
-        rank = 0
-        # Start with rank 0 and a number higher than the highest possible beer
-        # count. This forces the first iteration to step everything forward
-        last_total_points = max_points + 1
-        player_count = 0
-        for p in contest_players:
-            player_count = player_count + 1
-            # Calculate the "1224" style ranking
-            if p.total_points < last_total_points:
-                rank = player_count
-            p.rank = rank
-            last_total_points = p.total_points
-        return contest_players
+        return Contest_Player.objects.raw('SELECT *, RANK() OVER ' +
+                                          '(PARTITION BY contest_id ORDER BY ' +
+                                          'total_points DESC) as rank FROM ' +
+                                          'beers_contest_player WHERE ' +
+                                          'contest_id = %s', [self.id])
 
     def beers(self, player=None):
         """
@@ -199,22 +260,26 @@ class Contest(models.Model):
 
 class Brewery_Manager(models.Manager):
 
-    def create_brewery(self, name, untappd_id):
+    def create_brewery(self, name, untappd_url, location=None,):
         return self.create(name=name, 
-													 untappd_id=untappd_id,
-													 last_updated=timezone.now())
+                           untappd_url=untappd_url,
+                           location=location,
+						   last_updated=timezone.now())
 
 class Brewery(models.Model):
     name = models.CharField(max_length=250)
     untappd_id = models.CharField(max_length=25, null=True, blank=True,)
     untappd_url = models.URLField(null=True, blank=True,)
     state = models.CharField(max_length=250)
+    location = models.CharField(max_length=250, null=True, blank=True, default=None)
     last_updated = models.DateTimeField()
 
     objects = Brewery_Manager()
 
     def __str__(self):
-        return self.name
+        return "Brewery[name={}, url={}, location={}]".format(self.name,
+                                                              self.untappd_url,
+                                                              self.location)
 
 class Contest_BreweryManager(models.Manager):
 
@@ -263,7 +328,9 @@ class Contest_Player(models.Model):
         blank=True)
     last_checkin_load = models.DateTimeField(
         "Latest date in the last load for this player")
-    rank = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = (('contest', 'player'),)
 
     def __compute_losses(self):
         """
@@ -502,8 +569,29 @@ class Contest_Beer(models.Model):
             'for drinking this beer')
     total_drank = models.IntegerField("number of players who drank this beer")
 
+    class Meta:
+        unique_together = (('contest', 'beer'),)
+
     def __str__(self):
         return "{0}/{1}".format(self.beer.name, self.beer.brewery)
+
+class Contest_Bonus(models.Model):
+    """Represents a bonus associated with a particular contest"""
+
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, default=None, null=False, blank=False,)
+    description = models.CharField(max_length=250, default="", null=True, blank=True,)
+    hash_tags = models.CharField(max_length=250, 
+                                 default="", 
+                                 null=False, 
+                                 blank=False,
+                                 help_text="Comma delimited strings without # " +\
+                                           "symbols representing the list of tags " +\
+                                           "will score this bonus",)
+    point_value = models.IntegerField(default=1,)
+
+    class Meta:
+        unique_together = (('contest', 'name'),)
 
 class Unvalidated_CheckinManager(models.Manager):
     def create_checkin(self, contest_player, untappd_title, brewery, beer,
@@ -522,20 +610,27 @@ class Unvalidated_Checkin(models.Model):
     untappd_checkin_date = models.DateTimeField()
     brewery = models.CharField(max_length=250, default='')
     beer = models.CharField(max_length=250, default='')
+    beer_url = models.URLField(null=True, default=None)
+    brewery_url = models.URLField(null=True, default=None)
+    photo_url = models.URLField(null=True, default=None)
+    rating = models.IntegerField(null=True, default=None)
 
     objects = Unvalidated_CheckinManager()
 
     def __str__(self):
-        return "Unvalidated checkin: {0}".format(self.untappd_title)
-
-class Checkin(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
-    checkin_time = models.DateTimeField()
-    comment = models.CharField(max_length=250, null=True, blank=True, default='')
-    rating = models.IntegerField(default=-1)
-    untappd_checkin = models.URLField(max_length=250, null=True, blank=True)
-    runner_validated = models.BooleanField(default=False)
+        return """Checkin[beer={},
+                       brewery={},
+                       beer_url={},
+                       brewery_url={},
+                       checkin_url={},
+                       time={},
+                       photo_url={}]""".format(self.beer, 
+                                              self.brewery,
+                                              self.beer_url,
+                                              self.brewery_url,
+                                              self.untappd_checkin,
+                                              self.untappd_checkin_date.isoformat(),
+                                              self.photo_url)
 
 class Contest_CheckinManager(models.Manager):
     def create_checkin(self, contest_player, contest_beer, checkin_time,

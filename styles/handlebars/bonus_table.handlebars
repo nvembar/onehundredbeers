@@ -1,0 +1,41 @@
+<div id="alert-for-bonuses" class="alert-for-tab"></div>
+<div class="bonus-table">
+<div class="row bonus-row bonus-header">
+  <div class="col-xs-2">Name</div>
+  <div class="col-xs-4">Description</div>
+  <div class="col-xs-4">Tags</div>
+  <div class="col-xs-1">Points</div>
+  {{#if player }}
+    <div class="col-xs-1">Total</div>
+  {{/if}}
+  {{#if editing }}
+  <div class="col-xs-1">+/-</div>
+  {{/if}}
+</div>
+{{#unless bonuses}}
+<div class="col-xs-12"><span>No bonuses added to the contest yet</span></div>
+{{/unless}}
+{{#each bonuses}}
+<div id="bonus-{{this.id}}" class="row bonus-row">
+    <div class="col-xs-2">{{ this.name }}</div>
+    <div class="col-xs-4">{{ this.description }}</div>
+    <div class="col-xs-4">{{ this.hash_tags }}</div>
+    <div class="col-xs-1">{{ this.point_value }}</div>
+    {{#if player }}
+    <div class="col-xs-1">[cnt]</div>
+    {{/if}}
+    {{#if ../editing }}
+    <div class="col-xs-1">
+    <button type="button" class="btn btn-default" aria-label="Delete">
+      <span class="glyphicon glyphicon-remove" aria-hidden="true" onclick="EditContest.removeBonusFromContest(contest, {{ this.id }})"></span>
+    </button>
+    </div>
+    {{/if}}
+</div>
+{{/each}}
+</div>
+{{#if editing}}
+<div class="edit-buttons">
+  <button type="button" class="btn btn-primary edit-button" data-toggle="modal" data-target="#addBonus">Add Bonus</button>
+</div>
+{{/if}}

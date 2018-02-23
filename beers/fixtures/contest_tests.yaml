@@ -171,7 +171,7 @@
   pk: 4
   fields:
     contest: 1
-    beer: 1
+    beer: 4
     beer_name: Beer 4
     point_value: 3
     total_drank: 0
@@ -179,7 +179,7 @@
   pk: 5
   fields:
     contest: 1
-    beer: 1
+    beer: 5
     beer_name: Beer 5
     point_value: 3
     total_drank: 0
@@ -234,7 +234,6 @@
     last_checkin_date: null
     last_checkin_beer: null
     last_checkin_load: '2016-01-01 00:00:00.00+00:00'
-    rank: -1
 - model: beers.contest_player
   pk: 2
   fields:
@@ -246,7 +245,6 @@
     last_checkin_date: null
     last_checkin_beer: null
     last_checkin_load: '2016-01-01 00:00:00.00+00:00'
-    rank: -1
 - model: beers.contest_player
   pk: 3
   fields:
@@ -258,7 +256,6 @@
     last_checkin_date: null
     last_checkin_beer: null
     last_checkin_load: '2016-01-01 00:00:00.00+00:00'
-    rank: -1
 - model: beers.contest_player
   pk: 4
   fields:
@@ -270,7 +267,6 @@
     last_checkin_date: null
     last_checkin_beer: null
     last_checkin_load: '2016-01-01 00:00:00.00+00:00'
-    rank: -1
 - model: beers.contest_beer
   pk: 6
   fields:

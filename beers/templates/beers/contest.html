@@ -8,9 +8,11 @@
   <script type="text/javascript" src="{% static 'js-cookie/src/js.cookie.js' %}"></script>
   <script type="text/javascript" src="{% static 'select2/dist/js/select2.min.js' %}"></script>
   {{ form.media }}
-  {% if is_creator %}
+  <script type="text/javascript" src="{% static 'handlebars/dist/handlebars.runtime.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/templates.runtime.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/api.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/validate.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/edit-contest.js' %}"></script>
   <script type="text/javascript">
   $(function() {
       console.log('Getting a new contest');
@@ -33,13 +35,38 @@
       ];
       contest = Contests.init('{% url 'index' %}', {{ contest.id }});
       contest.selectData = selectData;
+      {% if contest.active and contest_player %}
+      contest.player = true;
+      {% endif %}
+      {% if not contest.active and is_creator %}
+      contest.editing = true;
+      let challengeEnable = () => 
+          $('.beer-challenge-input').prop('disabled', 
+                                          !$('#is-beer-challenge').is(':checked'));
+      $('#is-beer-challenge').change(challengeEnable);
+      contest.loadPlayers(function(players) {
+        var selector = $('#challenger');
+        selector.html('');
+        players.forEach(function (player) {
+           selector.append('<option value="' + player.url + '">' + player.username + "</option>\n");
+        });
+      });
+      $('#challenger')
+      {% endif %}
+      EditContest.displayBeers(contest);
+      EditContest.displayBreweries(contest);
+      EditContest.displayBonuses(contest);
       Validate.displayCheckins(contest, 1);
   });
   </script>
-  {% endif %}
 {% endblock %}
 
 {% block content %}
+{% if not contest.active and is_creator %}
+{% include "includes/add-beer-modal.html" %}
+{% include "includes/add-brewery-modal.html" %}
+{% include "includes/add-bonus-modal.html" %}
+{% endif %}
 	<div class="page-header">
 		<h1>{{ contest.name }}</h1>
 	</div>
@@ -49,6 +76,7 @@
       <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
       <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers</a></li>
       <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab">Breweries</a></li>
+      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab">Bonuses</a></li>
       {% if is_creator %}
       <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab">Validate</a></li>
       {% endif %}
@@ -68,7 +96,7 @@
             <div class="row leaderboard-row leaderboard-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %}">
               <div class="col-md-1 col-xs-1">{{ p.rank }}</div>
               <div class="col-md-4 col-xs-10">
-                <a href="{% url 'player-detail' contest.id p.user_name %}">{{ p.user_name }}</a>
+                <a href="{% url 'contest-player' contest.id p.user_name %}">{{ p.user_name }}</a>
               </div>
               <div class="col-md-2 col-md-push-5 col-xs-1">{{ p.total_points }}</div>
               <div class="col-md-5 col-md-pull-2 col-md-offset-0 col-xs-offset-1 col-xs-10">{{ p.last_checkin_beer }}</div>
@@ -89,7 +117,12 @@
               <div class="col-xs-4">Brewery</div>
               <div class="col-xs-1">State</div>
               <div class="col-xs-1">Points</div>
-              {% if contest_player %}<div class="col-xs-1">Checkin</div>{% endif %}
+              {% if contest.active and contest_player %}
+                <div class="col-xs-1">Checkin</div>
+              {% endif %}
+              {% if not contest.active and is_creator %}
+              <div class="col-xs-1">+/-</div>
+              {% endif %}
             </div>
 			{% for b in contest_beers %}
             <div class="row beer-row beer-{% if forloop.counter0|divisibleby:"2"%}even{% else %}odd{% endif %} {% if b.checked_into %}beer-checkedin{% endif %}">
@@ -97,15 +130,29 @@
               <div class="col-xs-4">{{ b.beer.brewery }}</div>
               <div class="col-xs-1">{{ b.beer.brewery_state }}</div>
               <div class="col-xs-1">{{ b.point_value }}</div>
-              {% if contest_player %}
+              {% if contest.active and contest_player %}
               <div class="col-xs-1">
                 {% if b.checked_into %}
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                 {% endif %}
               </div>
               {% endif %}
+              {% if not contest.active and is_creator %}
+              <div class="col-xs-1">
+                <button type="button" class="btn btn-default" aria-label="Delete">
+                  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+              </div>
+              {% endif %}
+            </div>
+            {% empty %}
+            <div class="row beer-row">
+              No beers yet added to this contest.
             </div>
             {% endfor %}
+            {% if not contest.active and is_creator %}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addBeer">Add Beer</button>
+            {% endif %}
           </div>
       </div>
       <div role="tabpanel" class="tab-pane" id="breweries">
@@ -137,6 +184,11 @@
             </div>
 		    {% endfor %}
           </div>
+      </div>
+      <div role="tabpanel" class="tab-pane" id="bonuses">
+        <div class="bonus-list">
+          <p>Loading...</p>
+        </div>
       </div>
       {% if is_creator %}
       <div role="tabpanel" class="tab-pane" id="validate">
