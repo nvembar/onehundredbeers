@@ -1,20 +1,22 @@
 sudo: required
 language: generic
 services:
-# - postgresql
 - docker
 env:
   global:
   - DATABASE_URL=postgres://postgres@localhost/hbeers
   - SSL_REDIRECT=0
+  - CC_TEST_REPORTER_ID=c057b9b3b1fb1fd38e703ae97c7ed39d5ee3fdf63073b9d9c144bfc625eec151
   - secure: aIt3vS/XxeW0Ymv+Sq1GxFB8SrvtXSAk/JidJ+95nRdNAsdIZNX403nG2Q9cG+hDF+o3zq2FA0RBoIhvOQrN1NrUdOaDbenc5KpNy67qz7hFwWMbwDTJf+0maJH2vbNRn7WYVaEIeU1gj7dx/hKTreNkCyRdw3AGcau0zrzFcTWD4L/4V4Oqwirv5xFlB8xbt6XNAXuVPKHiQJvUQw6l6k0X0WVXmSh0SMXdPgt9DtvfNZvSVNznrd2Fkzep0VpnjWZhYweLmjrqqQInmskXpJF0Hn5ngmn0lQlsfxEa+7TyK2psZsQfrwnj7MEq0kxqh417iY1bNRevBv3exiKzW6mWkUlIop10Nmq1bzLgpZnJQb3tq56KixCXfSaEQKwDlP2cm70UBaJXnIlY2crTBjlJ4KpGDmGf5IDOiMNUcn6sAgK1JQLGJEcfhXRjGh5tcyHFR/Ft1bezmfbR6yenmOkxMZsrzDyuJdgB7dLwbqfgNeWnhU+D3OeDseqkwHqiCnELomqm4kesPck6LKQpGPJnyIKlO5HF4BKVhD6fUn/7OvfLEL5sYzT1JD8PLqeMvxiCRpbUlILHSJt5WDNpglb8IULg8bI0Me1lOe1krt7KWAMoY5Bc5cTYJIPaqoap1FT8qagbKNeAEnsq+ITI24YzqJA/oK5cXKiT4oGvA48=
 before_script:
-# - psql -c 'create database hbeers;' -U postgres
-# - python manage.py collectstatic --noinput --verbosity 0
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- ./cc-test-reporter before-build
 - docker-compose build --force-rm web
 script:
-# - python manage.py test
 - docker-compose -f docker-compose.yml run web sh ./run-tests.sh
+after_script:
+- ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 deploy:
   provider: heroku
   app:
