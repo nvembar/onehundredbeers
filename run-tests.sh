@@ -1,4 +1,4 @@
 #!/bin/bash
 
 sleep 5
-python ./bin/coverage manage.py test
+python ./bin/coverage run manage.py test
