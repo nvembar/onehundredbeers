@@ -12,10 +12,12 @@ before_script:
 - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
 - chmod +x ./cc-test-reporter
 - ./cc-test-reporter before-build
+- mkdir coverage
 - docker-compose build --force-rm web
 script:
-- docker-compose run web sh ./run-tests.sh
+- docker-compose -f docker-compose.yml -f docker-compose.travis.yml run web sh ./run-tests.sh
 after_script:
+- cp coverage/.coverage .
 - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 deploy:
   provider: heroku
