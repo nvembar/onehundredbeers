@@ -14,7 +14,7 @@ before_script:
 - ./cc-test-reporter before-build
 - docker-compose build --force-rm web
 script:
-- docker-compose -f docker-compose.yml run web sh ./run-tests.sh
+- docker-compose run web sh ./run-tests.sh
 after_script:
 - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 deploy:
