@@ -17,7 +17,7 @@ before_script:
 script:
 - docker-compose -f docker-compose.yml -f docker-compose.travis.yml run web sh ./run-tests.sh
 after_script:
-- cp coverage/.coverage .
+- cp coverage/coverage.xml .
 - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 deploy:
   provider: heroku

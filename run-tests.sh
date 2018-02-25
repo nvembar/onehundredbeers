@@ -2,5 +2,7 @@
 
 sleep 5
 coverage run manage.py test
-mkdir coverage
-cp .coverage coverage
+if [ ! -d coverage ]; then
+    mkdir coverage
+fi
+coverage xml -o coverage/coverage.xml
