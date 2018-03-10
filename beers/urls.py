@@ -100,8 +100,15 @@ urlpatterns = [
     url(r'^api/contests/(?P<contest_id>[0-9]+)/bonuses/(?P<contest_bonus_id>[0-9]+)$',
         api_views.ContestBonusDetail.as_view(),
         name='contest-bonus-detail',),
+    url(r'^api/contests/(?P<contest_id>[0-9]+)/unvalidated_checkins$',
+        api_views.UnvalidatedCheckinList.as_view(),
+        name='unvalidated-checkin-list',),
+    url(r'^api/unvalidated_checkins/(?P<id>[0-9]+)$',
+        api_views.UnvalidatedCheckinDetail.as_view(),
+        name='unvalidated-checkin-detail',),
     url(r'^api/lookup/beer', api_views.BeerLookup.as_view(), name='beer-lookup'),
     url(r'^api/lookup/brewery', 
         api_views.BreweryLookup.as_view(), 
         name='brewery-lookup'),
 ]
+

@@ -6,10 +6,12 @@ from django.contrib.auth.models import User, Group
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import status, generics, permissions, serializers
 from beers.api.serializers import PlayerSerializer, ContestSerializer, \
                                   ContestBrewerySerializer, ContestBonusSerializer, \
-                                  ContestBeerSerializer, ContestPlayerSerializer
+                                  ContestBeerSerializer, ContestPlayerSerializer, \
+                                  UnvalidatedCheckinSerializer
 import beers.utils.untappd as untappd
 
 logger = logging.getLogger(__name__)
@@ -293,4 +295,47 @@ class BreweryLookup(APIView):
         except untappd.UntappdParseException as e:
             raise serializers.ValidationError({'non_field_errors': ['{}'.format(e)]})
 
+class UnvalidatedCheckinPaginator(LimitOffsetPagination):
+    default_limit = 25
+
+class UnvalidatedCheckinList(generics.ListAPIView):
+    """
+    Lists out all the unvalidated checkins with pagination.
+    """
+    queryset = models.Unvalidated_Checkin.objects.all()
+    serializer_class = UnvalidatedCheckinSerializer
+    pagination_class = UnvalidatedCheckinPaginator
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+
+    sort_mapping = { 
+        'id': 'id',
+        'date': 'untappd_checkin_date',
+        'beer': 'beer',
+        'brewery': 'brewery',
+        'player': 'contest_player__user_name',
+    }
+
+    def get_queryset(self):
+        contest_id = self.kwargs['contest_id']
+
+        checkins = models.Unvalidated_Checkin.objects.filter(
+                contest_player__contest__id=contest_id)
+        direction = self.request.query_params.get('direction', 'ascending')
+        modifier = ''
+        if direction == 'descending':
+            modifier = '-'
+        sort = self.request.query_params.get('sort', 'date')
+        sort_field = UnvalidatedCheckinList.sort_mapping.get(sort, 'untappd_checkin_date')
+        return checkins.order_by(modifier + sort_field)
+    
+class UnvalidatedCheckinDetail(generics.RetrieveDestroyAPIView):
+    """
+    Provides detail for a single Unvalidated Checkin
+    """
+    queryset = models.Unvalidated_Checkin.objects.all()
+    serializer_class = UnvalidatedCheckinSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
+                          IsContestRunnerPermission,)
+    lookup_field = 'id'
 

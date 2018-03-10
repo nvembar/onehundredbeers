@@ -5,6 +5,7 @@ import json
 from django.test import TestCase, override_settings, Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from rest_framework import status
 from beers.models import Beer, Brewery, Contest, Contest_Player, \
                          Unvalidated_Checkin, Contest_Checkin, Contest_Beer, \
                          Contest_Brewery, Player
@@ -165,11 +166,10 @@ class ContestTestCase(TestCase):
         """Tests whether a delete of a checkin works"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.delete(reverse('delete-checkin',
-                                    kwargs={'contest_id': 1,
-                                            'uv_checkin': 1}),
+        response = c.delete(reverse('unvalidated-checkin-detail',
+                                    kwargs={'id': 1, }),
                             HTTP_ACCEPT='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         with self.assertRaises(Unvalidated_Checkin.DoesNotExist):
             Unvalidated_Checkin.objects.get(id=1)
 
@@ -178,9 +178,8 @@ class ContestTestCase(TestCase):
         by a player who is not the contest runner fails"""
         c = Client()
         self.assertTrue(c.login(username='user1', password='password1%'))
-        response = c.delete(reverse('delete-checkin',
-                                    kwargs={'contest_id': 1,
-                                            'uv_checkin': 1}),
+        response = c.delete(reverse('unvalidated-checkin-detail',
+                                    kwargs={'id': 1, }),
                             HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
         uv = Unvalidated_Checkin.objects.get(id=1)
@@ -190,18 +189,12 @@ class ContestTestCase(TestCase):
         """Tests if the JSON API gets the right values for a single request"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json',
-                                 kwargs={'contest_id': 1}),
-                         {'slice_start': 2, 'slice_end': 3})
+        response = c.get(reverse('unvalidated-checkin-detail',
+                                 kwargs={'id': 3}))
         self.assertEqual(response.status_code, 200)
-        checkins = json.loads(response.content)
-        self.assertEqual(checkins['page_count'], 1)
-        self.assertEqual(checkins['page_index'], 1)
-        self.assertEqual(checkins['page_size'], 25)
-        self.assertEqual(len(checkins['checkins']), 1)
-        checkin = checkins['checkins'][0]
-        self.assertEqual(checkin['id'], 3)
-        self.assertEqual(checkin['index'], 2)
+        checkin = json.loads(response.content)
+        self.assertTrue(checkin['url'].endswith(
+             reverse('unvalidated-checkin-detail', kwargs={'id': 3})))
         self.assertEqual(checkin['player'], 'user1')
         self.assertEqual(checkin['brewery'], 'Brewery 3')
         self.assertEqual(checkin['beer'], 'Beer 3')
@@ -210,25 +203,20 @@ class ContestTestCase(TestCase):
         """Tests if the JSON API gets the right values for multiple results"""
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json',
+        response = c.get(reverse('unvalidated-checkin-list',
                                  kwargs={'contest_id': 1}),
-                         {'slice_start': 3, 'slice_end': 6})
+                         {'limit': 3, 'offset': 3, 'sort': 'id',})
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
-        self.assertEqual(checkins['page_count'], 1)
-        self.assertEqual(checkins['page_index'], 1)
-        self.assertEqual(checkins['page_size'], 25)
-        self.assertEqual(len(checkins['checkins']), 3)
+        self.assertEqual(len(checkins['results']), 3)
         cid = 4
-        cindex = 3
-        for checkin in checkins['checkins']:
-            self.assertEqual(checkin['id'], cid)
-            self.assertEqual(checkin['index'], cindex)
+        for checkin in checkins['results']:
+            self.assertTrue(checkin['url'].endswith( 
+                 reverse('unvalidated-checkin-detail', kwargs={'id': cid})))
             self.assertEqual(checkin['player'], 'user1')
             self.assertEqual(checkin['brewery'], 'Brewery {}'.format(cid))
             self.assertEqual(checkin['beer'], 'Beer {}'.format(cid))
             cid = cid + 1
-            cindex = cindex + 1
 
     def test_unvalidated_api_past_end(self):
         """
@@ -237,13 +225,12 @@ class ContestTestCase(TestCase):
         """
         c = Client()
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.get(reverse('unvalidated-checkins-json',
+        response = c.get(reverse('unvalidated-checkin-list',
                                  kwargs={'contest_id': 1}),
-                         {'slice_start': 100, 'slice_end': 105})
+                         {'limit': 25, 'offset': 100})
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
-        self.assertEqual(checkins['page_count'], 1)
-        self.assertEqual(len(checkins['checkins']), 0)
+        self.assertEqual(len(checkins['results']), 0)
 
     def __test_beer_and_brewery_calculations(self, cp, beers, breweries, bonuses=[]):
         """

@@ -315,3 +315,37 @@ class ContestBonusSerializer(serializers.HyperlinkedModelSerializer):
                   'hash_tags',
                   'point_value',
                  )
+
+class UnvalidatedCheckinToContestPlayerHyperlink(serializers.HyperlinkedRelatedField):
+    view_name = "contest-player-detail"
+
+    def get_url(self, contest_player_id, view_name, request, format):
+        player = models.Contest_Player.objects.get(id=contest_player_id.pk)
+        url_kwargs = {
+            'contest_id': player.contest.id,
+            'username': player.user_name,
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+        
+class UnvalidatedCheckinSerializer(serializers.HyperlinkedModelSerializer):
+
+    contest_player = UnvalidatedCheckinToContestPlayerHyperlink(read_only=True,)
+    player = serializers.ReadOnlyField(source='contest_player.user_name')
+
+    class Meta:
+        model = models.Unvalidated_Checkin
+        extra_kwargs = { 
+            'url': { 'view_name': 'unvalidated-checkin-detail', 'lookup_field': 'id', } 
+        }
+        fields = ('url',
+                  'contest_player', 
+                  'player',
+                  'untappd_title',
+                  'untappd_checkin',
+                  'untappd_checkin_date',
+                  'brewery',
+                  'beer',
+                  'beer_url',
+                  'brewery_url',
+                  'photo_url',
+                  'rating',)
