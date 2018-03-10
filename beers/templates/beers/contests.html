@@ -30,7 +30,7 @@
                 <form action="{% url 'contest-join' c.id %}" method="post">
                   {% csrf_token %}
                   <input type="hidden" name="action" value="join"/>
-                  <input type="submit" value="Join"/>
+                  <button class="btn btn-default" type="submit">Join</button>
                 </form>
               {% else %}
                 Playing
