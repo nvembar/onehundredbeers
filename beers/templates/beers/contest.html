@@ -67,10 +67,20 @@
 {% include "includes/add-brewery-modal.html" %}
 {% include "includes/add-bonus-modal.html" %}
 {% endif %}
-	<div class="page-header">
-		<h1>{{ contest.name }}</h1>
-	</div>
   <div class="container">
+	<div class="page-header">
+        <h1 style="float: left; margin-right: 10px;">{{ contest.name }}</h1> 
+        {% if not contest_player and player %}
+        <div style="float: left; margin-top: 20px; margin-bottom: 10px;">
+          <form class="form-inline" action="{% url 'contest-join' contest.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="join"/>
+            <button type="submit" class="btn btn-primary btn-sm">Join</button>
+          </form>
+        </div>
+        {% endif %}
+        <div style="clear: both;"></div>
+	</div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
       <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
