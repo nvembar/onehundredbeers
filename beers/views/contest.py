@@ -107,8 +107,11 @@ def contest(request, contest_id):
             is_creator = this_contest.creator.id == player.id
         except Player.DoesNotExist:
             pass
+        except Contest_Player.DoesNotExist:
+            pass
     context = {'contest': this_contest,
                'contest_player': this_contest_player,
+               'player': player,
                'players': ranked_players,
                'contest_beers': this_contest.beers(player),
                'contest_breweries': this_contest.breweries(player),
