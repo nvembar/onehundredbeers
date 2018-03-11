@@ -10,19 +10,24 @@ var Contests = {
 
             getUnvalidatedCheckins: function (startIndex, endIndex) {
                 // Returns an AJAX Promise to get thel ist of checkins
-                let url = this.contestUrl + '/unvalidated_checkins';
+                let url = this.baseUrl + 'api/contests/' 
+                                       + contestId + '/unvalidated_checkins';
                 console.log('Trying to use ' + url);
                 return $.ajax({
                     url: url,
                     headers: { Accept: 'application/json' },
-                    data: { 'slice_start': startIndex, 'slice_end': endIndex, },
+                    data: { 'limit': endIndex - startIndex + 1, 
+                            'offset': startIndex, 
+                            'direction': 'descending',
+                            'sort': 'date',
+                          },
                     method: 'GET',
                     contentType: 'application/json',
                 });
             },
 
             deleteUnvalidatedCheckin: function (uvId) {
-                let url = this.contestUrl + '/unvalidated_checkins/' + uvId;
+                let url = this.baseUrl + 'api/unvalidated_checkins/' + uvId;
                 return $.ajax({
                     url: url,
                     headers: { Accept: 'application/json' },
