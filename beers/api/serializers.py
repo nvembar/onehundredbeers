@@ -338,6 +338,7 @@ class UnvalidatedCheckinSerializer(serializers.HyperlinkedModelSerializer):
             'url': { 'view_name': 'unvalidated-checkin-detail', 'lookup_field': 'id', } 
         }
         fields = ('url',
+                  'id',
                   'contest_player', 
                   'player',
                   'untappd_title',
