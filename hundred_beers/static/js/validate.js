@@ -26,21 +26,10 @@ var Validate = {
       }
     },
 
-    addRow: function(checkin, even=true, updateSelect=true) {
-        $(".checkin-list").append(
-            '<div class="row checkin-row checkin-' + (even ? 'even' : 'odd') + '" id="id_' + checkin.id + '_row" data-validation-id="' + checkin.id + '">' + "\n" +
-            '<div class="col-xs-4 col-md-2"><em>' + checkin.player + "</em></div>\n" +
-            '<div class="col-xs-8 col-md-6">' +
-            '<a href="' + checkin.checkin_url + '" target="_blank">' +
-            '<em>' + checkin.beer + ' from ' + checkin.brewery + '</em>' +
-            "</a></div>\n" +
-            '<div class="col-xs-12 col-md-4"><select id="id_' + checkin.id + '_select" class="beer-select" style="width: 100%;"></select></div>' + "\n" +
-            '<div class="col-xs-2 col-md-2"><input id="id_' + checkin.id + '_trump" data-bonus-type="trump" class="bonus-checkbox" type="checkbox">Trump</input></div>' +
-            '<div class="col-xs-2 col-md-2"><input id="id_' + checkin.id + '_ballpark" data-bonus-type="ballpark" class="bonus-checkbox" type="checkbox">Ballpark</input></div>' +
-            '<div class="validation-buttons col-xs-4 col-md-offset-0 col-md-2"><button type="button" id="id_' + checkin.id + '_dbutton" class="btn dismissal-click">Dismiss</button></div>' + "\n" + 
-            '<div class="validation-buttons col-xs-4 col-md-2"><button type="button" id="id_' + checkin.id + '_vbutton" class="btn btn-primary validation-click" disabled>Validate</button></div>' + "\n" + 
-            "</div>\n"
-        );
+    addRow: function(contest, checkin, even=true, updateSelect=true) {
+        $(".checkin-list").append(Handlebars.templates.validation_grid(
+            { 'checkin': checkin, 'bonuses': contest.bonuses }
+        ));
         let select = $('#id_' + checkin.id + '_select');
         if ('possible_id'  in checkin) {
             $('#id_' + checkin.id + '_vbutton').prop('disabled', false);
@@ -147,15 +136,17 @@ var Validate = {
         let start = 25 * (page - 1) + 1;
         let end = start + 25;
         let that = this;
-        contest.getUnvalidatedCheckins(start, end)
+        contest.loadBonuses()
+            .then(() => contest.getUnvalidatedCheckins(start, end))
             .then(function(data) {
+                page_count = Math.ceil(data.count / 25);
                 $('.checkin-list').html('');
                 $('.checkin-list').data('currentPage', page);
-                $('.checkin-list').data('startIndex', data['page_index']);
-                $('.checkin-list').data('pageCount', data['page_count']);
-                $('.checkin-list').data('pageSize', data['page_size']);
-                for (let i = 0; i < data.checkins.length; i++) {
-                    that.addRow(data.checkins[i], i % 2 == 0);
+                $('.checkin-list').data('startIndex', start);
+                $('.checkin-list').data('pageCount', page_count);
+                $('.checkin-list').data('pageSize', 25);
+                for (let i = 0; i < data.results.length; i++) {
+                    that.addRow(contest, data.results[i], i % 2 == 0);
                 }
                 /* Convert to select2 for dropdown */
                 $(".beer-select").select2(
@@ -173,30 +164,29 @@ var Validate = {
                 $(".dismissal-click").click(that.dismissalFunction(contest));
                 $(".step-links").html(function (i, oldHtml) {
                     let html = '';
-                    if (data.page_index > 1) {
+                    if (page > 1) {
                         html = html + 
                             '<a href="#" onclick="Validate.displayCheckins(contest, ' +
                             '1)">first</a>' + "\n";
-                        if (data.page_index > 2) {
+                        if (page > 2) {
                             html = html + 
                                 '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
-                                (data.page_index - 1) + 
+                                (page - 1) + 
                                 ')">previous</a>' + "\n";
                         }
                     }
                     html = html + '<span id="page-description" closs="current">' +
-                           'Page ' + data.page_index + ' of ' + data.page_count +
-                           "</span>\n";
-                    if (data.page_index < data.page_count) {
-                        if (data.page_index < data.page_count - 1) {
+                           'Page ' + page + ' of ' + page_count + "</span>\n";
+                    if (page < page_count) {
+                        if (page < page_count - 1) {
                             html = html + 
                                 '<a href="#" onclick="Validate.displayCheckins(contest, ' + 
-                                (data.page_index + 1) + 
+                                (page + 1) + 
                                 ')">next</a>' + "\n";
                         }
                         html = html + 
                             '<a href="#" onclick="Validate.displayCheckins(contest, ' +
-                            (data.page_count) +
+                            (page_count) +
                             ')">last</a>' + "\n";
                     }
                     return html;

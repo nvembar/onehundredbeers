@@ -1,0 +1,28 @@
+<div class="validation-container checkin-row">
+  <div class="validation-player">{{checkin.player}}</div>
+  <div class="validation-beer">
+     <a href="{{checkin.checkin_url}}" target="_blank">
+       <em>{{checkin.beer}} from {{checkin.brewery}}</em>
+     </a>
+  </div>
+  <div class="validation-selection">
+    <select id="id_{{checkin.id}}_select" class="beer-select" style="width: 100%;"></select>
+  </div>
+  <div class="validation-bonuses">
+    {{#each bonuses}}
+    <span class="validation-bonus">
+      <input id="id_{{../checkin.id}}_{{id}}" class="bonus-checkbox" type="checkbox">{{name}}</input>
+    </span>
+    {{/each}}
+  </div>
+  <div class="validation-button">
+    <span>
+    <button type="button" id="id_{{checkin.id}}_vbutton" class="btn btn-primary validation-click" disabled>Validate</button>
+    </xpan>
+  </div>
+  <div class="dismissal-button">
+    <span>
+    <button type="button" id="id_{{checkin.id}}_dbutton" class="btn btn-default dismissal-click">Dismiss</button>
+    </span>
+  </div>
+</div>

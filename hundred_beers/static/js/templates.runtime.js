@@ -187,4 +187,56 @@ templates['brewery_table'] = template({"1":function(container,depth0,helpers,par
     + "</div>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.editing : depth0),{"name":"if","hash":{},"fn":container.program(19, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"useData":true,"useDepths":true});
+templates['validation_grid'] = template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=container.escapeExpression, alias2=depth0 != null ? depth0 : (container.nullContext || {}), alias3=helpers.helperMissing, alias4="function";
+
+  return "    <span class=\"validation-bonus\">\n      <input id=\"id_"
+    + alias1(container.lambda(((stack1 = (depths[1] != null ? depths[1].checkin : depths[1])) != null ? stack1.id : stack1), depth0))
+    + "_"
+    + alias1(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" class=\"bonus-checkbox\" type=\"checkbox\">"
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"name","hash":{},"data":data}) : helper)))
+    + "</input>\n    </span>\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "<div class=\"validation-container checkin-row\">\n  <div class=\"validation-player\">"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.player : stack1), depth0))
+    + "</div>\n  <div class=\"validation-beer\">\n     <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.checkin_url : stack1), depth0))
+    + "\" target=\"_blank\">\n       <em>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.beer : stack1), depth0))
+    + " from "
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.brewery : stack1), depth0))
+    + "</em>\n     </a>\n  </div>\n  <div class=\"validation-selection\">\n    <select id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "_select\" class=\"beer-select\" style=\"width: 100%;\"></select>\n  </div>\n  <div class=\"validation-bonuses\">\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.bonuses : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "  </div>\n  <div class=\"validation-button\">\n    <span>\n    <button type=\"button\" id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "_vbutton\" class=\"btn btn-primary validation-click\" disabled>Validate</button>\n    </xpan>\n  </div>\n  <div class=\"dismissal-button\">\n    <span>\n    <button type=\"button\" id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "_dbutton\" class=\"btn btn-default dismissal-click\">Dismiss</button>\n    </span>\n  </div>\n</div>\n";
+},"useData":true,"useDepths":true});
+templates['validation_row'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "<div class=\"row checkin-row\" id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "_row\" data-validation-id=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "\">\n   <div class=\"col-xs-4 col-md-2\">\n     <em>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.player : stack1), depth0))
+    + "</em>\n   </div>\n   <div class=\"col-xs-8 col-md-6\">\n     <a href=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.checkin_url : stack1), depth0))
+    + "\" target=\"_blank\">\n       <em>"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.beer : stack1), depth0))
+    + " from "
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.brewery : stack1), depth0))
+    + "</em>\n     </a>\n   </div>\n   <div class=\"col-xs-12 col-md-4\">\n     <select id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
+    + "_select\" class=\"beer-select\" style=\"width: 100%;\"></select>\n   </div>\n   <div class=\"col-xs-2 col-md-2\">\n     <input id=\"id_"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.d : stack1), depth0))
+    + "_t\n   </div>\n</div>\n";
+},"useData":true});
 })();
