@@ -225,6 +225,11 @@ class ContestBonusList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
                           IsContestRunnerPermission,)
 
+    def get_queryset(self):
+        contest_id = self.kwargs['contest_id']
+        return models.Contest_Bonus.objects.select_related('contest',
+                ).filter(contest__id=contest_id).order_by('name')
+
     def perform_create(self, serializer):
         contest_id = self.kwargs['contest_id']
         contest = models.Contest.objects.get(id=contest_id)
