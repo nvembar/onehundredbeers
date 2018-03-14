@@ -144,7 +144,7 @@ var Validate = {
                 $('.checkin-list').data('currentPage', page);
                 $('.checkin-list').data('startIndex', start);
                 $('.checkin-list').data('pageCount', page_count);
-                $('.checkin-list').data('pageSize', 25);
+                $('.checkin-list').data('pageSize', data.results.length);
                 for (let i = 0; i < data.results.length; i++) {
                     that.addRow(contest, data.results[i], i % 2 == 0);
                 }
