@@ -330,41 +330,6 @@ $login-field-width: 30em;
   margin-left: 1em;
 }
 
-$validation-button-color: #599bb3;
-
-.validation-button {
-	-moz-box-shadow: 0px 10px 14px -7px #276873;
-	-webkit-box-shadow: 0px 10px 14px -7px #276873;
-	box-shadow: 0px 10px 14px -7px #276873;
-	background-color: $validation-button-color;
-	-moz-border-radius:0.5rem;
-	-webkit-border-radius:0.5rem;
-	border-radius:0.5rem;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family:Arial;
-	font-size:1em;
-	font-weight:bold;
-	padding: 0.2rem 0.4em;
-	text-decoration:none;
-	text-shadow:0px 1px 0px #3d768a;
-}
-.validation-button:hover {
-	background-color: darken($validation-button-color, 15%);
-}
-.validation-button:active {
-	position:relative;
-	top:1px;
-}
-
-.validation-button:disabled {
-  background-color: dimgrey;
-	-moz-box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
-	-webkit-box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
-	box-shadow: inset 0px 10px 14px -7px darken(dimgrey, 5%);
-}
-
 .validation-box {
   width: 40em;
   margin-bottom: 0.25em;
@@ -684,3 +649,71 @@ $validation-button-color: #599bb3;
 .beer-entry {
   width: 90%;
 }
+
+.validation-container {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: 
+      "beer beer player"
+      "selection selection vbutton"
+      "bonus bonus dbutton";
+  border-width: medium;
+  border-style: solid;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.validation-player {
+  grid-area: player;
+  background-color: ivory;
+  font-style: italic;
+  border-bottom-width: thin;
+  border-bottom-style: solid;
+  padding: 3px;
+}
+
+.validation-beer {
+  grid-area: beer;
+  background-color: ivory;
+  font-style: italic;
+  border-bottom-width: thin;
+  border-bottom-style: solid;
+  padding: 3px;
+}
+
+.validation-selection {
+  grid-area: selection;
+  background-color: lightblue;
+  padding: 3px;
+}
+
+.validation-bonuses {
+  grid-area: bonus;
+  background-color: lightblue;
+  padding: 3px;
+}
+
+.validation-bonus {
+  width: 50%;
+  padding: 3px;
+}
+
+.validation-button {
+  grid-area: vbutton;
+  background-color: lightblue;
+  justify-self: end;
+  // align-self: start;
+  padding: 3px;
+  width: 100%;
+}
+
+.dismissal-button {
+  grid-area: dbutton;
+  background-color: lightblue;
+  justify-self: end;
+  // align-self: start;
+  padding: 3px;
+  width: 100%;
+}
+
