@@ -207,7 +207,7 @@ templates['validation_grid'] = template({"1":function(container,depth0,helpers,p
     + "\">\n  <div class=\"validation-player\">"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.player : stack1), depth0))
     + "</div>\n  <div class=\"validation-beer\">\n     <a href=\""
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.checkin_url : stack1), depth0))
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.untappd_checkin : stack1), depth0))
     + "\" target=\"_blank\">\n       <em>"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.beer : stack1), depth0))
     + " from "
