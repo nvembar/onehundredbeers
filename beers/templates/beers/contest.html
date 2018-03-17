@@ -35,10 +35,10 @@
       ];
       contest = Contests.init('{% url 'index' %}', {{ contest.id }});
       contest.selectData = selectData;
-      {% if contest.active and contest_player %}
+      {% if contest_player %}
       contest.player = true;
       {% endif %}
-      {% if not contest.active and is_creator %}
+      {% if is_creator %}
       contest.editing = true;
       let challengeEnable = () => 
           $('.beer-challenge-input').prop('disabled', 
@@ -51,7 +51,6 @@
            selector.append('<option value="' + player.url + '">' + player.username + "</option>\n");
         });
       });
-      $('#challenger')
       {% endif %}
       EditContest.displayBeers(contest);
       EditContest.displayBreweries(contest);
@@ -62,7 +61,7 @@
 {% endblock %}
 
 {% block content %}
-{% if not contest.active and is_creator %}
+{% if is_creator %}
 {% include "includes/add-beer-modal.html" %}
 {% include "includes/add-brewery-modal.html" %}
 {% include "includes/add-bonus-modal.html" %}
@@ -130,7 +129,7 @@
               {% if contest.active and contest_player %}
                 <div class="col-xs-1">Checkin</div>
               {% endif %}
-              {% if not contest.active and is_creator %}
+              {% if is_creator %}
               <div class="col-xs-1">+/-</div>
               {% endif %}
             </div>
@@ -147,7 +146,7 @@
                 {% endif %}
               </div>
               {% endif %}
-              {% if not contest.active and is_creator %}
+              {% if is_creator %}
               <div class="col-xs-1">
                 <button type="button" class="btn btn-default" aria-label="Delete">
                   <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
@@ -160,7 +159,7 @@
               No beers yet added to this contest.
             </div>
             {% endfor %}
-            {% if not contest.active and is_creator %}
+            {% if is_creator %}
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addBeer">Add Beer</button>
             {% endif %}
           </div>

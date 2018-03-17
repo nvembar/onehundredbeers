@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import unittest
 from django.test import TestCase, override_settings, Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -184,6 +185,7 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(Contest_Beer.objects.filter(contest=contest).count(), 0)
 
 
+    @unittest.skip("Allowing editing of active contests")
     def test_active_add_beer(self):
         """
         Tests whether a contest runner is prevented from adding a beer to an
@@ -357,6 +359,7 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(brewery_filter.count(), 1)
  
 
+    @unittest.skip("Allowing editing of active contests")
     def test_active_add_brewery(self):
         """
         Tests whether a contest runner is prevented from adding a brewery to an
