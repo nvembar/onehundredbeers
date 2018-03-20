@@ -194,6 +194,8 @@ templates['validation_grid'] = template({"1":function(container,depth0,helpers,p
     + alias1(container.lambda(((stack1 = (depths[1] != null ? depths[1].checkin : depths[1])) != null ? stack1.id : stack1), depth0))
     + "_"
     + alias1(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" data-bonus-type=\""
+    + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"name","hash":{},"data":data}) : helper)))
     + "\" class=\"bonus-checkbox\" type=\"checkbox\">"
     + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"name","hash":{},"data":data}) : helper)))
     + "</input>\n    </span>\n";

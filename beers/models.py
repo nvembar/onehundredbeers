@@ -502,6 +502,12 @@ class Contest_Player(models.Model):
         """
         checkin_time = None
         untappd_checkin = None
+        contest_bonus = None
+        try:
+            contest_bonus = Contest_Bonus.objects.get(contest=self.contest,
+                                                      name=bonus)
+        except Contest_Bonus.DoesNotExist:
+            raise ValueError('No such bonus {} for contest'.format(bonus))
         if checkin:
             if checkin.contest_player.id != self.id:
                 raise ValueError('Cannot use checkin not in the contest')
@@ -512,16 +518,17 @@ class Contest_Player(models.Model):
                 checkin_time = data['checkin_time']
             if 'untappd_checkin' in data:
                 untappd_checkin = data['untappd_checkin']
+        
         checkin = Contest_Checkin(contest_player=self,
-                                  bonus_type=bonus,
-                                  checkin_points=1,
+                                  contest_bonus=contest_bonus,
+                                  checkin_points=contest_bonus.point_value,
                                   untappd_checkin=untappd_checkin,
                                   checkin_time=checkin_time,
                                   tx_type='BO',
                                  )
         checkin.save()
-        self.bonus_points = self.bonus_points + 1
-        self.total_points = self.total_points + 1
+        self.bonus_points = self.bonus_points + contest_bonus.point_value
+        self.total_points = self.total_points + contest_bonus.point_value
         self.save()
         return checkin
 
@@ -671,6 +678,10 @@ class Contest_Checkin(models.Model):
                                         blank=True,
                                         null=True,
                                        )
+    contest_bonus = models.ForeignKey(Contest_Bonus,
+                                      on_delete=models.CASCADE,
+                                      blank=True,
+                                      null=True)
     bonus_type = models.CharField(max_length=10, blank=True, null=True,)
     checkin_points = models.IntegerField(default=1)
     checkin_time = models.DateTimeField()
@@ -697,5 +708,5 @@ class Contest_Checkin(models.Model):
         elif self.tx_type == 'CL':
             return "Lost points to competitor drinking challenge beer"
         elif self.tx_type == 'BO':
-            return "Got bonus '{}' points".format(self.bonus_type)
+            return "Got bonus '{}' points".format(self.contest_bonus.name)
 
