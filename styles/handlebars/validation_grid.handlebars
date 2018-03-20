@@ -11,7 +11,7 @@
   <div class="validation-bonuses">
     {{#each bonuses}}
     <span class="validation-bonus">
-      <input id="id_{{../checkin.id}}_{{id}}" class="bonus-checkbox" type="checkbox">{{name}}</input>
+      <input id="id_{{../checkin.id}}_{{id}}" data-bonus-type="{{name}}" class="bonus-checkbox" type="checkbox">{{name}}</input>
     </span>
     {{/each}}
   </div>

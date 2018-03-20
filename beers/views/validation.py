@@ -133,6 +133,7 @@ def validate_checkin(request, contest_id):
     if 'bonuses' in data:
         # for the moment, prefer the checkin for beers or breweries over
         # bonus checkins. Will need to fix this so it returns all relevant checkins
+        bonus_checkin = None
         for bonus in data['bonuses']:
             bonus_checkin = contest_player.drink_bonus(bonus, checkin=uv)
         if checkin is None:
