@@ -424,6 +424,7 @@ class Contest_Player(models.Model):
                 challenger.__compute_losses()
                 challenger.total_points = (challenger.beer_points
                                            + challenger.brewery_points
+                                           + challenger.bonus_points
                                            + challenger.challenge_point_gain
                                            - challenger.challenge_point_loss)
                 challenger.save()
@@ -439,6 +440,7 @@ class Contest_Player(models.Model):
             self.beer_points = self.beer_points + beer.point_value
         self.total_points = (self.brewery_points
                              + self.beer_points
+                             + self.bonus_points
                              + self.challenge_point_gain
                              - self.challenge_point_loss)
         self.beer_count = self.beer_count + 1
