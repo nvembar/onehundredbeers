@@ -499,7 +499,21 @@ class ContestTestCase(TestCase):
         """
         player = Contest_Player.objects.get(id=1)
         beer = Contest_Beer.objects.get(id=1)
-        self.__test_beer_and_brewery_calculations(player, [beer], [], ['pun'])
+
+    def test_mix_of_points(self):
+        """
+        This tests that bonus points can be gained by a player.
+        """
+        player = Contest_Player.objects.get(id=1)
+        beer1 = Contest_Beer.objects.get(id=1)
+        beer2 = Contest_Beer.objects.get(id=2)
+        brewery = Contest_Brewery.objects.get(id=1)
+        challenge = Contest_Beer.objects.get(id=6)
+        brewery = Contest_Brewery.objects.get(id=1)
+        self.__test_beer_and_brewery_calculations(player, 
+                                                  [beer1, beer2, challenge], 
+                                                  [brewery], 
+                                                  ['pun', 'ballgame'])
 
     def test_unvalidated_beer_list(self):
         """
