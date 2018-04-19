@@ -21,15 +21,19 @@
           {
             text: 'Beers',
             children: [
-              {% for b in contest_beers %}{ id: 'beer:{{ b.id }}', text: '{{ b.beer_name }}'},
+              {% autoescape off %}
+              {% for b in contest_beers %}{ id: 'beer:{{ b.id }}', text: '{{ b.beer_name|escapejs }}'},
               {% endfor %}
+              {% endautoescape %}
             ]
           },
           {
             text: 'Breweries',
             children: [
-              {% for b in contest_breweries %}{ id: 'brewery:{{ b.id }}', text: '{{ b.brewery_name }}'},
+              {% autoescape off %}
+              {% for b in contest_breweries %}{ id: 'brewery:{{ b.id }}', text: '{{ b.brewery_name|escapejs }}'},
               {% endfor %}
+              {% endautoescape %}
             ]
           }
       ];
