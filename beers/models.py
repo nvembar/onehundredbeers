@@ -5,6 +5,7 @@ import re
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 
 
 class PlayerManager(models.Manager):
@@ -621,6 +622,10 @@ class Unvalidated_Checkin(models.Model):
     beer = models.CharField(max_length=250, default='')
     beer_url = models.URLField(null=True, default=None)
     brewery_url = models.URLField(null=True, default=None)
+    possible_bonuses = ArrayField(base_field=models.IntegerField(), 
+                                  null=True, 
+                                  default=None)
+    has_possibles = models.BooleanField(default=False)
     photo_url = models.URLField(null=True, default=None)
     rating = models.IntegerField(null=True, default=None)
 

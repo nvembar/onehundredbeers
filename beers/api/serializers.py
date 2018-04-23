@@ -349,4 +349,6 @@ class UnvalidatedCheckinSerializer(serializers.HyperlinkedModelSerializer):
                   'beer_url',
                   'brewery_url',
                   'photo_url',
+                  'possible_bonuses',
+                  'has_possibles',
                   'rating',)
