@@ -293,12 +293,10 @@ class ContestBonusSerializer(serializers.HyperlinkedModelSerializer):
                                                   view_name='contest-detail',
                                                   lookup_field='id',)
 
-    hash_tags = HashTagListField()
-
     def create(self, validated_data):
         bonus = validated_data['contest'].add_bonus(validated_data['name'],
                                                     validated_data['description'],
-                                                    validated_data['hash_tags'],
+                                                    validated_data['hashtags'],
                                                     validated_data['point_value'],)
         return bonus
         
@@ -312,7 +310,7 @@ class ContestBonusSerializer(serializers.HyperlinkedModelSerializer):
                   'url', 
                   'name',
                   'description', 
-                  'hash_tags',
+                  'hashtags',
                   'point_value',
                  )
 

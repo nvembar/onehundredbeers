@@ -185,13 +185,8 @@ class Contest(models.Model):
         Checks if a hash tag is already in use for this contest. Returns matching 
         bonus or None if no bonus exists.
         """
-        maybe = Contest_Bonus.objects.filter(contest=self, hash_tags__contains=hash_tag)
-        if maybe.exists():
-            for bonus in maybe:
-                maybe_tags = bonus.hash_tags
-                if hash_tag in maybe_tags.split(','):
-                    return bonus
-        return None
+        return Contest_Bonus.objects.filter(contest=self, 
+                                            hashtags__contains=[hash_tag]).first()
 
     def add_bonus(self, name, description, hash_tags, point_value=1):
         """
@@ -210,7 +205,7 @@ class Contest(models.Model):
         bonus = Contest_Bonus(contest=self, 
                               name=name,
                               description=description,
-                              hash_tags=','.join(tag_list),
+                              hashtags=tag_list,
                               point_value=point_value)
         bonus.save()
         return bonus
@@ -606,13 +601,9 @@ class Contest_Bonus(models.Model):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default=None, null=False, blank=False,)
     description = models.CharField(max_length=250, default="", null=True, blank=True,)
-    hash_tags = models.CharField(max_length=250, 
-                                 default="", 
-                                 null=False, 
-                                 blank=False,
-                                 help_text="Comma delimited strings without # " +\
-                                           "symbols representing the list of tags " +\
-                                           "will score this bonus",)
+    hashtags = ArrayField(base_field=models.CharField(max_length=30, default=None),
+                          null=True, 
+                          default=None)
     point_value = models.IntegerField(default=1,)
 
     class Meta:

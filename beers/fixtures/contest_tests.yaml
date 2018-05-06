@@ -241,7 +241,9 @@
     contest: 1
     name: pun
     description: Punny
-    hash_tags: pun,puns
+    hashtags: 
+    - pun
+    - puns
     point_value: 1
 - model: beers.contest_bonus
   pk: 2
@@ -249,7 +251,9 @@
     contest: 1
     name: ballgame
     description: Ball game
-    hash_tags: baseball,ballgame
+    hashtags: 
+    - baseball
+    - ballgame
     point_value: 1
 - model: beers.contest_player
   pk: 1
