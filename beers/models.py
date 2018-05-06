@@ -2,7 +2,7 @@
 
 import datetime
 import re
-from django.db import models
+from django.db import models, connection
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
@@ -123,6 +123,7 @@ class Contest(models.Model):
         """Adds a beer into the contest"""
         beer = Contest_Beer(contest=self, beer=beer,
                             beer_name=beer.name,
+                            brewery_name=beer.brewery,
                             point_value=point_value,
                             total_drank=0,)
         beer.save()
@@ -556,6 +557,19 @@ class Contest_Player(models.Model):
                              - self.challenge_point_loss)
         self.save()
 
+    def find_possible_matches(self):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE beers_unvalidated_checkin uv
+                   SET has_possibles = TRUE
+                  FROM beers_contest_beer b
+                 WHERE uv.contest_player_id = %s
+                   AND b.contest_id = %s
+                   AND b.beer_name = uv.beer
+                   AND b.brewery_name = uv.brewery
+                """, [self.id, self.contest_id])
+                            
+
     def __str__(self):
         return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
@@ -570,6 +584,7 @@ class Contest_Beer(models.Model):
                                   )
     beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
     beer_name = models.CharField(max_length=250)
+    brewery_name = models.CharField(max_length=250, default='')
     point_value = models.IntegerField(default=1)
     challenge_point_loss = models.IntegerField(default=0)
     max_point_loss = models.IntegerField(default=0)
