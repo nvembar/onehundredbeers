@@ -1,7 +1,11 @@
-from beers.models import Player, Contest_Player, Contest, Unvalidated_Checkin, Contest_Checkin, Brewery, Contest_Brewery
+from beers.models import Player, Contest_Player, Contest, \
+                         Unvalidated_Checkin, Contest_Checkin, \
+                         Brewery, Contest_Brewery, Contest_Bonus
 from django.db import transaction
+from beers.utils.untappd import parse_checkin
 import feedparser
 import datetime
+import html
 import re
 import logging
 
@@ -16,6 +20,7 @@ def load_player_checkins(p, contest_id=None, from_date=None):
 
     re_has_loc = re.compile(r'^(.+)\s+at\s+(.+)$')
     re_title = re.compile(r'^(?P<user>.+)\s+is\s+drinking\s+a(n){0,1}\s+(?P<beer>.+)\s+by\s+(?P<brewery>.+)(\s+at\s+.+){0,1}$')
+    re_tags = re.compile(r'#(\w+)')
 
     logger.debug('Parsing "{}" for player {}'.format(p.untappd_rss, p.user.username))
     if p.untappd_rss:
@@ -58,21 +63,35 @@ def load_player_checkins(p, contest_id=None, from_date=None):
                         last_date = dt
                     elif last_date < dt:
                         last_date = dt
+                    """
+                    uv = parse_checkin(c.link)
+                    uv.contest_player = cp
+                    """
                     lmatch = re.match(re_has_loc, c.title)
                     title = c.title
                     if lmatch:
                         title = lmatch.group(1)
                     match = re.match(re_title, title)
                     if not match:
-                        logger.info("{0} did not match '{1}': url: {}".format(re_title, c.title, c.link))
+                        logger.info("'{0}' was not in the proper format: {1}".format(
+                                    c.title, c.link))
                         continue
+                        
+                    logger.info("Adding unvalidated checkin at {}".format(c.link))
                     uv = Unvalidated_Checkin.objects.create_checkin(cp, c.title,
                             match.group('brewery').strip(),
                             match.group('beer').strip(), c.link, dt)
-                    logger.debug('\tAdding "{0}" to {1} for {2} with date {3}'.format(
-                        uv.untappd_title, p.user.username, cp.contest.id, dt))
+                    if hasattr(c, "description"):
+                        description = html.unescape(c.description)
+                        tags = re.findall(re_tags, description)
+                        if len(tags) > 0:
+                            pbonuses = list(
+                                Contest_Bonus.objects.filter(contest=contest,
+                                         hashtags__overlap=tags).iterator())
+                            uv.possible_bonuses = [b.id for b in pbonuses]
                     uv.save()
                 else:
                     logger.debug('Ignoring "{0}" as it already exists in database'.format(c.title))
+            cp.find_possible_matches()
             cp.last_checkin_load = last_date
             cp.save()

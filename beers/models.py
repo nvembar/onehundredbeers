@@ -564,7 +564,6 @@ class Contest_Player(models.Model):
                    AND b.brewery_name = uv.brewery
                 """, [self.id, self.contest_id])
                             
-
     def __str__(self):
         return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
