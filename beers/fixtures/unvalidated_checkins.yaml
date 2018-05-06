@@ -7,6 +7,9 @@
     untappd_checkin_date: '2016-01-01 00:00:00.00+00:00'
     brewery: Brewery 1
     beer: Beer 1
+    beer_url: https://test.com/beers/beer1
+    brewery_url: https://test.com/breweries/brewery1
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 2
   fields:
@@ -16,6 +19,9 @@
     untappd_checkin_date: '2016-01-02 00:00:00.00+00:00'
     brewery: Brewery 2
     beer: Beer 2
+    beer_url: https://test.com/beers/beer2
+    brewery_url: https://test.com/breweries/brewery2
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 3
   fields:
@@ -25,6 +31,9 @@
     untappd_checkin_date: '2016-01-03 00:00:00.00+00:00'
     brewery: Brewery 3
     beer: Beer 3
+    beer_url: https://test.com/beers/beer3
+    brewery_url: https://test.com/breweries/brewery3
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 4
   fields:
@@ -34,6 +43,9 @@
     untappd_checkin_date: '2016-01-04 00:00:00.00+00:00'
     brewery: Brewery 4
     beer: Beer 4
+    beer_url: https://test.com/beers/not_beer4
+    brewery_url: https://test.com/breweries/not_brewery4
+    has_possibles: false
 - model: beers.unvalidated_checkin
   pk: 5
   fields:
@@ -43,6 +55,9 @@
     untappd_checkin_date: '2016-01-05 00:00:00.00+00:00'
     brewery: Brewery 5
     beer: Beer 5
+    beer_url: https://test.com/beers/not_beer5
+    brewery_url: https://test.com/breweries/not_brewery5
+    has_possibles: false
 - model: beers.unvalidated_checkin
   pk: 6
   fields:
@@ -52,6 +67,9 @@
     untappd_checkin_date: '2016-01-06 00:00:00.00+00:00'
     brewery: Brewery 6
     beer: Beer 6
+    beer_url: https://test.com/beers/beer6
+    brewery_url: https://test.com/breweries/brewery6
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 7
   fields:
@@ -61,6 +79,9 @@
     untappd_checkin_date: '2016-01-07 00:00:00.00+00:00'
     brewery: Brewery 7
     beer: Beer 7
+    beer_url: https://test.com/beers/not_beer7
+    brewery_url: https://test.com/breweries/not_brewery7
+    has_possibles: false
 - model: beers.unvalidated_checkin
   pk: 8
   fields:
@@ -70,6 +91,9 @@
     untappd_checkin_date: '2016-01-08 00:00:00.00+00:00'
     brewery: Brewery 6
     beer: Beer 6
+    beer_url: https://test.com/beers/beer6
+    brewery_url: https://test.com/breweries/beer6
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 9
   fields:
@@ -79,6 +103,9 @@
     untappd_checkin_date: '2016-01-08 00:00:00.00+00:00'
     brewery: Brewery 7
     beer: Beer 7
+    beer_url: https://test.com/beers/beer7
+    brewery_url: https://test.com/breweries/beer7
+    has_possibles: true
 - model: beers.unvalidated_checkin
   pk: 10
   fields:
@@ -88,3 +115,6 @@
     untappd_checkin_date: '2016-01-08 00:00:00.00+00:00'
     brewery: Brewery 1
     beer: Beer 1
+    beer_url: https://test.com/beers/beer1
+    brewery_url: https://test.com/breweries/beer1
+    has_possibles: true
