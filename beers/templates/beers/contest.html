@@ -56,10 +56,10 @@
         });
       });
       {% endif %}
-      EditContest.displayBeers(contest);
-      EditContest.displayBreweries(contest);
-      EditContest.displayBonuses(contest);
-      Validate.displayCheckins(contest, 1);
+      $.when(EditContest.displayBeers(contest),
+             EditContest.displayBreweries(contest),
+             EditContest.displayBonuses(contest)).then(
+                  Validate.displayCheckins(contest, 1)).done();
   });
   </script>
 {% endblock %}

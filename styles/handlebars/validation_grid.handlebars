@@ -1,4 +1,4 @@
-<div id="id_{{checkin.id}}_row" class="validation-container checkin-row" data-validation-id="{{checkin.id}}">
+<div id="id_{{checkin.id}}_row" class="{{#if checkin.possible_id}}possible-row{{/if}} validation-container checkin-row" data-validation-id="{{checkin.id}}">
   <div class="validation-player">{{checkin.player}}</div>
   <div class="validation-beer">
      <a href="{{checkin.untappd_checkin}}" target="_blank">
@@ -6,7 +6,13 @@
      </a>
   </div>
   <div class="validation-selection">
-    <select id="id_{{checkin.id}}_select" class="beer-select" style="width: 100%;"></select>
+    <select id="id_{{checkin.id}}_select" class="beer-select" style="width: 100%;">
+    {{#if checkin.possible_id}}
+    <option value="beer:{{checkin.possible_id}}">{{checkin.possible_name}}</option>
+    {{else}}
+    <option></option>
+    {{/if}}
+    </select>
   </div>
   <div class="validation-bonuses">
     {{#each bonuses}}
