@@ -5,6 +5,7 @@ import json
 from django.test import TestCase, override_settings, Client
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework import status
 from beers.models import Beer, Brewery, Contest, Contest_Player, \
                          Unvalidated_Checkin, Contest_Checkin, Contest_Beer, \
@@ -231,6 +232,27 @@ class ContestTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         checkins = json.loads(response.content)
         self.assertEqual(len(checkins['results']), 0)
+
+    def test_unvalidated_api_possibles_only(self):
+        """
+        Tests if the results get filtered by possibles.
+        """
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        response = c.get(reverse('unvalidated-checkin-list',
+                                 kwargs={'contest_id': 1}),
+                         {'possibles_only': 'true'})
+        self.assertEqual(response.status_code, 200)
+        checkins = json.loads(response.content)
+        for checkin in checkins['results']:
+            uv = Unvalidated_Checkin.objects.get(id=int(checkin['id']))
+            self.assertTrue(uv.has_possibles or uv.possible_bonuses is not None)
+            self.assertEqual(uv.contest_player.user_name, checkin['player'])
+            self.assertEqual(uv.brewery, checkin['brewery'])
+            self.assertEqual(uv.beer, checkin['beer'])
+        self.assertEqual(len(checkins['results']), 
+             Unvalidated_Checkin.objects.filter(contest_player__contest__id=1).filter(
+                    Q(has_possibles=True) | Q(possible_bonuses__isnull=False)).count())
 
     def __test_beer_and_brewery_calculations(self, cp, beers, breweries, bonuses=[]):
         """

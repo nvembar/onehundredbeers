@@ -11,6 +11,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer1
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 2
@@ -25,6 +26,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer2
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 3
@@ -39,6 +41,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer3
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 4
@@ -53,6 +56,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer4
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 5
@@ -67,6 +71,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer5
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 6
@@ -81,6 +86,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer6
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.beer
   pk: 7
@@ -95,6 +101,7 @@
     brewery_lat: null
     brewery_lon: null
     untappd_id: null
+    untappd_url: https://test.com/beers/beer7
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 1
@@ -102,6 +109,7 @@
     name: Brewery 1
     state: DC
     untappd_id: null
+    untappd_url: https://test.com/breweries/brewery1
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 2
@@ -109,6 +117,7 @@
     name: Brewery 2
     state: DC
     untappd_id: null
+    untappd_url: https://test.com/breweries/brewery2
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 3
@@ -116,6 +125,7 @@
     name: Brewery 3
     state: DC
     untappd_id: null
+    untappd_url: https://test.com/breweries/brewery3
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 4
@@ -123,6 +133,7 @@
     name: Brewery 4
     state: DC
     untappd_id: null
+    untappd_url: https://test.com/breweries/brewery4
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.brewery
   pk: 5
@@ -130,6 +141,7 @@
     name: Brewery 5
     state: DC
     untappd_id: null
+    untappd_url: https://test.com/breweries/brewery5
     last_updated: '2016-01-01 00:00:00.00+00:00'
 - model: beers.contest
   pk: 1
@@ -229,7 +241,9 @@
     contest: 1
     name: pun
     description: Punny
-    hash_tags: pun,puns
+    hashtags: 
+    - pun
+    - puns
     point_value: 1
 - model: beers.contest_bonus
   pk: 2
@@ -237,7 +251,9 @@
     contest: 1
     name: ballgame
     description: Ball game
-    hash_tags: baseball,ballgame
+    hashtags: 
+    - baseball
+    - ballgame
     point_value: 1
 - model: beers.contest_player
   pk: 1

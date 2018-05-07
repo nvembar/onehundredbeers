@@ -2,9 +2,10 @@
 
 import datetime
 import re
-from django.db import models
+from django.db import models, connection
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.postgres.fields import ArrayField
 
 
 class PlayerManager(models.Manager):
@@ -122,6 +123,7 @@ class Contest(models.Model):
         """Adds a beer into the contest"""
         beer = Contest_Beer(contest=self, beer=beer,
                             beer_name=beer.name,
+                            brewery_name=beer.brewery,
                             point_value=point_value,
                             total_drank=0,)
         beer.save()
@@ -183,13 +185,8 @@ class Contest(models.Model):
         Checks if a hash tag is already in use for this contest. Returns matching 
         bonus or None if no bonus exists.
         """
-        maybe = Contest_Bonus.objects.filter(contest=self, hash_tags__contains=hash_tag)
-        if maybe.exists():
-            for bonus in maybe:
-                maybe_tags = bonus.hash_tags
-                if hash_tag in maybe_tags.split(','):
-                    return bonus
-        return None
+        return Contest_Bonus.objects.filter(contest=self, 
+                                            hashtags__contains=[hash_tag]).first()
 
     def add_bonus(self, name, description, hash_tags, point_value=1):
         """
@@ -208,7 +205,7 @@ class Contest(models.Model):
         bonus = Contest_Bonus(contest=self, 
                               name=name,
                               description=description,
-                              hash_tags=','.join(tag_list),
+                              hashtags=tag_list,
                               point_value=point_value)
         bonus.save()
         return bonus
@@ -555,6 +552,18 @@ class Contest_Player(models.Model):
                              - self.challenge_point_loss)
         self.save()
 
+    def find_possible_matches(self):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                UPDATE beers_unvalidated_checkin uv
+                   SET has_possibles = TRUE
+                  FROM beers_contest_beer b
+                 WHERE uv.contest_player_id = %s
+                   AND b.contest_id = %s
+                   AND b.beer_name = uv.beer
+                   AND b.brewery_name = uv.brewery
+                """, [self.id, self.contest_id])
+                            
     def __str__(self):
         return "{0}:[Player={1}]".format(self.contest.name, self.user_name)
 
@@ -569,6 +578,7 @@ class Contest_Beer(models.Model):
                                   )
     beer = models.ForeignKey(Beer, on_delete=models.CASCADE)
     beer_name = models.CharField(max_length=250)
+    brewery_name = models.CharField(max_length=250, default='')
     point_value = models.IntegerField(default=1)
     challenge_point_loss = models.IntegerField(default=0)
     max_point_loss = models.IntegerField(default=0)
@@ -590,13 +600,9 @@ class Contest_Bonus(models.Model):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default=None, null=False, blank=False,)
     description = models.CharField(max_length=250, default="", null=True, blank=True,)
-    hash_tags = models.CharField(max_length=250, 
-                                 default="", 
-                                 null=False, 
-                                 blank=False,
-                                 help_text="Comma delimited strings without # " +\
-                                           "symbols representing the list of tags " +\
-                                           "will score this bonus",)
+    hashtags = ArrayField(base_field=models.CharField(max_length=30, default=None),
+                          null=True, 
+                          default=None)
     point_value = models.IntegerField(default=1,)
 
     class Meta:
@@ -621,6 +627,10 @@ class Unvalidated_Checkin(models.Model):
     beer = models.CharField(max_length=250, default='')
     beer_url = models.URLField(null=True, default=None)
     brewery_url = models.URLField(null=True, default=None)
+    possible_bonuses = ArrayField(base_field=models.IntegerField(), 
+                                  null=True, 
+                                  default=None)
+    has_possibles = models.BooleanField(default=False)
     photo_url = models.URLField(null=True, default=None)
     rating = models.IntegerField(null=True, default=None)
 

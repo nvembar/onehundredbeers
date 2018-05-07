@@ -572,7 +572,7 @@ class ContestEditingTestCase(TestCase):
                           content_type='application/json',
                           data=json.dumps({'name': 'bonus1',
                                            'description': 'First Bonus',
-                                           'hash_tags': ['tag1', 'tag2'],
+                                           'hashtags': ['tag1', 'tag2'],
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -580,7 +580,7 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(bonus_filter.count(), 1)
         bonus = bonus_filter.get()
         self.assertEqual(bonus.description, 'First Bonus')
-        self.assertEqual(bonus.hash_tags, 'tag1,tag2')
+        self.assertEqual(bonus.hashtags, ['tag1','tag2'])
         self.assertEqual(bonus.point_value, 2)
         get = c.get(reverse('contest-bonus-detail', 
                             kwargs={'contest_id': contest.id,
@@ -591,9 +591,9 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(obj['name'], 'bonus1')
         self.assertEqual(obj['description'], 'First Bonus')
         self.assertEqual(obj['point_value'], 2)
-        self.assertEqual(len(obj['hash_tags']), 2)
-        self.assertIn('tag1', obj['hash_tags'])
-        self.assertIn('tag2', obj['hash_tags'])
+        self.assertEqual(len(obj['hashtags']), 2)
+        self.assertIn('tag1', obj['hashtags'])
+        self.assertIn('tag2', obj['hashtags'])
 
     def test_failed_duplicate_bonus_hash_tag(self):
         c = Client()
@@ -604,7 +604,7 @@ class ContestEditingTestCase(TestCase):
                           content_type='application/json',
                           data=json.dumps({'name': 'bonus1',
                                            'description': 'First Bonus',
-                                           'hash_tags': ['tag1', 'tag2'],
+                                           'hashtags': ['tag1', 'tag2'],
                                            'point_value': 2}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -612,14 +612,14 @@ class ContestEditingTestCase(TestCase):
         self.assertEqual(bonus_filter.count(), 1)
         bonus = bonus_filter.get()
         self.assertEqual(bonus.description, 'First Bonus')
-        self.assertEqual(bonus.hash_tags, 'tag1,tag2')
+        self.assertEqual(bonus.hashtags, ['tag1','tag2'])
         self.assertEqual(bonus.point_value, 2)
         response = c.post(reverse('contest-bonus-list', 
                                   kwargs={'contest_id': contest.id}),
                           content_type='application/json',
                           data=json.dumps({'name': 'bonus2',
                                            'description': 'First Bonus',
-                                           'hash_tags': ['tag2', 'tag3'],
+                                           'hashtags': ['tag2', 'tag3'],
                                            'point_value': 1}),
                           HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

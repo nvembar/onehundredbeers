@@ -27,9 +27,16 @@ var Validate = {
     },
 
     addRow: function(contest, checkin, even=true, updateSelect=true) {
+        if (checkin.has_possibles) {
+            beer = contest.beers.find(b => 
+                    (checkin.beer == b.name && checkin.brewery && b.brewery))
+            checkin.possible_id = beer.id
+            checkin.possible_name = beer.name
+        }
         $(".checkin-list").append(Handlebars.templates.validation_grid(
             { 'checkin': checkin, 'bonuses': contest.bonuses }
         ));
+        /*
         let select = $('#id_' + checkin.id + '_select');
         if ('possible_id'  in checkin) {
             $('#id_' + checkin.id + '_vbutton').prop('disabled', false);
@@ -42,7 +49,6 @@ var Validate = {
             select.append('<option></option>');
         }
 
-        /*
         select.select2({ placeholder: "Select a beer or brewery", allowClear: true, data: exports.data });
         select.on("select2:select", exports.beerListOnSelect);
         select.on("select2:unselect", exports.beerListOnUnselect);
@@ -136,7 +142,7 @@ var Validate = {
         let start = 25 * (page - 1) + 1;
         let end = start + 25;
         let that = this;
-        contest.loadBonuses()
+        return contest.loadBonuses()
             .then(() => contest.getUnvalidatedCheckins(start, end))
             .then(function(data) {
                 page_count = Math.ceil(data.count / 25);

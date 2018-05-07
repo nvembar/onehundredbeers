@@ -64,7 +64,7 @@ var EditContest = {
   },
 
   displayBeers: function(contest) {
-    contest.loadBeers(function (beers) {
+    return contest.loadBeers().then(function (beers) {
       console.log('Loaded beers');
       contest.beers.forEach(function(beer) {
         if (beer.challenger) {
@@ -76,14 +76,14 @@ var EditContest = {
   },
 
   displayBreweries: function(contest) {
-    contest.loadBreweries(function (breweries) {
+    return contest.loadBreweries().then(function (breweries) {
       console.log('Loaded breweries');
       $('.brewery-list').html(Handlebars.templates.brewery_table(contest));
     });
   },
 
   displayBonuses: function(contest) {
-    contest.loadBonuses(function (bonuses) {
+    return contest.loadBonuses().then(function (bonuses) {
       console.log('Loaded bonuses');
       $('.bonus-list').html(Handlebars.templates.bonus_table(contest));
     });
