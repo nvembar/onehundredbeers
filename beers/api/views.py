@@ -3,6 +3,7 @@ from beers import models
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, Group
+from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
@@ -331,6 +332,10 @@ class UnvalidatedCheckinList(generics.ListAPIView):
         checkins = models.Unvalidated_Checkin.objects.filter(
                 contest_player__contest__id=contest_id)
         direction = self.request.query_params.get('direction', 'ascending')
+        possibles_only = self.request.query_params.get('possibles_only', 'false')
+        if possibles_only == 'true':
+            checkins = checkins.filter(Q(has_possibles=True) | 
+                                       Q(possible_bonuses__isnull=False))
         modifier = ''
         if direction == 'descending':
             modifier = '-'

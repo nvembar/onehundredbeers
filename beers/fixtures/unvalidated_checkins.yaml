@@ -118,3 +118,17 @@
     beer_url: https://test.com/beers/beer1
     brewery_url: https://test.com/breweries/beer1
     has_possibles: true
+- model: beers.unvalidated_checkin
+  pk: 11
+  fields:
+    contest_player: 1
+    untappd_title: Unvalidated Checkin 10
+    untappd_checkin: https://example.com/unvalidated_10
+    untappd_checkin_date: '2016-01-08 00:00:00.00+00:00'
+    brewery: Brewery 1
+    beer: Beer 1
+    beer_url: https://test.com/beers/beer1
+    brewery_url: https://test.com/breweries/beer1
+    has_possibles: false
+    possible_bonuses: 
+    - 1
