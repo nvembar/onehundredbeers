@@ -1,4 +1,4 @@
-<div id="id_{{checkin.id}}_row" class="{{#if checkin.possible_id}}possible-row{{/if}} validation-container checkin-row" data-validation-id="{{checkin.id}}">
+<div id="id_{{checkin.id}}_row" class="{{#if checkin.any_possible}}possible-row{{/if}} validation-container checkin-row" data-validation-id="{{checkin.id}}">
   <div class="validation-player">{{checkin.player}}</div>
   <div class="validation-beer">
      <a href="{{checkin.untappd_checkin}}" target="_blank">
@@ -17,14 +17,14 @@
   <div class="validation-bonuses">
     {{#each bonuses}}
     <span class="validation-bonus">
-      <input id="id_{{../checkin.id}}_{{id}}" data-bonus-type="{{name}}" class="bonus-checkbox" type="checkbox">{{name}}</input>
+      <input id="id_{{../checkin.id}}_{{id}}" data-bonus-id="{{id}}" data-bonus-type="{{name}}" class="bonus-checkbox" type="checkbox">{{name}}</input>
     </span>
     {{/each}}
   </div>
   <div class="validation-button">
     <span>
-    <button type="button" id="id_{{checkin.id}}_vbutton" class="btn btn-primary validation-click" disabled>Validate</button>
-    </xpan>
+    <button type="button" id="id_{{checkin.id}}_vbutton" class="btn btn-primary validation-click" {{#unless checkin.any_possible}}disabled{{/unless}}>Validate</button>
+    </span>
   </div>
   <div class="dismissal-button">
     <span>

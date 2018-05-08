@@ -29,32 +29,23 @@ var Validate = {
     addRow: function(contest, checkin, even=true, updateSelect=true) {
         if (checkin.has_possibles) {
             beer = contest.beers.find(b => 
-                    (checkin.beer == b.name && checkin.brewery && b.brewery))
-            checkin.possible_id = beer.id
-            checkin.possible_name = beer.name
+                    (checkin.beer == b.name && checkin.brewery && b.brewery));
+            checkin.possible_id = beer.id;
+            checkin.any_possible = true;
+            checkin.possible_name = beer.name;
+        }
+        if (checkin.possible_bonuses) {
+            checkin.any_possible = true;
         }
         $(".checkin-list").append(Handlebars.templates.validation_grid(
             { 'checkin': checkin, 'bonuses': contest.bonuses }
         ));
-        /*
-        let select = $('#id_' + checkin.id + '_select');
-        if ('possible_id'  in checkin) {
-            $('#id_' + checkin.id + '_vbutton').prop('disabled', false);
-            select.append(
-                '<option value="beer:' + checkin.possible_id + '">' + 
-                checkin.possible_name + 
-                '</option>'
-            );
-        } else {
-            select.append('<option></option>');
+        if (checkin.possible_bonuses) {
+            for (let i = 0; i < checkin.possible_bonuses.length; ++i) {
+                $('#id_' + checkin.id + '_' + checkin.possible_bonuses[i]).prop(
+                        'checked', true);
+            }
         }
-
-        select.select2({ placeholder: "Select a beer or brewery", allowClear: true, data: exports.data });
-        select.on("select2:select", exports.beerListOnSelect);
-        select.on("select2:unselect", exports.beerListOnUnselect);
-        $("#id_" + checkin.id + "_vbutton").click(exports.validationClick);
-        $("#id_" + checkin.id + "_dbutton").click(exports.dismissalClick);
-        */
     },
 
     determineValidateState: function(e) {

@@ -206,18 +206,22 @@ templates['validation_grid'] = template({"1":function(container,depth0,helpers,p
     + alias1(container.lambda(((stack1 = (depths[1] != null ? depths[1].checkin : depths[1])) != null ? stack1.id : stack1), depth0))
     + "_"
     + alias1(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"id","hash":{},"data":data}) : helper)))
+    + "\" data-bonus-id=\""
+    + alias1(((helper = (helper = helpers.id || (depth0 != null ? depth0.id : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"id","hash":{},"data":data}) : helper)))
     + "\" data-bonus-type=\""
     + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"name","hash":{},"data":data}) : helper)))
     + "\" class=\"bonus-checkbox\" type=\"checkbox\">"
     + alias1(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"name","hash":{},"data":data}) : helper)))
     + "</input>\n    </span>\n";
+},"9":function(container,depth0,helpers,partials,data) {
+    return "disabled";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : (container.nullContext || {});
 
   return "<div id=\"id_"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
     + "_row\" class=\""
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.possible_id : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.any_possible : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + " validation-container checkin-row\" data-validation-id=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
     + "\">\n  <div class=\"validation-player\">"
@@ -236,7 +240,9 @@ templates['validation_grid'] = template({"1":function(container,depth0,helpers,p
     + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.bonuses : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "  </div>\n  <div class=\"validation-button\">\n    <span>\n    <button type=\"button\" id=\"id_"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
-    + "_vbutton\" class=\"btn btn-primary validation-click\" disabled>Validate</button>\n    </xpan>\n  </div>\n  <div class=\"dismissal-button\">\n    <span>\n    <button type=\"button\" id=\"id_"
+    + "_vbutton\" class=\"btn btn-primary validation-click\" "
+    + ((stack1 = helpers.unless.call(alias3,((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.any_possible : stack1),{"name":"unless","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ">Validate</button>\n    </span>\n  </div>\n  <div class=\"dismissal-button\">\n    <span>\n    <button type=\"button\" id=\"id_"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.checkin : depth0)) != null ? stack1.id : stack1), depth0))
     + "_dbutton\" class=\"btn btn-default dismissal-click\">Dismiss</button>\n    </span>\n  </div>\n</div>\n";
 },"useData":true,"useDepths":true});
