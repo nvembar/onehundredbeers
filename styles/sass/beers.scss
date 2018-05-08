@@ -684,13 +684,13 @@ $login-field-width: 30em;
 
 .validation-selection {
   grid-area: selection;
-  background-color: lightblue;
+  background-color: aliceblue;
   padding: 3px;
 }
 
 .validation-bonuses {
   grid-area: bonus;
-  background-color: lightblue;
+  background-color: aliceblue;
   padding: 3px;
 }
 
@@ -701,7 +701,7 @@ $login-field-width: 30em;
 
 .validation-button {
   grid-area: vbutton;
-  background-color: lightblue;
+  background-color: aliceblue;
   justify-self: end;
   // align-self: start;
   padding: 3px;
@@ -710,10 +710,16 @@ $login-field-width: 30em;
 
 .dismissal-button {
   grid-area: dbutton;
-  background-color: lightblue;
+  background-color: aliceblue;
   justify-self: end;
   // align-self: start;
   padding: 3px;
   width: 100%;
 }
 
+.possible-row > .validation-selection,
+.possible-row > .validation-bonuses,
+.possible-row > .validation-button,
+.possible-row > .dismissal-button {
+  background-color: lightblue;
+}

@@ -628,14 +628,14 @@ img.column-icon {
 /* line 685, ../../../styles/sass/beers.scss */
 .validation-selection {
   grid-area: selection;
-  background-color: lightblue;
+  background-color: aliceblue;
   padding: 3px;
 }
 
 /* line 691, ../../../styles/sass/beers.scss */
 .validation-bonuses {
   grid-area: bonus;
-  background-color: lightblue;
+  background-color: aliceblue;
   padding: 3px;
 }
 
@@ -648,7 +648,7 @@ img.column-icon {
 /* line 702, ../../../styles/sass/beers.scss */
 .validation-button {
   grid-area: vbutton;
-  background-color: lightblue;
+  background-color: aliceblue;
   justify-self: end;
   padding: 3px;
   width: 100%;
@@ -657,8 +657,16 @@ img.column-icon {
 /* line 711, ../../../styles/sass/beers.scss */
 .dismissal-button {
   grid-area: dbutton;
-  background-color: lightblue;
+  background-color: aliceblue;
   justify-self: end;
   padding: 3px;
   width: 100%;
+}
+
+/* line 720, ../../../styles/sass/beers.scss */
+.possible-row > .validation-selection,
+.possible-row > .validation-bonuses,
+.possible-row > .validation-button,
+.possible-row > .dismissal-button {
+  background-color: lightblue;
 }
