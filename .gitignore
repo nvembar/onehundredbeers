@@ -10,3 +10,4 @@ pip-selfcheck.json
 dev-data
 staticfiles/
 **/*.swp
+.vscode
