@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup, Tag
 import datetime
 import logging
 import re
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from urllib.parse import urljoin
 from django.utils import timezone
 from beers.models import Unvalidated_Checkin, Beer, Brewery
@@ -11,6 +11,8 @@ from beers.models import Unvalidated_Checkin, Beer, Brewery
 logger = logging.getLogger(__name__)
 
 RE_RATING = re.compile('r[0-9]{3}')
+HEADERS= {'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:66.0) Gecko/20100101 Firefox/66.0'}
 
 class UntappdParseException(Exception):
     pass
@@ -21,7 +23,7 @@ def parse_checkin(url):
     with the following attributes, all optional:
 
     """
-    with urlopen(url) as response:
+    with urlopen(Request(url, headers=HEADERS)) as response:
         soup = BeautifulSoup(response, "html.parser")
         result = Unvalidated_Checkin()
         # Get title
@@ -72,7 +74,7 @@ def parse_checkin(url):
         return result
 
 def parse_beer(url, followBrewery=True):
-    with urlopen(url) as response:
+    with urlopen(Request(url, headers=HEADERS)) as response:
         soup = BeautifulSoup(response, "html.parser")
         result = Beer()
         divs = soup.find_all('div', class_='name')
@@ -103,7 +105,7 @@ def parse_beer(url, followBrewery=True):
         return result
 
 def parse_brewery(url):
-    with urlopen(url) as response:
+    with urlopen(Request(url, headers=HEADERS)) as response:
         soup = BeautifulSoup(response, "html.parser")
         result = Brewery()
         result.untappd_url = response.geturl()
