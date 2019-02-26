@@ -191,8 +191,8 @@ var EditContest = {
 
   addBonusFromForm: function(contest) {
     console.log('In addBonusFromForm');
-    let keys = ['name', 'description', 'hash_tags', 'point_value'];
-    let transform = { hash_tags: s => s.split(',').map(t => t.trim()) }
+    let keys = ['name', 'description', 'hashtags', 'point_value'];
+    let transform = { hashtags: s => s.split(',').map(t => t.trim()) }
     EditContest.addToContestFromForm(contest, contest.addBonus, 
                                      keys, $('#addBonus'), 'name', transform).done(
             function () { 
