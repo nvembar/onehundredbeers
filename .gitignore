@@ -11,3 +11,4 @@ dev-data
 staticfiles/
 **/*.swp
 .vscode
+.env
