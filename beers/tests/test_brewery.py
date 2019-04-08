@@ -3,7 +3,7 @@
 
 import json
 from django.test import Client, TestCase, override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from beers.models import Contest, Contest_Player, Unvalidated_Checkin, \
                          Contest_Checkin, Contest_Brewery
 
