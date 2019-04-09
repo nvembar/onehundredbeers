@@ -11,6 +11,7 @@ COPY yarn.lock .
 RUN yarn install
 COPY Pipfile .
 COPY Pipfile.lock .
+ARG PIPENV_ARGS
 RUN pipenv install $PIPENV_ARGS --system
 COPY . /code
 ARG SECRET_KEY
