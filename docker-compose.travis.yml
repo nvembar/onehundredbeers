@@ -3,6 +3,6 @@ version: '3'
 services:
   web:
     environment:
-      - PIPENV_DEV=1
+      - PIPENV_ARGS=--dev
     volumes:
       - ./coverage:/code/coverage
