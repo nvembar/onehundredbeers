@@ -2,7 +2,8 @@ version: '3'
 
 services:
   web:
-    environment:
-      - PIPENV_ARGS=--dev
+    build:
+      args:
+        - PIPENV_ARGS=--dev
     volumes:
       - ./coverage:/code/coverage
