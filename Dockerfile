@@ -12,7 +12,8 @@ RUN yarn install
 COPY Pipfile .
 COPY Pipfile.lock .
 ARG PIPENV_ARGS
-RUN pipenv install $PIPENV_ARGS --system
+# Ugh - installing all the dev requirements, too
+RUN pipenv install --dev --system
 COPY . /code
 ARG SECRET_KEY
 RUN SECRET_KEY=$SECRET_KEY python manage.py collectstatic --noinput -v 0
