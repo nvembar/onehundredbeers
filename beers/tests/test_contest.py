@@ -3,7 +3,7 @@
 import datetime
 import json
 from django.test import TestCase, override_settings, Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework import status
