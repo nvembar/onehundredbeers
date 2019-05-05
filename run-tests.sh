@@ -1,8 +1,8 @@
 #!/bin/bash
 
 sleep 5
-coverage run manage.py test
+pipenv run coverage run manage.py test
 if [ ! -d coverage ]; then
     mkdir coverage
 fi
-coverage xml -o coverage/coverage.xml
+pipenv run coverage xml -o coverage/coverage.xml

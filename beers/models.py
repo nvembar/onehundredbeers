@@ -97,7 +97,7 @@ class Contest(models.Model):
     "Represents a contest"
 
     name = models.CharField(max_length=250, unique=True)
-    creator = models.ForeignKey(Player, default=1)
+    creator = models.ForeignKey(Player, default=1, on_delete=models.PROTECT)
     active = models.BooleanField(default=False)
     created_on = models.DateTimeField()
     last_updated = models.DateTimeField()

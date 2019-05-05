@@ -3,7 +3,7 @@
 import datetime
 from django.test import TestCase, override_settings
 from django.test import Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from beers.models import Contest, Player, Contest_Player, Contest_Checkin, Contest_Beer, Contest_Brewery
 

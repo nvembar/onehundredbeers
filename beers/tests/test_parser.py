@@ -3,7 +3,7 @@
 import os
 import datetime
 from django.test import TestCase, override_settings, Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from beers.utils import untappd
 from beers.models import Beer, Brewery, Unvalidated_Checkin

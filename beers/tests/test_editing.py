@@ -4,7 +4,7 @@ import datetime
 import json
 import unittest
 from django.test import TestCase, override_settings, Client
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from beers.models import Beer, Brewery, Contest, Contest_Player, \
