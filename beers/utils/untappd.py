@@ -45,6 +45,8 @@ def parse_checkin(url):
             elif link['href'].startswith('/brewery/'):
                 result.brewery = link.string.strip()
                 result.brewery_url = urljoin(response.geturl(), link['href'])
+            elif link['href'].startswith('/user/'):
+                result.untappd_user = link['href'][link['href'].rfind('/')+1:]
 
         if result.beer is None or result.beer_url is None:
             raise UntappdParseException(
