@@ -86,13 +86,13 @@
 	</div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-      <li role="presentation" {% if not activerow or activerow == "leaderboard" %}class="active"{% endif %}><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
-      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab" {% if activerow == "beers" %}class="active"{% endif %}>Beers</a></li>
-      <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab" {% if activerow == "breweries" %}class="active"{% endif %}>Breweries</a></li>
-      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab" {% if activerow == "bonuses" %}class="active"{% endif %}>Bonuses</a></li>
+      <li role="presentation" {% if not activetab or activetab == "leaderboard" %}class="active"{% endif %}><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
+      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab" {% if activetab == "beers" %}class="active"{% endif %}>Beers</a></li>
+      <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab" {% if activetab == "breweries" %}class="active"{% endif %}>Breweries</a></li>
+      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab" {% if activetab == "bonuses" %}class="active"{% endif %}>Bonuses</a></li>
       {% if is_creator %}
-      <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab" {% if activerow == "validate" %}class="active"{% endif %}>Validate</a></li>
-      <li role="presentation"><a href="#addcheckins" aria-controls="addcheckins" role="tab" data-toggle="tab" {% if activerow == "checkins" %}class="active"{% endif %}>Checkins</a></li>
+      <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab" {% if activetab == "validate" %}class="active"{% endif %}>Validate</a></li>
+      <li role="presentation"><a href="#addcheckins" aria-controls="addcheckins" role="tab" data-toggle="tab" {% if activetab == "checkins" %}class="active"{% endif %}>Checkins</a></li>
       {% endif %}
     </ul>
 
