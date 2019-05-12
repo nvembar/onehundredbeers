@@ -217,12 +217,21 @@
       <div role="tabpanel" class="tab-pane" id="addcheckins">
         <div class="row">
           <div class="col-lg-6">
-            <form>
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Untappd URL">
-                <span class="input-group-btn">
-                  <button class="btn btn-default" type="button">Add</button>
-                </span>
+            <form action="{% url 'unvalidated-checkins-json' contest.id %}" method="post">
+              {% csrf_token %}
+              <div class="form-group{% if errors %} has-error{% endif %} {% if uv %} has-success{% endif %}">
+                <div class="input-group">
+                  <input id="untappd_url" name="untappd_url" type="text" class="form-control" placeholder="Untappd URL" aria-describedby="url-help-block">
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">Add</button>
+                  </span>
+                  {% if errors %}
+                  <span id="urlhelp-block" class="url-help-block">{{ errors.0 }}</span>
+                  {% endif %}
+                  {% if uv %}
+                  <span id="urlhelp-block" class="url-help-block">Successfully loaded {{ uv.contest_player.user_name}}'s checkin</span>
+                  {% endif %}
+                </div>
               </div>
             </form>
           </div>
