@@ -82,9 +82,21 @@ class AddCheckinTestCase(TestCase):
                                   data={'untappd_checkin': 'https://example.com/unvalidated_checkin_new'})
         self.assertEqual(response.status_code, 201)
         checkin = json.loads(response.content)
-        print('New checkin url {}'.format(checkin['url']))
         self.assertTrue(checkin['url'].endswith(reverse('unvalidated-checkin-detail', 
                                                 kwargs={'id': checkin['id']})))
         self.assertEqual(checkin['player'], 'user1')
         self.assertEqual(checkin['brewery'], 'Brewery 7')
         self.assertEqual(checkin['beer'], 'Beer 7')
+
+    @mock.patch('beers.api.views.untappd.parse_checkin', side_effect=outer_mock_parse_checkin)
+    def test_unvalidated_api_create_not_in_contest(self, mocked_function):
+        """Tests if the JSON API gets the right values for a single request"""
+        c = Client()
+        self.assertTrue(c.login(username='runner1', password='password1%'))
+        response = c.post(reverse('unvalidated-checkin-list',
+                                  kwargs={'contest_id': 3}),
+                                  data={'untappd_checkin': 'https://example.com/unvalidated_checkin_new'})
+        self.assertEqual(response.status_code, 400)
+        errors = json.loads(response.content)
+        self.assertIn('non_field_errors', errors)
+        self.assertTrue(errors['non_field_errors'][0].count("Can't link") > 0)
