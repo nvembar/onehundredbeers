@@ -344,16 +344,24 @@ class UnvalidatedCheckinList(generics.ListCreateAPIView):
         return checkins.order_by(modifier + sort_field)
 
     def perform_create(self, serializer):
+        """
+        Creates a Unvalidated Checkin from the URL being passed in as `untappd_checkin`
+        """
+        logger.info("Entering perform_create")
         contest_id = self.kwargs['contest_id']
 
-        untappd_url = self.request.data['untappd_checkin']
+        untappd_url = self.request.data.get('untappd_checkin', None)
+        logger.info("Attempting perform_create on %s", untappd_url)
         if untappd_url is None:
+            logger.warning("No 'untappd_checkin' passed into create")
             raise serializers.ValidationError(
                 {'untappd_checkin': "Untappd checkin URL required'"}
             )
         if models.Unvalidated_Checkin.objects.filter(
                                             contest_player__contest_id=contest_id, 
                                             untappd_checkin=untappd_url).count() > 0:
+            logger.warning("Passed in 'untappd_checkin' (%s) is already saved in contest", 
+                           untappd_url)
             raise serializers.ValidationError(
                 {'untappd_checkin': "Untappd checkin URL already in validation list'"}
             )
@@ -371,10 +379,15 @@ class UnvalidatedCheckinList(generics.ListCreateAPIView):
                             beer_url=uv.beer_url,
                             photo_url=uv.photo_url,)
             logger.info('Saved unvalidated checkin at url: {}'.format(uv.untappd_checkin))
-        except UntappdParseException as e:
+        except untappd.UntappdParseException as e:
+            logger.warning("Bad Untappd parse at %s: %s", untappd_url, e)
             raise serializers.ValidationError({'non_field_errors': ["{}".format(e)]})
-        except models.Contest_Player.DoesNotExist:
-            raise serializers.ValidationError({'non_field_errors': ["{}".format(e)]})
+        except models.Contest_Player.DoesNotExist as e:
+            logger.warning("Untappd user %s is not part of contest %i", 
+                           uv.untappd_user, contest_id)
+            raise serializers.ValidationError(
+                {'non_field_errors': ["Can't link Untappd user {} to contest {}".format(
+                            uv.untappd_user, contest_id)]})
     
 class UnvalidatedCheckinDetail(generics.RetrieveDestroyAPIView):
     """
