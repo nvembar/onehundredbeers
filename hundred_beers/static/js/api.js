@@ -26,6 +26,18 @@ var Contests = {
                 });
             },
 
+            addUnvalidatedCheckin: function(untappdUrl) {
+                let url = this.baseUrl + 'api/contests/' 
+                                       + contestId + '/unvalidated_checkins';
+                return $.ajax({
+                  url: url,
+                  headers: { Accept: 'application/json' },
+                  data: { 'untappd_checkin': untappdUrl },
+                  method: 'POST',
+                  contestType: 'application/json',
+                })
+            },
+
             deleteUnvalidatedCheckin: function (uvId) {
                 let url = this.baseUrl + 'api/unvalidated_checkins/' + uvId;
                 return $.ajax({
