@@ -308,7 +308,7 @@ class BreweryLookup(APIView):
 class UnvalidatedCheckinPaginator(LimitOffsetPagination):
     default_limit = 25
 
-class UnvalidatedCheckinList(generics.ListAPIView):
+class UnvalidatedCheckinList(generics.ListCreateAPIView):
     """
     Lists out all the unvalidated checkins with pagination.
     """
@@ -342,6 +342,39 @@ class UnvalidatedCheckinList(generics.ListAPIView):
         sort = self.request.query_params.get('sort', 'date')
         sort_field = UnvalidatedCheckinList.sort_mapping.get(sort, 'untappd_checkin_date')
         return checkins.order_by(modifier + sort_field)
+
+    def perform_create(self, serializer):
+        contest_id = self.kwargs['contest_id']
+
+        untappd_url = self.request.data['untappd_checkin']
+        if untappd_url is None:
+            raise serializers.ValidationError(
+                {'untappd_checkin': "Untappd checkin URL required'"}
+            )
+        if models.Unvalidated_Checkin.objects.filter(
+                                            contest_player__contest_id=contest_id, 
+                                            untappd_checkin=untappd_url).count() > 0:
+            raise serializers.ValidationError(
+                {'untappd_checkin': "Untappd checkin URL already in validation list'"}
+            )
+        try:
+            uv = untappd.parse_checkin(untappd_url)
+            player = models.Contest_Player.objects.get(contest_id=contest_id, 
+                                                       player__untappd_username=uv.untappd_user)
+            serializer.save(contest_player=player,
+                            untappd_title=uv.untappd_title,
+                            untappd_checkin=uv.untappd_checkin,
+                            untappd_checkin_date=uv.untappd_checkin_date,
+                            brewery=uv.brewery,
+                            beer=uv.beer,
+                            brewery_url=uv.brewery_url,
+                            beer_url=uv.beer_url,
+                            photo_url=uv.photo_url,)
+            logger.info('Saved unvalidated checkin at url: {}'.format(uv.untappd_checkin))
+        except UntappdParseException as e:
+            raise serializers.ValidationError({'non_field_errors': ["{}".format(e)]})
+        except models.Contest_Player.DoesNotExist:
+            raise serializers.ValidationError({'non_field_errors': ["{}".format(e)]})
     
 class UnvalidatedCheckinDetail(generics.RetrieveDestroyAPIView):
     """

@@ -350,3 +350,16 @@ class UnvalidatedCheckinSerializer(serializers.HyperlinkedModelSerializer):
                   'possible_bonuses',
                   'has_possibles',
                   'rating',)
+        read_only_fields = ('id', 
+                            'contest_player',
+                            'player',
+                            'untappd_title',
+                            'untappd_checkin_date',
+                            'brewery',
+                            'beer',
+                            'beer_url',
+                            'brewery_url',
+                            'photo_url',
+                            'possible_bonuses',
+                            'has_possibles',
+                            'rating',)
