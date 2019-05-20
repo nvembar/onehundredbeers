@@ -207,18 +207,22 @@
       <div role="tabpanel" class="tab-pane" id="validate">
         <div class="row">
           <div class="col-lg-6">
-            <form>
-              <div id="uv-form-group" class="form-group">
-                <div class="input-group">
-                  <input id="uv_untappd_url" name="uv_untappd_url_name" type="text" class="form-control" placeholder="Untappd URL" onchange="console.log('-> ' + this.value)" aria-describedby="uv-help-block"></input>
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" 
-                            onclick="Validate.addUnvalidatedCheckinToContest(contest)">Add Checkin</button>
-                  </span>
-                </div>
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <form>
+                  <div id="uv-form-group" class="form-group">
+                    <div class="input-group">
+                      <input id="uv_untappd_url" name="uv_untappd_url_name" type="text" class="form-control" placeholder="Untappd URL" onchange="console.log('-> ' + this.value)" aria-describedby="uv-help-block"></input>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" 
+                                onclick="Validate.addUnvalidatedCheckinToContest(contest)">Add Checkin</button>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+                <span id="uv-help-block" class="help-block url-help-block"></span>
               </div>
-            </form>
-            <span id="uv-help-block" class="help-block url-help-block"></span>
+            </div>
           </div>
         </div>
         <div class="checkin-list">
