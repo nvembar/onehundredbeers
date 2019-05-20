@@ -2,7 +2,7 @@
 
 
 from django.conf.urls import url, include
-from beers.views import user, validation, contest
+from beers.views import user, validation, contest, checkin
 import beers.api.views as api_views
 
 urlpatterns = [
@@ -60,9 +60,9 @@ urlpatterns = [
     url(r'^contests/(?P<contest_id>[0-9]+)/bonuses/(?P<bonus_tag>[A-Za-z0-9]+)$',
         contest.contest_bonus,
         name='contest-bonus'),
-    url(r'^contests/(?P<contest_id>[0-9]+)/recover$',
-        validation.initiate_recover,
-        name='initiate-recover'),
+    # url(r'^contests/(?P<contest_id>[0-9]+)/unvalidated_checkins$',
+        # checkin.add_unvalidated_checkin,
+        # name='add-unvalidated-checkin'),
     url(r'^instructions$', contest.instructions, name='instructions'),
     url(r'^api/players/$', 
         api_views.PlayerList.as_view(), 

@@ -39,12 +39,25 @@ def parse_checkin(url):
         for link in links:
             if 'href' not in link.attrs:
                 continue
+            logger.info('Examining URL: {}'.format(link['href']))
             if link['href'].startswith('/b/'):
                 result.beer = link.string.strip()
                 result.beer_url = urljoin(response.geturl(), link['href'])
-            elif link['href'].startswith('/brewery/'):
+            elif link['href'].startswith('/brewery/') or link['href'].count('/') == 1:
                 result.brewery = link.string.strip()
                 result.brewery_url = urljoin(response.geturl(), link['href'])
+        userInfo = soup.find("div", class_="user-info")
+        if userInfo is None:
+            raise UntappdParseException(
+                    "Unable to find user information on checkin page")
+        links = userInfo.find_all("a")
+        for link in links:
+            if 'href' not in link.attrs:
+                continue
+            if link['href'].startswith('/user/'):
+                result.untappd_user = link['href'][link['href'].rfind('/')+1:]
+                logger.info('Extracted user {} from URL: {}'.format(result.untappd_user, 
+                                                                    link['href']))
 
         if result.beer is None or result.beer_url is None:
             raise UntappdParseException(

@@ -350,3 +350,32 @@ class UnvalidatedCheckinSerializer(serializers.HyperlinkedModelSerializer):
                   'possible_bonuses',
                   'has_possibles',
                   'rating',)
+        read_only_fields = ('id', 
+                            'contest_player',
+                            'player',
+                            'untappd_title',
+                            'untappd_checkin_date',
+                            'brewery',
+                            'beer',
+                            'beer_url',
+                            'brewery_url',
+                            'photo_url',
+                            'possible_bonuses',
+                            'has_possibles',
+                            'rating',)
+
+    def create(self, validated_data):
+        logger.info("In unvalidated checkin create()")
+        unvalidated_checkin = models.Unvalidated_Checkin(
+            contest_player=validated_data['contest_player'],
+            untappd_title=validated_data['untappd_title'],
+            untappd_checkin=validated_data['untappd_checkin'],
+            untappd_checkin_date=validated_data['untappd_checkin_date'],
+            beer=validated_data['beer'],
+            brewery=validated_data['brewery'],
+            beer_url=validated_data['beer_url'],
+            brewery_url=validated_data['brewery_url'],
+        )
+        unvalidated_checkin.save()
+        logger.info("Saved %s", unvalidated_checkin.untappd_checkin)
+        return unvalidated_checkin
