@@ -215,5 +215,13 @@ var EditContest = {
       }
     );
   },
+
+  addUnvalidatedCheckinToContest: function (contest, untappdUrl) {
+    return contest.addUnvalidatedCheckin(untappdUrl).then(
+
+    ).fail(
+
+    );
+  }
 };
 

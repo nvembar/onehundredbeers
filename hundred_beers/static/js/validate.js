@@ -1,3 +1,4 @@
+"use strict";
 
 var Validate = {
 
@@ -28,7 +29,7 @@ var Validate = {
 
     addRow: function(contest, checkin, even=true, updateSelect=true) {
         if (checkin.has_possibles) {
-            beer = contest.beers.find(b => 
+            let beer = contest.beers.find(b => 
                     (checkin.beer == b.name && checkin.brewery && b.brewery));
             checkin.possible_id = beer.id;
             checkin.any_possible = true;
@@ -49,7 +50,7 @@ var Validate = {
     },
 
     determineValidateState: function(e) {
-        row = $(this).parents('.checkin-row');
+        let row = $(this).parents('.checkin-row');
         console.log('Selection: ' + $(row).find('.beer-select option:selected').val());
         let selected = $(row).find('.beer-select option:selected').val();
         $(row).find('.validation-click').prop('disabled', 
@@ -136,7 +137,7 @@ var Validate = {
         return contest.loadBonuses()
             .then(() => contest.getUnvalidatedCheckins(start, end))
             .then(function(data) {
-                page_count = Math.ceil(data.count / 25);
+                let page_count = Math.ceil(data.count / 25);
                 $('.checkin-list').html('');
                 $('.checkin-list').data('currentPage', page);
                 $('.checkin-list').data('startIndex', start);
@@ -190,10 +191,60 @@ var Validate = {
                 });
              });
     },
+
+    addUnvalidatedCheckinToContest: function (contest) {
+        let urlInput = document.getElementById('uv_untappd_url')
+        console.log("--urlInput w var--")
+        console.log(urlInput)
+        console.log("--urlInput w var--")
+        var untappdUrl = urlInput.value;
+        console.log("In addUnvalidatedCheckinToContest(" + untappdUrl + ")")
+        $("#uv-help-block").removeClass(["has-success", "has-error"]);
+        $("#uv-form-group").removeClass(["has-success", "has-error"]);
+        $("#uv-help-block").text("")
+        return contest.addUnvalidatedCheckin(untappdUrl).then(
+            function (uv) {
+                $("#uv-help-block").text("Added " + uv.player + " checkin to " + uv.beer);
+                $("#uv-form-group").addClass("has-success");
+            }
+        ).then(
+            function (data) {
+                let page = $(".checkin-list").data("currentPage")
+                if (page == null) {
+                    page = 1
+                }
+                Validate.displayCheckins(contest, page)
+            }
+        ).fail(
+            function (jqXHR) {
+                try {
+                    let errors = JSON.parse(jqXHR.responseText)
+                    console.log(jqXHR.responseText)
+                    if (errors["non_field_errors"] != undefined) {
+                        $("#uv-help-block").text(errors["non_field_errors"][0])
+                        $("#uv-help-block").addClass("has-error")
+                        $("#uv-form-group").addClass("has-error")
+                    } else if (errors["untappd_checkin"] != undefined) {
+                        $("#uv-help-block").text(errors["untappd_checkin"])
+                        $("#uv-help-block").addClass("has-error")
+                        $("#uv-form-group").addClass("has-error")
+                    }
+                } catch (e) {
+                    $("#uv-help-block").text('Unknown Error')
+                    $("#uv-help-block").addClass("has-error")
+                    $("#uv-form-group").addClass("has-error")
+                    console.log("Exception caught: " + e)
+                    console.log('--Returned text below--')
+                    console.log(jqXHR.responseText)
+                    console.log('--End Returned text--')
+                }
+            }
+        );
+    }
 };
 
 $(function() {
-    csrfSafeMethod = function(method) {
+    var csrfSafeMethod = function(method) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }

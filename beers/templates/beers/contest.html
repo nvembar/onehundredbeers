@@ -86,12 +86,12 @@
 	</div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="active"><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
-      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab">Beers</a></li>
-      <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab">Breweries</a></li>
-      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab">Bonuses</a></li>
+      <li role="presentation" {% if not activetab or activetab == "leaderboard" %}class="active"{% endif %}><a href="#leaderboard" aria-controls="leaderboard" role="tab" data-toggle="tab">Leaderboard</a></li>
+      <li role="presentation"><a href="#beers" aria-controls="beers" role="tab" data-toggle="tab" {% if activetab == "beers" %}class="active"{% endif %}>Beers</a></li>
+      <li role="presentation"><a href="#breweries" aria-controls="breweries" role="tab" data-toggle="tab" {% if activetab == "breweries" %}class="active"{% endif %}>Breweries</a></li>
+      <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab" {% if activetab == "bonuses" %}class="active"{% endif %}>Bonuses</a></li>
       {% if is_creator %}
-      <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab">Validate</a></li>
+      <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab" {% if activetab == "validate" %}class="active"{% endif %}>Validate</a></li>
       {% endif %}
     </ul>
 
@@ -205,6 +205,26 @@
       </div>
       {% if is_creator %}
       <div role="tabpanel" class="tab-pane" id="validate">
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                <form>
+                  <div id="uv-form-group" class="form-group">
+                    <div class="input-group">
+                      <input id="uv_untappd_url" name="uv_untappd_url_name" type="text" class="form-control" placeholder="Untappd URL" onchange="console.log('-> ' + this.value)" aria-describedby="uv-help-block"></input>
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" 
+                                onclick="Validate.addUnvalidatedCheckinToContest(contest)">Add Checkin</button>
+                      </span>
+                    </div>
+                  </div>
+                </form>
+                <span id="uv-help-block" class="help-block url-help-block"></span>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="checkin-list">
           <p>Loading...</p>
         </div>
@@ -217,6 +237,4 @@
     </div>
 
   </div>
-
-
 {% endblock %}
