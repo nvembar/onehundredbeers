@@ -92,7 +92,6 @@
       <li role="presentation"><a href="#bonuses" aria-controls="bonuses" role="tab" data-toggle="tab" {% if activetab == "bonuses" %}class="active"{% endif %}>Bonuses</a></li>
       {% if is_creator %}
       <li role="presentation"><a href="#validate" aria-controls="validate" role="tab" data-toggle="tab" {% if activetab == "validate" %}class="active"{% endif %}>Validate</a></li>
-      <li role="presentation"><a href="#addcheckins" aria-controls="addcheckins" role="tab" data-toggle="tab" {% if activetab == "checkins" %}class="active"{% endif %}>Checkins</a></li>
       {% endif %}
     </ul>
 
@@ -206,6 +205,22 @@
       </div>
       {% if is_creator %}
       <div role="tabpanel" class="tab-pane" id="validate">
+        <div class="row">
+          <div class="col-lg-6">
+            <form>
+              <div id="uv-form-group" class="form-group">
+                <div class="input-group">
+                  <input id="uv_untappd_url" name="uv_untappd_url_name" type="text" class="form-control" placeholder="Untappd URL" onchange="console.log('-> ' + this.value)" aria-describedby="uv-help-block"></input>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" 
+                            onclick="Validate.addUnvalidatedCheckinToContest(contest)">Add Checkin</button>
+                  </span>
+                </div>
+              </div>
+            </form>
+            <span id="uv-help-block" class="help-block url-help-block"></span>
+          </div>
+        </div>
         <div class="checkin-list">
           <p>Loading...</p>
         </div>
@@ -214,33 +229,8 @@
           </span>
         </div>
       </div>
-      <div role="tabpanel" class="tab-pane" id="addcheckins">
-        <div class="row">
-          <div class="col-lg-6">
-            <form action="{% url 'unvalidated-checkins-json' contest.id %}" method="post">
-              {% csrf_token %}
-              <div class="form-group{% if errors %} has-error{% endif %} {% if uv %} has-success{% endif %}">
-                <div class="input-group">
-                  <input id="untappd_url" name="untappd_url" type="text" class="form-control" placeholder="Untappd URL" aria-describedby="url-help-block">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit">Add</button>
-                  </span>
-                  {% if errors %}
-                  <span id="urlhelp-block" class="url-help-block">{{ errors.0 }}</span>
-                  {% endif %}
-                  {% if uv %}
-                  <span id="urlhelp-block" class="url-help-block">Successfully loaded {{ uv.contest_player.user_name}}'s checkin</span>
-                  {% endif %}
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
       {% endif %}
     </div>
 
   </div>
-
-
 {% endblock %}
