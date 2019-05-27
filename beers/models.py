@@ -357,8 +357,6 @@ class Contest_Player(models.Model):
 
         returns Contest_Checkin
         """
-        logger.info("contest_player(%s).drink_beer: beer %s, checkin: %s", 
-                    self.user_name, beer, checkin)
         if beer.contest.id != self.contest.id:
             raise ValueError('Cannot check into a beer not in the contest')
         checkin_time = None
@@ -373,6 +371,8 @@ class Contest_Player(models.Model):
                 checkin_time = data['checkin_time']
             if 'untappd_checkin' in data:
                 untappd_checkin = data['untappd_checkin']
+        logger.info("contest_player(%s).drink_beer: beer %s, checkin: %s", 
+                    self.user_name, beer.beer_name, untappd_checkin)
         self.last_checkin_date = checkin_time
         self.last_checkin_beer = beer.beer_name
         self.last_checkin_brewery = None
