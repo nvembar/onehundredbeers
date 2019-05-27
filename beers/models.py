@@ -1,12 +1,14 @@
 """Models supporting One Hundred Beers"""
 
 import datetime
+import logging
 import re
 from django.db import models, connection
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 
+logger = logging.getLogger(__name__)
 
 class PlayerManager(models.Manager):
     """A model manager for the Player object"""
@@ -369,17 +371,25 @@ class Contest_Player(models.Model):
                 checkin_time = data['checkin_time']
             if 'untappd_checkin' in data:
                 untappd_checkin = data['untappd_checkin']
+        logger.info("contest_player(%s).drink_beer: beer %s, checkin: %s", 
+                    self.user_name, beer.beer_name, untappd_checkin)
         self.last_checkin_date = checkin_time
         self.last_checkin_beer = beer.beer_name
         self.last_checkin_brewery = None
+        # Check if the beer has already been checked in
+        # Exclude the CL type as that indicates that another use drank the beer
         if Contest_Checkin.objects.filter(contest_player=self,
-                                          contest_beer=beer).count() > 0:
+                                          contest_beer=beer).exclude(tx_type='CL').count() > 0:
+            logger.info("contest_player(%s).drink_beer: Already checked into beer %s",
+                        self.user_name, beer.beer_name)
             return None
         checkin = None
         # Check if this is a challenge beer
         if beer.challenger is not None:
             # This is our own challenge beer, so
             if beer.challenger.id == self.id:
+                logger.info("contest_player(%s).drink_beer: Adding self-drink challenge beer %s",
+                            self.user_name, untappd_checkin)
                 checkin = Contest_Checkin(contest_player=self,
                                           contest_beer=beer,
                                           checkin_points=beer.challenge_point_value,
@@ -391,6 +401,8 @@ class Contest_Player(models.Model):
                 self.challenge_point_gain = (self.challenge_point_gain
                                              + beer.challenge_point_value)
             else:
+                logger.info("contest_player(%s).drink_beer: Adding other-drinnk challenge beer %s",
+                            self.user_name, untappd_checkin)
                 checkin = Contest_Checkin(contest_player=self,
                                           contest_beer=beer,
                                           checkin_points=beer.point_value,
@@ -426,6 +438,8 @@ class Contest_Player(models.Model):
                                            - challenger.challenge_point_loss)
                 challenger.save()
         else:
+            logger.info("contest_player(%s).drink_beer: Adding drink non-challenge beer %s",
+                            self.user_name, untappd_checkin)
             checkin = Contest_Checkin(contest_player=self,
                                       contest_beer=beer,
                                       checkin_points=beer.point_value,

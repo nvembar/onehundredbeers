@@ -274,7 +274,7 @@ class ContestTestCase(TestCase):
             # been drunk
             had_prior = Contest_Checkin.objects.filter(
                 contest_player=cp,
-                contest_beer=beer).count() > 0
+                contest_beer=beer).exclude(tx_type='CL').count() > 0
             if beer.challenger and beer.challenger.id not in challengers:
                 challengers[beer.challenger.id] = {
                     'gain': beer.challenger.challenge_point_gain,
