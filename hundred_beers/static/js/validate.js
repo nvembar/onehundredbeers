@@ -38,6 +38,7 @@ var Validate = {
         if (checkin.possible_bonuses) {
             checkin.any_possible = true;
         }
+        console.log("Adding " + checkin.beer + " from " + checkin.brewery + " for " + checkin.player)
         $(".checkin-list").append(Handlebars.templates.validation_grid(
             { 'checkin': checkin, 'bonuses': contest.bonuses }
         ));
@@ -131,7 +132,7 @@ var Validate = {
     },
     
     displayCheckins: function(contest, page) {
-        let start = 25 * (page - 1) + 1;
+        let start = 25 * (page - 1);
         let end = start + 25;
         let that = this;
         return contest.loadBonuses()
