@@ -8,49 +8,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 from .player import Player
+from .drinks import Beer, Brewery
 
 logger = logging.getLogger(__name__)
-class BeerManager(models.Manager):
-    """Manages beer data"""
-    def create_beer(self, name, brewery, untappd_url='',
-                    style='', description='', brewery_url='',
-                    brewery_city='', brewery_state=''):
-        """Creates a contest with defaults on active status, creation date,
-        update date, beer count, and user count"""
-        beer = self.create(name=name, brewery=brewery,
-                           style=style, description=description,
-                           untappd_url=untappd_url,
-                           brewery_city=brewery_city,
-                           brewery_state=brewery_state,
-                           brewery_url=brewery_url,
-                           last_updated=timezone.now())
-        return beer
-
-# Create your models here.
-class Beer(models.Model):
-    "Represents a common beer - can be shared across contests"
-
-    name = models.CharField(max_length=250)
-    brewery = models.CharField(max_length=250)
-    style = models.CharField(max_length=250, null=True, blank=True, default='')
-    description = models.CharField(max_length=250, null=True, blank=True, default='')
-    brewery_city = models.CharField(max_length=250, null=True, blank=True, default='')
-    brewery_state = models.CharField(max_length=250, null=True, blank=True, default='')
-    brewery_country = models.CharField(max_length=250, null=True, blank=True, default='')
-    brewery_lat = models.FloatField(null=True, blank=True)
-    brewery_lon = models.FloatField(null=True, blank=True)
-    untappd_id = models.CharField(max_length=25, null=True, blank=True)
-    untappd_url = models.URLField(null=True, blank=True)
-    brewery_url = models.URLField(null=True, blank=True)
-    last_updated = models.DateTimeField()
-
-    objects = BeerManager()
-
-    def __str__(self):
-        return "Beer[{}<{}> / {}<{}>]".format(self.name, 
-                                        self.untappd_url, 
-                                        self.brewery, self.brewery_url)
-
 class ContestManager(models.Manager):
     "Manager for contests"
 
@@ -228,30 +188,6 @@ class Contest(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Brewery_Manager(models.Manager):
-
-    def create_brewery(self, name, untappd_url, location=None,):
-        return self.create(name=name, 
-                           untappd_url=untappd_url,
-                           location=location,
-						   last_updated=timezone.now())
-
-class Brewery(models.Model):
-    name = models.CharField(max_length=250)
-    untappd_id = models.CharField(max_length=25, null=True, blank=True,)
-    untappd_url = models.URLField(null=True, blank=True,)
-    state = models.CharField(max_length=250)
-    location = models.CharField(max_length=250, null=True, blank=True, default=None)
-    last_updated = models.DateTimeField()
-
-    objects = Brewery_Manager()
-
-    def __str__(self):
-        return "Brewery[name={}, url={}, location={}]".format(self.name,
-                                                              self.untappd_url,
-                                                              self.location)
 
 class Contest_BreweryManager(models.Manager):
 
@@ -594,50 +530,6 @@ class Contest_Bonus(models.Model):
 
     class Meta:
         unique_together = (('contest', 'name'),)
-
-class Unvalidated_CheckinManager(models.Manager):
-    def create_checkin(self, contest_player, untappd_title, brewery, beer,
-                       untappd_checkin, untappd_checkin_date):
-        return self.create(contest_player=contest_player,
-                           untappd_title=untappd_title,
-                           brewery=brewery,
-                           beer=beer,
-                           untappd_checkin=untappd_checkin,
-                           untappd_checkin_date=untappd_checkin_date)
-
-class Unvalidated_Checkin(models.Model):
-    contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
-    untappd_title = models.CharField(max_length=500, blank=False)
-    untappd_checkin = models.URLField()
-    untappd_checkin_date = models.DateTimeField()
-    brewery = models.CharField(max_length=250, default='')
-    beer = models.CharField(max_length=250, default='')
-    beer_url = models.URLField(null=True, default=None)
-    brewery_url = models.URLField(null=True, default=None)
-    possible_bonuses = ArrayField(base_field=models.IntegerField(), 
-                                  null=True, 
-                                  default=None)
-    has_possibles = models.BooleanField(default=False)
-    photo_url = models.URLField(null=True, default=None)
-    rating = models.IntegerField(null=True, default=None)
-
-    objects = Unvalidated_CheckinManager()
-
-    def __str__(self):
-        return """Checkin[beer={},
-                       brewery={},
-                       beer_url={},
-                       brewery_url={},
-                       checkin_url={},
-                       time={},
-                       photo_url={}]""".format(self.beer, 
-                                              self.brewery,
-                                              self.beer_url,
-                                              self.brewery_url,
-                                              self.untappd_checkin,
-                                              self.untappd_checkin_date.isoformat(),
-                                              self.photo_url)
-
 class Contest_CheckinManager(models.Manager):
     def create_checkin(self, contest_player, contest_beer, checkin_time,
                        untappd_checkin):
