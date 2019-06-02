@@ -17,7 +17,7 @@ class Unvalidated_CheckinManager(models.Manager):
                            untappd_checkin_date=untappd_checkin_date)
 
 class Unvalidated_Checkin(models.Model):
-    from beers.models.models import Contest_Player
+    from .contest_player import Contest_Player
     contest_player = models.ForeignKey(Contest_Player, on_delete=models.CASCADE)
     untappd_title = models.CharField(max_length=500, blank=False)
     untappd_checkin = models.URLField()

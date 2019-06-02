@@ -16,7 +16,7 @@ class Contest_BreweryManager(models.Manager):
                            point_value=value, total_drank=0,)
 
 class Contest_Brewery(models.Model):
-    from .models import Contest
+    from .contest import Contest
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     brewery = models.ForeignKey(Brewery, on_delete=models.CASCADE)
     brewery_name = models.CharField(max_length=250)
@@ -33,7 +33,8 @@ class Contest_Brewery(models.Model):
 class Contest_Beer(models.Model):
     "Represents a many-to-many connection between a beer and a contest"
 
-    from .models import Contest, Contest_Player
+    from .contest import Contest
+    from .contest_player import Contest_Player
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     challenger = models.ForeignKey(Contest_Player,
                                    on_delete=models.CASCADE,
@@ -60,7 +61,7 @@ class Contest_Beer(models.Model):
 
 class Contest_Bonus(models.Model):
     """Represents a bonus associated with a particular contest"""
-    from .models import Contest
+    from .contest import Contest
 
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, default=None, null=False, blank=False,)

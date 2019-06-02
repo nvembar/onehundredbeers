@@ -1,7 +1,8 @@
-from beers.models.models import (
-    Contest, Contest_Checkin, Contest_Player
+from beers.models.contest_player import (
+    Contest_Checkin, Contest_Player
 )
 
+from beers.models.contest import Contest
 from beers.models.player import Player
 from beers.models.drinks import Beer, Brewery
 from beers.models.checkin import Unvalidated_Checkin
