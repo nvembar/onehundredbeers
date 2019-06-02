@@ -2,7 +2,7 @@
 
 
 from django.urls import path, include
-from beers.views import user, validation, contest, checkin
+from beers.views import user, validation, contest
 import beers.api.views as api_views
 
 api_patterns = [
