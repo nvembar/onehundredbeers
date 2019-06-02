@@ -17,9 +17,10 @@ import botocore.session
 from botocore.stub import Stubber
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from beers.models import Contest_Beer, Beer, Contest, User, Player, \
+from beers.models import Contest_Beer, Beer, Contest, Player, \
                          Contest_Checkin, Unvalidated_Checkin, Contest_Bonus
 from beers.utils.loader import create_contest_from_csv
 from beers.utils.checkin import load_player_checkins
