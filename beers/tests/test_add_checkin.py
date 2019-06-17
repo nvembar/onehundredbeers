@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.db.models import Q
 from rest_framework import status
 from unittest import mock
-from beers.views.checkin import add_unvalidated_checkin
 
 from beers.models import Beer, Brewery, Contest, Contest_Player, \
                          Unvalidated_Checkin, Contest_Checkin, Contest_Beer, \
@@ -45,14 +44,14 @@ class AddCheckinTestCase(TestCase):
         checkin.brewery_url = 'https://test.com/brewery/brewery7'
         clz.CHECKINS['https://example.com/unvalidated_checkin_new'] = checkin
 
-    @mock.patch('beers.views.checkin.parse_checkin', side_effect=outer_mock_parse_checkin)
+    @mock.patch('beers.api.views.untappd.parse_checkin', side_effect=outer_mock_parse_checkin)
     def test_successful_add_checkin(self, mocked_function):
         c = Client()
         untappd_url = 'https://example.com/unvalidated_checkin_new'
         _ = Player.objects.get(user__username='runner1')
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.post(reverse('unvalidated-checkins-json', args=[1]), data={'untappd_url': untappd_url})
-        self.assertEqual(response.status_code, 200)
+        response = c.post(reverse('unvalidated-checkin-list', args=[1]), data={'untappd_checkin': untappd_url})
+        self.assertEqual(response.status_code, 201)
         uv = Unvalidated_Checkin.objects.get(untappd_checkin=untappd_url)
         checkin = AddCheckinTestCase.CHECKINS[untappd_url]
         self.assertEqual(uv.untappd_checkin, untappd_url)
@@ -63,13 +62,13 @@ class AddCheckinTestCase(TestCase):
         self.assertEqual(uv.beer_url, checkin.beer_url)
         self.assertEqual(uv.brewery_url, checkin.brewery_url)
 
-    @mock.patch('beers.views.checkin.parse_checkin', side_effect=outer_mock_parse_checkin)
+    @mock.patch('beers.api.views.untappd.parse_checkin', side_effect=outer_mock_parse_checkin)
     def test_failed_duplicate_url(self, mocked_function):
         c = Client()
         untappd_url = 'https://example.com/unvalidated_1'
         _ = Player.objects.get(user__username='runner1')
         self.assertTrue(c.login(username='runner1', password='password1%'))
-        response = c.post(reverse('unvalidated-checkins-json', args=[1]), data={'untappd_url': untappd_url})
+        response = c.post(reverse('unvalidated-checkin-list', args=[1]), data={'untappd_checkin': untappd_url})
         self.assertEqual(response.status_code, 400)
 
     @mock.patch('beers.api.views.untappd.parse_checkin', side_effect=outer_mock_parse_checkin)
