@@ -10,7 +10,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from beers.views.checkin import add_unvalidated_checkin
 from beers.models import Contest, Contest_Checkin, Contest_Beer, \
                          Contest_Player, Contest_Brewery, Unvalidated_Checkin
 from .helper import is_authenticated_user_contest_runner, \
@@ -166,15 +165,13 @@ def delete_checkin(request, contest_id, uv_checkin):
 
 
 @login_required
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET'])
 def unvalidated_checkins_json(request, contest_id):
     """
     Provides a JSON object with all the checkins between the two slices
     slice_start is the first index to pull
     slice_end is the non-inclusive end index
     """
-    if request.method == 'POST':
-        return add_unvalidated_checkin(request, contest_id)
     contest = get_object_or_404(Contest.objects, id=contest_id)
     if not is_authenticated_user_contest_runner(request):
         logger.warning("User %s attempted to validate checkins for contest %s",
