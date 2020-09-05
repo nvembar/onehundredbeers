@@ -10,7 +10,7 @@
   "dependencies": {
     "bootstrap": "3",
     "bootstrap-datepicker": "^1.7.1",
-    "handlebars": "^4.0.11",
+    "handlebars": "^4.5.3",
     "jquery": "^3.3.1",
     "js-cookie": "^2.2.0",
     "select2": "^4.0.6-rc.1"
